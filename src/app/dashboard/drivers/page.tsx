@@ -3,6 +3,7 @@ import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
 import DriversClient from "./drivers-client";
 import { Car, CheckCircle, Clock, ShieldBan, AlertCircle, Star } from "lucide-react";
+import Link from "next/link";
 
 type TabType = "pending" | "approved" | "blocked" | "revision";
 
@@ -254,6 +255,11 @@ export default async function DriversPage({
                               </button>
                             </form>
                           )}
+                          <Link href={`/dashboard/drivers/${driver.id}`}
+                            className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-opacity hover:opacity-80"
+                            style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                            التفاصيل
+                          </Link>
                           <DriversRevisionButton driverId={driver.id} driverName={user?.name} />
                         </div>
                       </td>
@@ -329,6 +335,13 @@ export default async function DriversPage({
                     )}
                     <div className="flex-1">
                       <DriversRevisionButton driverId={driver.id} driverName={user?.name} mobile />
+                    </div>
+                    <div className="flex-1">
+                      <Link href={`/dashboard/drivers/${driver.id}`}
+                        className="flex items-center justify-center w-full py-2 rounded-xl text-[12px] font-bold transition-opacity hover:opacity-80"
+                        style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                        التفاصيل
+                      </Link>
                     </div>
                   </div>
                 </div>
