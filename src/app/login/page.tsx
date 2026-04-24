@@ -57,22 +57,22 @@ export default function LoginPage() {
       />
 
       {/* Floating particles */}
-      {[
+      {([
         { top: "15%", right: "12%", size: 3, color: "#3B82F6", delay: "0s", dur: "8s" },
         { top: "28%", left: "8%", size: 4, color: "#8B5CF6", delay: "1.5s", dur: "10s" },
         { bottom: "35%", right: "18%", size: 2, color: "#06B6D4", delay: "0.8s", dur: "7s" },
         { bottom: "20%", left: "15%", size: 5, color: "#EC4899", delay: "2s", dur: "9s" },
         { top: "55%", right: "6%", size: 2, color: "#10B981", delay: "1s", dur: "11s" },
         { top: "40%", left: "25%", size: 3, color: "#F59E0B", delay: "3s", dur: "8s" },
-      ].map((p, i) => (
+      ] as Array<{ top?: string; bottom?: string; left?: string; right?: string; size: number; color: string; delay: string; dur: string }>).map((p, i) => (
         <div
           key={i}
           className="absolute rounded-full pointer-events-none"
           style={{
             top: p.top,
-            bottom: (p as Record<string, string>).bottom,
+            bottom: p.bottom,
             right: p.right,
-            left: (p as Record<string, string>).left,
+            left: p.left,
             width: p.size,
             height: p.size,
             background: p.color,
