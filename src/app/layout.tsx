@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`${cairo.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-background text-foreground font-(family-name:--font-cairo)">
+    <html lang="ar" dir="rtl" data-scroll-behavior="smooth" className={`${cairo.variable} h-full antialiased`}>
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground font-(family-name:--font-cairo)">
         {children}
       </body>
     </html>

@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
 import CouponsClient from "./coupons-client";
+import { Tag, Percent, Hash, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default async function CouponsPage({
   searchParams,
@@ -22,96 +23,206 @@ export default async function CouponsPage({
 
   const totalPages = Math.ceil((count || 0) / pageSize);
 
+  const activeCount = (coupons || []).filter((c) => c.is_active).length;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-7">
+
+      {/* ===== PAGE HEADER ===== */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">الكوبونات</h1>
-          <p className="text-text-secondary text-[13px] mt-0.5">إدارة كوبونات الخصم</p>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
+            <span className="w-1 h-1 rounded-full bg-amber-500/60" />
+            <span className="text-[11px] text-text-disabled">الكوبونات</span>
+          </div>
+          <h1 className="page-title">الكوبونات</h1>
+          <p className="page-subtitle">إدارة كوبونات الخصم وعروض المستخدمين</p>
         </div>
-        <CouponsClient />
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
+            style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34D399" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-success" style={{ boxShadow: "0 0 5px rgba(16,185,129,0.5)" }} />
+            {activeCount} نشط
+          </div>
+          {/* Add New Coupon Button */}
+          <CouponsClient />
+        </div>
       </div>
 
-      {/* Coupons Table */}
-      <div className="bg-surface/80 backdrop-blur-sm rounded-2xl border border-divider/60 overflow-hidden">
+      {/* ===== COUPONS TABLE ===== */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
+        }}
+      >
+        {/* Header bar */}
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: "1px solid var(--divider)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-[3px] h-5 rounded-full"
+              style={{
+                background: "linear-gradient(to bottom, #F59E0B, #D97706)",
+                boxShadow: "0 0 8px rgba(245,158,11,0.5)",
+              }}
+            />
+            <div>
+              <h3 className="text-[13px] font-bold text-text-primary">قائمة الكوبونات</h3>
+              <p className="text-[10px] text-text-tertiary">{count || 0} كوبون إجمالاً</p>
+            </div>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full">
             <thead>
-              <tr className="border-b border-divider/60">
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">الكود</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">نوع الخصم</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">قيمة الخصم</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">حد أدنى</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">استخدامات</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">تاريخ الانتهاء</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">الحالة</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">إجراءات</th>
+              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+                {["الكود", "نوع الخصم", "قيمة الخصم", "حد أدنى", "الاستخدامات", "تاريخ الانتهاء", "الحالة", "إجراءات"].map((h) => (
+                  <th
+                    key={h}
+                    className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {(coupons || []).map((coupon) => (
-                <tr
-                  key={coupon.id}
-                  className="border-b border-divider/30 hover:bg-surface-elevated/30 transition-colors"
-                >
-                  <td className="py-3 px-4 text-text-primary font-mono font-bold text-[13px]">
-                    {coupon.code}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {coupon.discount_type === "percentage" ? "نسبة مئوية" : "مبلغ ثابت"}
-                  </td>
-                  <td className="py-3 px-4 text-text-primary font-medium text-[13px]">
-                    {coupon.discount_type === "percentage"
-                      ? `${coupon.discount_value}%`
-                      : formatCurrency(Number(coupon.discount_value))}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {coupon.min_trip_price ? formatCurrency(Number(coupon.min_trip_price)) : "—"}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {coupon.used_count}/{coupon.max_uses || "∞"}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[11px]">
-                    {coupon.expires_at ? formatDate(coupon.expires_at) : "بدون انتهاء"}
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge variant={coupon.is_active ? "success" : "error"}>
-                      {coupon.is_active ? "نشط" : "معطّل"}
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <form action={`/api/coupons/toggle`} method="POST">
-                        <input type="hidden" name="coupon_id" value={coupon.id} />
-                        <input type="hidden" name="is_active" value={coupon.is_active ? "false" : "true"} />
-                        <button
-                          type="submit"
-                          className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-colors ${
-                            coupon.is_active
-                              ? "bg-warning/15 text-warning hover:bg-warning/25 border-warning/20"
-                              : "bg-success/15 text-success hover:bg-success/25 border-success/20"
-                          }`}
-                        >
-                          {coupon.is_active ? "تعطيل" : "تفعيل"}
-                        </button>
-                      </form>
-                      <form action={`/api/coupons/delete`} method="POST">
-                        <input type="hidden" name="coupon_id" value={coupon.id} />
-                        <button
-                          type="submit"
-                          className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-error/15 text-error hover:bg-error/25 border border-error/20 transition-colors"
-                        >
-                          حذف
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {(coupons || []).map((coupon) => {
+                const isExpired = coupon.expires_at && new Date(coupon.expires_at) < new Date();
+
+                return (
+                  <tr
+                    key={coupon.id}
+                    className="group/row table-row-hover"
+                    style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}
+                  >
+                    {/* Coupon Code */}
+                    <td className="py-3.5 px-4">
+                      <div
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-[12px] mono"
+                        style={{
+                          background: "rgba(245,158,11,0.1)",
+                          color: "#FCD34D",
+                          border: "1px solid rgba(245,158,11,0.25)",
+                          boxShadow: "0 2px 8px rgba(245,158,11,0.1)",
+                        }}
+                      >
+                        <Tag size={11} />
+                        {coupon.code}
+                      </div>
+                    </td>
+
+                    {/* Discount Type */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5">
+                        {coupon.discount_type === "percentage" ? (
+                          <Percent size={12} className="text-text-tertiary" />
+                        ) : (
+                          <Hash size={12} className="text-text-tertiary" />
+                        )}
+                        <span className="text-text-secondary text-[13px]">
+                          {coupon.discount_type === "percentage" ? "نسبة مئوية" : "مبلغ ثابت"}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Discount Value */}
+                    <td className="py-3.5 px-4">
+                      <span className="text-[14px] font-black num"
+                        style={{ color: "#34D399" }}>
+                        {coupon.discount_type === "percentage"
+                          ? `${coupon.discount_value}٪`
+                          : formatCurrency(Number(coupon.discount_value))}
+                      </span>
+                    </td>
+
+                    {/* Min Price */}
+                    <td className="py-3.5 px-4 text-text-tertiary text-[13px] num">
+                      {coupon.min_trip_price ? formatCurrency(Number(coupon.min_trip_price)) : "—"}
+                    </td>
+
+                    {/* Usage */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-text-primary font-bold text-[13px] num">{coupon.used_count}</span>
+                        <span className="text-text-disabled text-[11px]">/</span>
+                        <span className="text-text-tertiary text-[12px] num">{coupon.max_uses || "∞"}</span>
+                      </div>
+                    </td>
+
+                    {/* Expiry */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      {coupon.expires_at ? (
+                        <span className={`text-[12px] font-medium ${isExpired ? "text-error" : "text-text-tertiary"}`}>
+                          {isExpired ? "⚠ " : ""}{formatDate(coupon.expires_at)}
+                        </span>
+                      ) : (
+                        <span className="text-text-disabled text-[12px]">بدون انتهاء</span>
+                      )}
+                    </td>
+
+                    {/* Status */}
+                    <td className="py-3.5 px-4">
+                      <Badge variant={coupon.is_active ? "success" : "error"} dot>
+                        {coupon.is_active ? "نشط" : "معطّل"}
+                      </Badge>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex gap-2">
+                        <form action={`/api/coupons/toggle`} method="POST">
+                          <input type="hidden" name="coupon_id" value={coupon.id} />
+                          <input type="hidden" name="is_active" value={coupon.is_active ? "false" : "true"} />
+                          <button
+                            type="submit"
+                            className={`btn py-1.5 px-3 text-[11px] ${coupon.is_active ? "btn-warning" : "btn-success"}`}
+                            id={`toggle-coupon-${coupon.id}`}
+                          >
+                            {coupon.is_active ? "تعطيل" : "تفعيل"}
+                          </button>
+                        </form>
+                        <form action={`/api/coupons/delete`} method="POST">
+                          <input type="hidden" name="coupon_id" value={coupon.id} />
+                          <button
+                            type="submit"
+                            className="btn btn-error py-1.5 px-3 text-[11px]"
+                            id={`delete-coupon-${coupon.id}`}
+                          >
+                            حذف
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
               {(!coupons || coupons.length === 0) && (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-text-disabled">
-                    لا توجد كوبونات
+                  <td colSpan={8} className="py-20 text-center">
+                    <div className="flex flex-col items-center gap-3 text-text-disabled">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                      >
+                        <Tag size={24} className="opacity-40" />
+                      </div>
+                      <div>
+                        <p className="text-text-secondary font-semibold">لا توجد كوبونات</p>
+                        <p className="text-text-tertiary text-sm mt-1">أضف كوبون جديد للبدء</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -120,22 +231,39 @@ export default async function CouponsPage({
         </div>
       </div>
 
-      {/* Pagination */}
+      {/* ===== PAGINATION ===== */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
+          <a
+            href={`/dashboard/coupons?page=${page - 1}`}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page <= 1 ? "pointer-events-none opacity-30" : ""}`}
+            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+          >
+            <ChevronRight size={14} />
+          </a>
+
           {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
             <a
               key={p}
               href={`/dashboard/coupons?page=${p}`}
-              className={`w-8 h-8 rounded-lg text-sm flex items-center justify-center ${
+              className="w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all"
+              style={
                 p === page
-                  ? "bg-primary text-white shadow-sm shadow-primary/25"
-                  : "bg-surface/80 border border-divider/60 text-text-secondary hover:border-primary/30"
-              }`}
+                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                  : { background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
+              }
             >
               {p}
             </a>
           ))}
+
+          <a
+            href={`/dashboard/coupons?page=${page + 1}`}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page >= totalPages ? "pointer-events-none opacity-30" : ""}`}
+            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+          >
+            <ChevronLeft size={14} />
+          </a>
         </div>
       )}
     </div>

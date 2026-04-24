@@ -11,49 +11,61 @@ import {
   DollarSign,
   Bell,
   MessageSquare,
+  MessageSquareWarning,
   LogOut,
-  ChevronRight,
+  ChevronLeft,
   Menu,
   X,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const navItems = [
-  { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
-  { href: "/dashboard/users", label: "المستخدمين", icon: Users },
-  { href: "/dashboard/drivers", label: "السائقين", icon: Car },
-  { href: "/dashboard/trips", label: "الرحلات", icon: MapPin },
-  { href: "/dashboard/coupons", label: "الكوبونات", icon: Tag },
-  { href: "/dashboard/pricing", label: "التسعير", icon: DollarSign },
-  { href: "/dashboard/notifications", label: "الإشعارات", icon: Bell },
-  { href: "/dashboard/messages", label: "الرسائل", icon: MessageSquare },
+  { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, color: "text-blue-400", glow: "rgba(96,165,250,0.3)" },
+  { href: "/dashboard/users", label: "المستخدمين", icon: Users, color: "text-violet-400", glow: "rgba(167,139,250,0.3)" },
+  { href: "/dashboard/drivers", label: "السائقين", icon: Car, color: "text-cyan-400", glow: "rgba(34,211,238,0.3)" },
+  { href: "/dashboard/trips", label: "الرحلات", icon: MapPin, color: "text-emerald-400", glow: "rgba(52,211,153,0.3)" },
+  { href: "/dashboard/complaints", label: "الشكاوي", icon: MessageSquareWarning, color: "text-red-400", glow: "rgba(248,113,113,0.3)" },
+  { href: "/dashboard/coupons", label: "الكوبونات", icon: Tag, color: "text-amber-400", glow: "rgba(251,191,36,0.3)" },
+  { href: "/dashboard/pricing", label: "التسعير", icon: DollarSign, color: "text-green-400", glow: "rgba(74,222,128,0.3)" },
+  { href: "/dashboard/notifications", label: "الإشعارات", icon: Bell, color: "text-rose-400", glow: "rgba(251,113,133,0.3)" },
+  { href: "/dashboard/messages", label: "الرسائل", icon: MessageSquare, color: "text-sky-400", glow: "rgba(56,189,248,0.3)" },
 ];
 
-export default function Sidebar() {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const sidebarContent = (
-    <>
-      {/* Logo / Branding */}
-      <div className="p-6 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-bl from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/25">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+  return (
+    <div className="flex flex-col h-full">
+      {/* ===== LOGO ===== */}
+      <div className="px-6 py-6">
+        <div className="flex items-center gap-3.5">
+          <div className="relative flex-shrink-0">
+            {/* Glow halo */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/50 to-violet-600/40 blur-lg opacity-70 scale-110" />
+            <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-violet-700 flex items-center justify-center shadow-lg shadow-blue-500/30 border border-white/10">
+              <Zap size={20} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+            </div>
           </div>
           <div>
-            <h1 className="text-lg font-bold text-text-primary tracking-tight">تاكسي</h1>
-            <p className="text-[11px] text-text-secondary -mt-0.5">لوحة تحكم الأدمن</p>
+            <div className="text-[17px] font-black text-transparent bg-clip-text bg-gradient-to-l from-blue-300 to-violet-300 tracking-tight leading-none">
+              تاكسي
+            </div>
+            <div className="text-[11px] text-text-tertiary font-medium mt-0.5 tracking-wide">
+              لوحة تحكم الأدمن
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-4 h-px bg-gradient-to-l from-transparent via-divider to-transparent" />
+      {/* Divider */}
+      <div className="mx-5 mb-4">
+        <div className="h-px bg-gradient-to-l from-transparent via-divider to-transparent" />
+      </div>
 
-      <nav className="flex-1 p-3 space-y-1 mt-2">
+      {/* ===== NAV ITEMS ===== */}
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -62,64 +74,157 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
+              onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200",
+                "group relative flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 overflow-hidden",
                 isActive
-                  ? "bg-primary/15 text-primary border border-primary/20 shadow-sm shadow-primary/10"
-                  : "text-text-secondary hover:bg-surface-elevated/60 hover:text-text-primary border border-transparent"
+                  ? "text-white"
+                  : "text-text-secondary hover:text-text-primary"
               )}
             >
-              <item.icon size={17} className={cn(isActive && "drop-shadow-[0_0_6px_rgba(59,130,246,0.5)]")} />
-              <span>{item.label}</span>
-              {isActive && <ChevronRight size={13} className="mr-auto opacity-60" />}
+              {/* Active background */}
+              {isActive && (
+                <>
+                  <div
+                    className="absolute inset-0 rounded-xl"
+                    style={{
+                      background: `linear-gradient(135deg, ${item.glow.replace('0.3', '0.18')} 0%, rgba(59,130,246,0.08) 100%)`,
+                      border: `1px solid ${item.glow.replace('0.3', '0.3')}`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 rounded-xl opacity-40"
+                    style={{
+                      boxShadow: `inset 0 1px 0 ${item.glow.replace('0.3', '0.2')}`,
+                    }}
+                  />
+                </>
+              )}
+
+              {/* Hover background */}
+              {!isActive && (
+                <div className="absolute inset-0 rounded-xl bg-surface-elevated/0 group-hover:bg-surface-elevated/70 transition-all duration-200 border border-transparent group-hover:border-divider/50" />
+              )}
+
+              {/* Icon */}
+              <div
+                className={cn(
+                  "relative flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200",
+                  isActive
+                    ? "bg-white/10"
+                    : "bg-surface-elevated/0 group-hover:bg-surface-elevated"
+                )}
+              >
+                <item.icon
+                  size={15}
+                  className={cn(
+                    "transition-all duration-200",
+                    isActive ? item.color : "text-text-tertiary group-hover:text-text-secondary"
+                  )}
+                  style={isActive ? { filter: `drop-shadow(0 0 6px ${item.glow})` } : {}}
+                />
+              </div>
+
+              {/* Label */}
+              <span className="relative flex-1 transition-all duration-200">{item.label}</span>
+
+              {/* Active indicator arrow */}
+              {isActive && (
+                <ChevronLeft
+                  size={12}
+                  className={cn("relative opacity-60 flex-shrink-0", item.color)}
+                />
+              )}
+
+              {/* Left active bar */}
+              {isActive && (
+                <div
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full"
+                  style={{
+                    background: `linear-gradient(to bottom, ${item.glow.replace('0.3', '0.9')}, ${item.glow.replace('0.3', '0.5')})`,
+                    boxShadow: `0 0 8px ${item.glow}`,
+                  }}
+                />
+              )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-3 mt-auto">
+      {/* ===== LOGOUT ===== */}
+      <div className="p-3 mt-2">
         <div className="h-px bg-gradient-to-l from-transparent via-divider to-transparent mb-3" />
         <form action="/api/auth/logout" method="POST">
           <button
             type="submit"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-medium text-text-secondary hover:bg-error/10 hover:text-error w-full transition-all duration-200 border border-transparent hover:border-error/20"
+            className="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-text-tertiary hover:text-error w-full transition-all duration-200 overflow-hidden"
           >
-            <LogOut size={17} />
-            <span>تسجيل الخروج</span>
+            <div className="absolute inset-0 rounded-xl bg-error/0 group-hover:bg-error/8 border border-transparent group-hover:border-error/20 transition-all duration-200" />
+            <div className="relative flex-shrink-0 w-8 h-8 rounded-lg bg-surface-elevated/0 group-hover:bg-error/10 flex items-center justify-center transition-all duration-200">
+              <LogOut size={15} className="transition-all duration-200 group-hover:text-error" />
+            </div>
+            <span className="relative">تسجيل الخروج</span>
           </button>
         </form>
+
+        {/* Version */}
+        <div className="mt-3 px-4 text-[10px] text-text-disabled font-medium text-center tracking-wider">
+          v2.0 — نظام إدارة تاكسي
+        </div>
       </div>
-    </>
+    </div>
   );
+}
+
+export default function Sidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
+      {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 right-4 z-50 p-2.5 bg-surface-elevated rounded-xl border border-divider shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2.5 rounded-xl bg-surface-elevated/80 backdrop-blur-xl border border-divider shadow-lg shadow-black/30 text-text-secondary hover:text-text-primary transition-colors"
+        id="sidebar-mobile-toggle"
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
+      {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
+      {/* Mobile Sidebar */}
       <aside
         className={cn(
-          "lg:hidden fixed inset-y-0 right-0 z-40 w-72 bg-surface/95 backdrop-blur-xl border-l border-divider flex flex-col transition-transform duration-300",
+          "lg:hidden fixed inset-y-0 right-0 z-40 flex flex-col transition-transform duration-300 ease-out",
+          "w-[280px] border-l border-divider",
+          "bg-surface/95 backdrop-blur-2xl",
           mobileOpen ? "translate-x-0" : "translate-x-full"
         )}
+        style={{
+          boxShadow: mobileOpen ? "-20px 0 60px rgba(0,0,0,0.5)" : "none",
+        }}
       >
-        {sidebarContent}
+        <SidebarContent onClose={() => setMobileOpen(false)} />
       </aside>
 
-      <aside className="hidden lg:flex w-72 bg-surface/50 backdrop-blur-sm border-l border-divider flex-col h-screen sticky top-0">
-        {sidebarContent}
+      {/* Desktop Sidebar */}
+      <aside
+        className="hidden lg:flex flex-col sticky top-0 h-screen border-l border-divider"
+        style={{
+          width: "var(--sidebar-width)",
+          background: "linear-gradient(180deg, rgba(10,22,40,0.95) 0%, rgba(7,15,28,0.98) 100%)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          boxShadow: "-1px 0 0 rgba(255,255,255,0.02) inset, 4px 0 24px rgba(0,0,0,0.3)",
+        }}
+      >
+        <SidebarContent />
       </aside>
     </>
   );

@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
 import TripsClient from "./trips-client";
+import { MapPin, ArrowRight, Car, Gauge, Eye } from "lucide-react";
+import Link from "next/link";
 
 export default async function TripsPage({
   searchParams,
@@ -34,7 +36,6 @@ export default async function TripsPage({
   const { data: trips, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  // Get user/driver names for the trips
   const userIds = [...new Set((trips || []).map((t) => [t.user_id, t.driver_id]).flat().filter(Boolean))];
   const { data: tripUsers } = await supabase
     .from("users")
@@ -43,13 +44,43 @@ export default async function TripsPage({
 
   const userMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
+  const totalRevenue = (trips || [])
+    .filter((t) => t.status === "completed")
+    .reduce((s, t) => s + (Number(t.price) || 0), 0);
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">الرحلات</h1>
-        <p className="text-text-secondary text-[13px] mt-0.5">إدارة ومتابعة جميع الرحلات</p>
+    <div className="space-y-7">
+
+      {/* ===== PAGE HEADER ===== */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
+            <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
+            <span className="text-[11px] text-text-disabled">الرحلات</span>
+          </div>
+          <h1 className="page-title">الرحلات</h1>
+          <p className="page-subtitle">إدارة ومتابعة جميع الرحلات في المنصة</p>
+        </div>
+
+        {/* Total info */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
+            style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#93C5FD" }}>
+            <MapPin size={11} />
+            {count || 0} رحلة
+          </div>
+          {!statusFilter && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
+              style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34D399" }}>
+              <Gauge size={11} />
+              {formatCurrency(totalRevenue)}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* ===== FILTERS ===== */}
       <TripsClient
         currentPage={page}
         totalPages={totalPages}
@@ -58,66 +89,161 @@ export default async function TripsPage({
         totalCount={count || 0}
       />
 
-      {/* Trips Table */}
-      <div className="bg-surface/80 backdrop-blur-sm rounded-2xl border border-divider/60 overflow-hidden">
+      {/* ===== TRIPS TABLE ===== */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
+        }}
+      >
+        {/* Table Header bar */}
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: "1px solid var(--divider)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-[3px] h-5 rounded-full"
+              style={{
+                background: "linear-gradient(to bottom, #10B981, #059669)",
+                boxShadow: "0 0 8px rgba(16,185,129,0.5)",
+              }}
+            />
+            <div>
+              <h3 className="text-[13px] font-bold text-text-primary">قائمة الرحلات</h3>
+              <p className="text-[10px] text-text-tertiary">
+                صفحة {page} من {totalPages || 1}
+              </p>
+            </div>
+          </div>
+
+          {(statusFilter || vehicleFilter) && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-amber-400"
+              style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
+              فلتر نشط
+            </div>
+          )}
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full">
             <thead>
-              <tr className="border-b border-divider/60">
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">من</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">إلى</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">المسافة</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">السعر</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">النوع</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">المستخدم</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">السائق</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">الحالة</th>
-                <th className="text-right py-3 px-4 text-text-secondary text-[12px] font-medium">التاريخ</th>
+              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+                {["من", "إلى", "المسافة", "السعر", "النوع", "المستخدم", "السائق", "الحالة", "التاريخ", "إجراء"].map((h) => (
+                  <th
+                    key={h}
+                    className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {(trips || []).map((trip) => (
+              {(trips || []).map((trip, index) => (
                 <tr
                   key={trip.id}
-                  className="border-b border-divider/30 hover:bg-surface-elevated/30 transition-colors"
+                  className="group/row table-row-hover"
+                  style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}
                 >
-                  <td className="py-3 px-4 text-text-primary max-w-[120px] truncate text-[13px]">
-                    {trip.pickup_address}
+                  <td className="py-3.5 px-4 max-w-[140px] truncate text-[13px] text-text-primary">
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ background: "#10B981", boxShadow: "0 0 4px rgba(16,185,129,0.6)" }}
+                      />
+                      <span className="truncate">{trip.pickup_address}</span>
+                    </span>
                   </td>
-                  <td className="py-3 px-4 text-text-primary max-w-[120px] truncate text-[13px]">
+                  <td className="py-3.5 px-4 max-w-[140px] truncate text-[13px] text-text-secondary">
                     {trip.destination_address}
                   </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
+                  <td className="py-3.5 px-4 text-text-tertiary text-[13px] num whitespace-nowrap">
                     {Number(trip.distance_km).toFixed(1)} كم
                   </td>
-                  <td className="py-3 px-4 text-text-primary font-medium text-[13px]">
+                  <td className="py-3.5 px-4 text-[13px] font-black num text-emerald-400 whitespace-nowrap">
                     {formatCurrency(Number(trip.price))}
                   </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {trip.vehicle_type === "car" ? "عربية" : "مكنة"}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {userMap.get(trip.user_id) || "—"}
-                  </td>
-                  <td className="py-3 px-4 text-text-secondary text-[13px]">
-                    {trip.driver_id ? userMap.get(trip.driver_id) || "—" : "—"}
-                  </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3.5 px-4">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${getStatusColor(trip.status)}`}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap"
+                      style={{
+                        background: trip.vehicle_type === "car" ? "rgba(59,130,246,0.1)" : "rgba(16,185,129,0.1)",
+                        color: trip.vehicle_type === "car" ? "#60A5FA" : "#34D399",
+                        border: `1px solid ${trip.vehicle_type === "car" ? "rgba(59,130,246,0.2)" : "rgba(16,185,129,0.2)"}`,
+                      }}
+                    >
+                      {trip.vehicle_type === "car" ? "🚗" : "🏍"}
+                      {trip.vehicle_type === "car" ? "عربية" : "مكنة"}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span
+                      className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium max-w-[100px] truncate"
+                      style={{
+                        background: "rgba(15,30,53,0.8)",
+                        color: "var(--text-secondary)",
+                        border: "1px solid var(--divider)",
+                      }}
+                    >
+                      {userMap.get(trip.user_id) || "—"}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    {trip.driver_id ? (
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium max-w-[100px] truncate"
+                        style={{
+                          background: "rgba(15,30,53,0.8)",
+                          color: "var(--text-secondary)",
+                          border: "1px solid var(--divider)",
+                        }}
+                      >
+                        {userMap.get(trip.driver_id) || "—"}
+                      </span>
+                    ) : (
+                      <span className="text-text-disabled text-[12px]">—</span>
+                    )}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${getStatusColor(trip.status)}`}
                     >
                       {getStatusLabel(trip.status)}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-text-secondary text-[11px]">
+                  <td className="py-3.5 px-4 text-text-tertiary text-[11px] font-medium whitespace-nowrap">
                     {formatDate(trip.created_at)}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <Link
+                      href={`/dashboard/trips/${trip.id}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
+                      style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
+                    >
+                      <Eye size={12} /> عرض
+                    </Link>
                   </td>
                 </tr>
               ))}
+
               {(!trips || trips.length === 0) && (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-text-disabled">
-                    لا توجد رحلات
+                  <td colSpan={10} className="py-20 text-center">
+                    <div className="flex flex-col items-center gap-3 text-text-disabled">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                      >
+                        <MapPin size={24} className="opacity-40" />
+                      </div>
+                      <div>
+                        <p className="text-text-secondary font-semibold">لا توجد رحلات</p>
+                        <p className="text-text-tertiary text-sm mt-1">جرب تغيير الفلاتر</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
