@@ -54,7 +54,7 @@ export default async function ComplaintsPage({
 
   const statusVariant = (s: string) => {
     if (s === "open") return "warning";
-    if (s === "in_progress") return "primary";
+    if (s === "in_progress") return "info";
     if (s === "resolved") return "success";
     return "default";
   };
@@ -174,7 +174,7 @@ export default async function ComplaintsPage({
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      <Badge variant={statusVariant(complaint.status) as "success" | "warning" | "primary" | "error" | "default"} dot>
+                      <Badge variant={statusVariant(complaint.status) as "success" | "warning" | "info" | "error" | "default"} dot>
                         {statusLabel(complaint.status)}
                       </Badge>
                     </td>
@@ -209,7 +209,7 @@ export default async function ComplaintsPage({
                     <p className="font-bold text-text-primary text-[14px]">{user?.name}</p>
                     <p className="text-text-tertiary text-[12px]">{complaint.subject}</p>
                   </div>
-                  <Badge variant={statusVariant(complaint.status) as "success" | "warning" | "primary" | "error" | "default"} dot>
+                  <Badge variant={statusVariant(complaint.status) as "success" | "warning" | "info" | "error" | "default"} dot>
                     {statusLabel(complaint.status)}
                   </Badge>
                 </div>
