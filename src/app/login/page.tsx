@@ -22,13 +22,14 @@ export default function LoginPage() {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
         setError("الإيميل أو كلمة المرور غير صحيحة");
+        setLoading(false);
         return;
       }
       router.push("/dashboard");
       router.refresh();
+      // Keep loading as true while redirecting
     } catch {
       setError("حدث خطأ، حاول مرة أخرى");
-    } finally {
       setLoading(false);
     }
   };
