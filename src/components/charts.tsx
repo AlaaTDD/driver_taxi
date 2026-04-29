@@ -118,8 +118,9 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
 
   return (
     <ChartCard title="توزيع حالات الرحلات" subtitle={`${total} رحلة إجمالاً`} accent="#3B82F6">
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+      <div className="h-64" style={{ minHeight: 200, minWidth: 200 }}>
+        {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
           <PieChart>
             <Pie
               data={data}
@@ -154,6 +155,9 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
             />
           </PieChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full text-text-tertiary text-sm">لا توجد بيانات</div>
+        )}
       </div>
 
       {/* Center total label */}
@@ -180,8 +184,9 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
 
   return (
     <ChartCard title="الإيرادات حسب نوع المركبة" subtitle={`إجمالي: ${formatCurrency(total)}`} accent="#10B981">
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+      <div className="h-64" style={{ minHeight: 200, minWidth: 200 }}>
+        {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
           <BarChart data={data} barCategoryGap="40%">
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -235,6 +240,9 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full text-text-tertiary text-sm">لا توجد بيانات</div>
+        )}
       </div>
 
       {/* Revenue breakdown */}
