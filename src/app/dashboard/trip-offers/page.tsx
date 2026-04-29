@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, getStatusColor, getStatusLabel } from "@/lib/utils";
 import Link from "next/link";
-import { ArrowLeftRight, Clock, User, Car, Eye, Filter } from "lucide-react";
+import { ArrowLeftRight, Clock, User, Car, Eye, Filter, X } from "lucide-react";
 
 export default async function TripOffersPage({
   searchParams,
