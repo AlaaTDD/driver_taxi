@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import ComplaintsClient from "./complaints-client";
+import ComplaintsClient from "@/app/dashboard/complaints/complaints-client";
 import { MessageSquareWarning, CheckCircle, Clock, AlertTriangle, Zap } from "lucide-react";
 
 export default async function ComplaintsPage({
