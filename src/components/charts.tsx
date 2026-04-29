@@ -117,16 +117,17 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   return (
     <ChartCard title="توزيع حالات الرحلات" subtitle={`${total} رحلة إجمالاً`} accent="#3B82F6">
-      <div className="h-64 w-full relative">
+      <div className="h-64 w-full">
         {!mounted ? (
-          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
+          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
         ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" aspect={2}>
           <PieChart>
             <Pie
               data={data}
@@ -162,7 +163,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
           </PieChart>
         </ResponsiveContainer>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
+          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
         )}
       </div>
     </ChartCard>
@@ -174,16 +175,17 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   return (
     <ChartCard title="الإيرادات حسب نوع المركبة" subtitle={`إجمالي: ${formatCurrency(total)}`} accent="#10B981">
-      <div className="h-64 w-full relative">
+      <div className="h-64 w-full">
         {!mounted ? (
-          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
+          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
         ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" aspect={2}>
           <BarChart data={data} barCategoryGap="40%">
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -238,7 +240,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
           </BarChart>
         </ResponsiveContainer>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
+          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
         )}
       </div>
       {/* Revenue breakdown */}
