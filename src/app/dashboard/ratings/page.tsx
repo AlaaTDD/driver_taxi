@@ -141,7 +141,7 @@ export default async function RatingsPage({
       </div>
 
       {/* Filters */}
-      <form className="flex flex-wrap gap-3">
+      <form className="flex flex-wrap gap-3 items-center">
         <select
           name="driver_id"
           defaultValue={driverFilter}
@@ -150,12 +150,6 @@ export default async function RatingsPage({
             background: "rgba(15,30,53,0.6)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
-          }}
-          onChange={(e) => {
-            const url = new URL(window.location.href);
-            if (e.target.value) url.searchParams.set("driver_id", e.target.value);
-            else url.searchParams.delete("driver_id");
-            window.location.href = url.toString();
           }}
         >
           <option value="">كل السائقين</option>
@@ -175,18 +169,30 @@ export default async function RatingsPage({
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
-          onChange={(e) => {
-            const url = new URL(window.location.href);
-            if (e.target.value) url.searchParams.set("min_rating", e.target.value);
-            else url.searchParams.delete("min_rating");
-            window.location.href = url.toString();
-          }}
         >
           <option value="">كل التقييمات</option>
           <option value="4">4+ نجوم</option>
           <option value="3">3+ نجوم</option>
           <option value="1">1-2 نجوم</option>
         </select>
+
+        <button
+          type="submit"
+          className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white"
+          style={{ background: "#3B82F6" }}
+        >
+          تطبيق الفلتر
+        </button>
+
+        {(driverFilter || minRating > 0) && (
+          <a
+            href="/dashboard/ratings"
+            className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary"
+            style={{ border: "1px solid var(--divider)" }}
+          >
+            إعادة ضبط
+          </a>
+        )}
       </form>
 
       {/* Ratings List */}

@@ -105,7 +105,7 @@ export default async function AdminLogsPage({
       </div>
 
       {/* Filters */}
-      <form className="flex flex-wrap gap-3">
+      <form className="flex flex-wrap gap-3 items-center">
         <select
           name="admin_id"
           defaultValue={adminFilter}
@@ -114,12 +114,6 @@ export default async function AdminLogsPage({
             background: "rgba(15,30,53,0.6)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
-          }}
-          onChange={(e) => {
-            const url = new URL(window.location.href);
-            if (e.target.value) url.searchParams.set("admin_id", e.target.value);
-            else url.searchParams.delete("admin_id");
-            window.location.href = url.toString();
           }}
         >
           <option value="">كل المشرفين</option>
@@ -139,12 +133,6 @@ export default async function AdminLogsPage({
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
-          onChange={(e) => {
-            const url = new URL(window.location.href);
-            if (e.target.value) url.searchParams.set("action", e.target.value);
-            else url.searchParams.delete("action");
-            window.location.href = url.toString();
-          }}
         >
           <option value="">كل الإجراءات</option>
           {Object.entries(actionLabels).map(([key, val]) => (
@@ -153,6 +141,24 @@ export default async function AdminLogsPage({
             </option>
           ))}
         </select>
+
+        <button
+          type="submit"
+          className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white"
+          style={{ background: "#3B82F6" }}
+        >
+          تطبيق الفلتر
+        </button>
+
+        {(adminFilter || actionFilter) && (
+          <a
+            href="/dashboard/admin-logs"
+            className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary"
+            style={{ border: "1px solid var(--divider)" }}
+          >
+            إعادة ضبط
+          </a>
+        )}
       </form>
 
       {/* Logs Table */}
