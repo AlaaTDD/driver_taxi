@@ -19,6 +19,10 @@ import {
   Zap,
   Star,
   Shield,
+  Truck,
+  ArrowLeftRight,
+  Ticket,
+  Navigation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -28,12 +32,16 @@ const navItems = [
   { href: "/dashboard/users", label: "المستخدمين", icon: Users, color: "text-violet-400", glow: "rgba(167,139,250,0.3)" },
   { href: "/dashboard/drivers", label: "السائقين", icon: Car, color: "text-cyan-400", glow: "rgba(34,211,238,0.3)" },
   { href: "/dashboard/trips", label: "الرحلات", icon: MapPin, color: "text-emerald-400", glow: "rgba(52,211,153,0.3)" },
+  { href: "/dashboard/trip-offers", label: "عروض الرحلات", icon: ArrowLeftRight, color: "text-purple-400", glow: "rgba(192,132,252,0.3)" },
   { href: "/dashboard/ratings", label: "التقييمات", icon: Star, color: "text-yellow-400", glow: "rgba(250,204,21,0.3)" },
   { href: "/dashboard/complaints", label: "الشكاوي", icon: MessageSquareWarning, color: "text-red-400", glow: "rgba(248,113,113,0.3)" },
   { href: "/dashboard/coupons", label: "الكوبونات", icon: Tag, color: "text-amber-400", glow: "rgba(251,191,36,0.3)" },
+  { href: "/dashboard/user-coupons", label: "كوبونات المستخدمين", icon: Ticket, color: "text-pink-400", glow: "rgba(244,114,182,0.3)" },
   { href: "/dashboard/pricing", label: "التسعير", icon: DollarSign, color: "text-green-400", glow: "rgba(74,222,128,0.3)" },
+  { href: "/dashboard/vehicle-types", label: "أنواع المركبات", icon: Truck, color: "text-teal-400", glow: "rgba(45,212,191,0.3)" },
   { href: "/dashboard/notifications", label: "الإشعارات", icon: Bell, color: "text-rose-400", glow: "rgba(251,113,133,0.3)" },
   { href: "/dashboard/messages", label: "الرسائل", icon: MessageSquare, color: "text-sky-400", glow: "rgba(56,189,248,0.3)" },
+  { href: "/dashboard/driver-locations", label: "مواقع السائقين", icon: Navigation, color: "text-indigo-400", glow: "rgba(129,140,248,0.3)" },
   { href: "/dashboard/admin-logs", label: "سجل الأدمن", icon: Shield, color: "text-orange-400", glow: "rgba(251,146,60,0.3)" },
 ];
 

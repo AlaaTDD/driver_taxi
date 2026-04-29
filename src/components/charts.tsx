@@ -127,7 +127,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
         {!mounted ? (
           <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
         ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" aspect={2}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
           <PieChart>
             <Pie
               data={data}
@@ -185,7 +185,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
         {!mounted ? (
           <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
         ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" aspect={2}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
           <BarChart data={data} barCategoryGap="40%">
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
