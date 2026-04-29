@@ -12,10 +12,9 @@ import {
   Cell,
   Legend,
   CartesianGrid,
-  AreaChart,
-  Area,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface StatusData {
   name: string;
@@ -114,13 +113,20 @@ function hexToRgb(hex: string) {
 }
 
 export function TripsStatusChart({ data }: { data: StatusData[] }) {
+  const [mounted, setMounted] = useState(false);
   const total = data.reduce((s, d) => s + d.value, 0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <ChartCard title="توزيع حالات الرحلات" subtitle={`${total} رحلة إجمالاً`} accent="#3B82F6">
-      <div className="h-64" style={{ minHeight: 200, minWidth: 200 }}>
-        {data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+      <div className="h-64 w-full relative">
+        {!mounted ? (
+          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
+        ) : data.length > 0 ? (
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
@@ -156,37 +162,28 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
           </PieChart>
         </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-full text-text-tertiary text-sm">لا توجد بيانات</div>
+          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
         )}
       </div>
-
-      {/* Center total label */}
-      {data.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2 justify-center">
-          {data.slice(0, 4).map((d, i) => (
-            <div key={d.status} className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ background: PIE_COLORS[i % PIE_COLORS.length], boxShadow: `0 0 4px ${PIE_COLORS[i % PIE_COLORS.length]}80` }}
-              />
-              <span>{d.name}</span>
-              <span className="font-bold text-text-secondary">{d.value}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </ChartCard>
   );
 }
 
 export function RevenueChart({ data }: { data: RevenueData[] }) {
+  const [mounted, setMounted] = useState(false);
   const total = data.reduce((s, d) => s + d.revenue, 0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <ChartCard title="الإيرادات حسب نوع المركبة" subtitle={`إجمالي: ${formatCurrency(total)}`} accent="#10B981">
-      <div className="h-64" style={{ minHeight: 200, minWidth: 200 }}>
-        {data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+      <div className="h-64 w-full relative">
+        {!mounted ? (
+          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
+        ) : data.length > 0 ? (
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} barCategoryGap="40%">
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -241,28 +238,29 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
           </BarChart>
         </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-full text-text-tertiary text-sm">لا توجد بيانات</div>
+          <div className="absolute inset-0 flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
         )}
       </div>
-
       {/* Revenue breakdown */}
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        {data.map((d, i) => (
-          <div
-            key={d.name}
-            className="flex items-center justify-between p-2.5 rounded-xl"
-            style={{
-              background: "rgba(15,30,53,0.5)",
-              border: "1px solid var(--divider)",
-            }}
-          >
-            <span className="text-[11px] text-text-tertiary">{d.name}</span>
-            <span className="text-[12px] font-bold" style={{ color: i === 0 ? "#60A5FA" : "#34D399" }}>
-              {formatCurrency(d.revenue)}
-            </span>
-          </div>
-        ))}
-      </div>
+      {data.length > 0 && (
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {data.map((d, i) => (
+            <div
+              key={d.name}
+              className="flex items-center justify-between p-2.5 rounded-xl"
+              style={{
+                background: "rgba(15,30,53,0.5)",
+                border: "1px solid var(--divider)",
+              }}
+            >
+              <span className="text-[11px] text-text-tertiary">{d.name}</span>
+              <span className="text-[12px] font-bold" style={{ color: i === 0 ? "#60A5FA" : "#34D399" }}>
+                {formatCurrency(d.revenue)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </ChartCard>
   );
 }
