@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
+import { DashboardShell } from "@/components/dashboard-shell";
 import DriversClient from "./drivers-client";
+import { getTranslations } from "next-intl/server";
 import { Car, CheckCircle, Clock, ShieldBan, AlertCircle, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -18,6 +20,7 @@ export default async function DriversPage({
   const pageSize = 10;
   const searchQuery = params.q || "";
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   // Stats counts
@@ -75,25 +78,20 @@ export default async function DriversPage({
   const totalPages = Math.ceil(((tab === "revision" ? revisionRes.count : driversCount) || 0) / pageSize);
 
   const tabs = [
-    { key: "pending", label: "بانتظار الاعتماد", count: pendingRes.count || 0, icon: <Clock size={14} />, color: "#F59E0B" },
-    { key: "approved", label: "معتمدون", count: approvedRes.count || 0, icon: <CheckCircle size={14} />, color: "#10B981" },
-    { key: "blocked", label: "محظورون", count: blockedRes.count || 0, icon: <ShieldBan size={14} />, color: "#EF4444" },
-    { key: "revision", label: "يحتاج مراجعة", count: revisionRes.count || 0, icon: <AlertCircle size={14} />, color: "#8B5CF6" },
+    { key: "pending", label: t("drivers.tabs.pending"), count: pendingRes.count || 0, icon: <Clock size={14} />, color: "#F59E0B" },
+    { key: "approved", label: t("drivers.tabs.approved"), count: approvedRes.count || 0, icon: <CheckCircle size={14} />, color: "#10B981" },
+    { key: "blocked", label: t("drivers.tabs.blocked"), count: blockedRes.count || 0, icon: <ShieldBan size={14} />, color: "#EF4444" },
+    { key: "revision", label: t("drivers.tabs.revision"), count: revisionRes.count || 0, icon: <AlertCircle size={14} />, color: "#8B5CF6" },
   ];
 
   return (
-    <div className="space-y-6">
-
-      {/* ===== PAGE HEADER ===== */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-          <span className="w-1 h-1 rounded-full bg-green-500/60" />
-          <span className="text-[11px] text-text-disabled">السائقون</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("drivers.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("drivers.subtitle")}</p>
         </div>
-        <h1 className="page-title">إدارة السائقين</h1>
-        <p className="page-subtitle">اعتماد السائقين وإدارة ملفاتهم وطلب مراجعة الوثائق</p>
-      </div>
 
       {/* ===== TABS ===== */}
       <div className="flex gap-2 flex-wrap">
@@ -109,7 +107,7 @@ export default async function DriversPage({
               color: t.color,
               boxShadow: `0 4px 12px ${t.color}15`,
             } : {
-              background: "rgba(15,30,53,0.5)",
+              background: "var(--surface-glass)",
               border: "1px solid var(--divider)",
               color: "var(--text-tertiary)",
             }}
@@ -119,7 +117,7 @@ export default async function DriversPage({
             {t.count > 0 && (
               <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
                 style={{
-                  background: tab === t.key ? t.color : "rgba(15,30,53,0.8)",
+                  background: tab === t.key ? t.color : "var(--surface-glass)",
                   color: tab === t.key ? "white" : "var(--text-tertiary)",
                   border: tab === t.key ? "none" : "1px solid var(--divider)",
                 }}>
@@ -155,7 +153,7 @@ export default async function DriversPage({
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+                <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                   {["السائق", "المركبة", "الوثائق", "الرحلات", "التقييم", "الحالة", "إجراءات"].map(h => (
                     <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
@@ -170,7 +168,7 @@ export default async function DriversPage({
                       {/* Driver info */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0"
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black shrink-0"
                             style={{
                               background: driver.is_verified ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.12)",
                               color: driver.is_verified ? "#34D399" : "#FCD34D",
@@ -188,7 +186,7 @@ export default async function DriversPage({
                       {/* Vehicle */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
-                          <Car size={11} className="text-text-disabled flex-shrink-0" />
+                          <Car size={11} className="text-text-disabled shrink-0" />
                           <span className="text-text-secondary text-[12px]">
                             {driver.vehicle_brand} {driver.vehicle_model} — {driver.vehicle_type === "car" ? "🚗" : "🏍"}
                           </span>
@@ -420,6 +418,7 @@ export default async function DriversPage({
         </div>
       )}
     </div>
+    </DashboardShell>
   );
 }
 

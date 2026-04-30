@@ -6,15 +6,14 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  Legend,
   CartesianGrid,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 
 interface StatusData {
   name: string;
@@ -39,14 +38,13 @@ const PIE_COLORS = [
 ];
 
 const TOOLTIP_STYLE = {
-  backgroundColor: "rgba(7, 15, 28, 0.95)",
-  border: "1px solid rgba(59, 130, 246, 0.2)",
+  backgroundColor: "var(--surface-elevated)",
+  border: "1px solid var(--divider)",
   borderRadius: "12px",
-  color: "#F0F6FF",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset",
+  color: "var(--text-primary)",
+  boxShadow: "var(--shadow-lg)",
   backdropFilter: "blur(16px)",
   fontSize: "13px",
-  fontFamily: "'Cairo', sans-serif",
   padding: "10px 14px",
 };
 
@@ -65,9 +63,9 @@ function ChartCard({
     <div
       className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
       style={{
-        background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-        border: "1px solid rgba(255,255,255,0.05)",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
+        background: "var(--surface)",
+        border: "1px solid var(--divider)",
+        boxShadow: "var(--shadow-md)",
       }}
     >
       {/* Top accent line */}
@@ -79,16 +77,10 @@ function ChartCard({
         }}
       />
 
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ boxShadow: `0 0 40px rgba(${hexToRgb(accent)}, 0.04) inset` }}
-      />
-
       <div className="relative p-5">
         <div className="flex items-center gap-2.5 mb-5">
           <div
-            className="w-[3px] h-5 rounded-full flex-shrink-0"
+            className="w-[3px] h-5 rounded-full shrink-0"
             style={{
               background: `linear-gradient(to bottom, ${accent}, ${accent}88)`,
               boxShadow: `0 0 8px ${accent}60`,
@@ -105,65 +97,104 @@ function ChartCard({
   );
 }
 
-function hexToRgb(hex: string) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-    : "59, 130, 246";
+function useChartSize() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const cr = entry.contentRect;
+        setSize({ width: Math.floor(cr.width), height: Math.floor(cr.height) });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return { ref, ...size };
 }
 
 export function TripsStatusChart({ data }: { data: StatusData[] }) {
-  const [mounted, setMounted] = useState(false);
+  const t = useTranslations();
+  const { ref, width } = useChartSize();
   const total = data.reduce((s, d) => s + d.value, 0);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
-
   return (
-    <ChartCard title="توزيع حالات الرحلات" subtitle={`${total} رحلة إجمالاً`} accent="#3B82F6">
-      <div className="h-64 w-full">
-        {!mounted ? (
-          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
-        ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={58}
-              outerRadius={88}
-              paddingAngle={3}
-              dataKey="value"
-              strokeWidth={0}
-            >
-              {data.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={PIE_COLORS[index % PIE_COLORS.length]}
-                  style={{ filter: `drop-shadow(0 0 6px ${PIE_COLORS[index % PIE_COLORS.length]}60)` }}
+    <ChartCard title={t("dashboard.charts.tripStatus")} subtitle={`${total} ${t("dashboard.charts.totalTrips")}`} accent="#3B82F6">
+      <div ref={ref} className="w-full flex flex-col items-center">
+        <div className="h-56 w-full">
+          {width > 0 && data.length > 0 ? (
+            <PieChart width={width} height={224}>
+              <Pie
+                data={data}
+                cx={width / 2}
+                cy={105}
+                innerRadius={Math.min(width, 224) * 0.26}
+                outerRadius={Math.min(width, 224) * 0.42}
+                paddingAngle={3}
+                dataKey="value"
+                strokeWidth={0}
+                labelLine={false}
+                label={({ cx, cy, midAngle, outerRadius, value }) => {
+                  const RADIAN = Math.PI / 180;
+                  const radius = (outerRadius ?? 0) + 18;
+                  const mAngle = midAngle ?? 0;
+                  const x = cx + radius * Math.cos(-mAngle * RADIAN);
+                  const y = cy + radius * Math.sin(-mAngle * RADIAN);
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      textAnchor={x > cx ? "start" : "end"}
+                      dominantBaseline="central"
+                      fill="var(--text-secondary)"
+                      fontSize={11}
+                      fontFamily="'Cairo', sans-serif"
+                    >
+                      {((Number(value) / total) * 100).toFixed(0)}%
+                    </text>
+                  );
+                }}
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={PIE_COLORS[index % PIE_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={TOOLTIP_STYLE}
+                formatter={(value: unknown, name?: unknown) => {
+                  const v = Number(value ?? 0);
+                  return [`${v} ${t("dashboard.charts.tripsLabel")} (${((v / total) * 100).toFixed(1)}%)`, String(name ?? "")] as unknown as [string, string];
+                }}
+              />
+            </PieChart>
+          ) : (
+            <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
+          )}
+        </div>
+        {/* Custom Legend - prevents overlap */}
+        {data.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2 pb-1">
+            {data.map((entry, index) => (
+              <div key={entry.name} className="flex items-center gap-1.5">
+                <span
+                  className="inline-block rounded-full"
+                  style={{
+                    width: 8,
+                    height: 8,
+                    background: PIE_COLORS[index % PIE_COLORS.length],
+                  }}
                 />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={TOOLTIP_STYLE}
-              formatter={(value: unknown) => { const v = Number(value ?? 0); return [`${v} رحلة (${((v / total) * 100).toFixed(1)}%)`, ""]; }}
-            />
-            <Legend
-              iconType="circle"
-              iconSize={8}
-              formatter={(value) => (
-                <span style={{ color: "var(--text-secondary)", fontSize: "11px", fontFamily: "'Cairo', sans-serif" }}>
-                  {value}
-                </span>
-              )}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        ) : (
-          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
+                <span className="text-[11px] text-text-secondary">{entry.name}</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </ChartCard>
@@ -171,22 +202,15 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
 }
 
 export function RevenueChart({ data }: { data: RevenueData[] }) {
-  const [mounted, setMounted] = useState(false);
+  const t = useTranslations();
+  const { ref, width, height } = useChartSize();
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
-
   return (
-    <ChartCard title="الإيرادات حسب نوع المركبة" subtitle={`إجمالي: ${formatCurrency(total)}`} accent="#10B981">
-      <div className="h-64 w-full">
-        {!mounted ? (
-          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">جاري التحميل...</div>
-        ) : data.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-          <BarChart data={data} barCategoryGap="40%">
+    <ChartCard title={t("dashboard.charts.revenueByVehicle")} subtitle={`${t("dashboard.charts.totalLabel")}: ${formatCurrency(total)}`} accent="#10B981">
+      <div ref={ref} className="h-64 w-full">
+        {width > 0 && height > 0 && data.length > 0 ? (
+          <BarChart data={data} width={width} height={height} barCategoryGap="40%">
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
@@ -222,7 +246,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
             <Tooltip
               contentStyle={TOOLTIP_STYLE}
               cursor={{ fill: "rgba(59,130,246,0.06)", radius: 8 }}
-              formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), "الإيرادات"]}
+              formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), t("dashboard.charts.revenueLabel")]}
             />
             <Bar
               dataKey="revenue"
@@ -238,9 +262,8 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
               ))}
             </Bar>
           </BarChart>
-        </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">لا توجد بيانات</div>
+          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
         )}
       </div>
       {/* Revenue breakdown */}
@@ -251,7 +274,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
               key={d.name}
               className="flex items-center justify-between p-2.5 rounded-xl"
               style={{
-                background: "rgba(15,30,53,0.5)",
+                background: "var(--surface-elevated)",
                 border: "1px solid var(--divider)",
               }}
             >

@@ -1,18 +1,21 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import ComplaintDetailClient from "./complaint-detail-client";
 import { MessageSquareWarning, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default async function ComplaintDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   const { data: complaint } = await supabase
     .from("complaints")
     .select(`
-      id, subject, message, category, status, priority,
+      id, title, description, category, status, priority,
       admin_reply, replied_at, resolved_at, created_at,
       trip_id,
       users!user_id(id, name, phone, email),
@@ -32,18 +35,19 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
   const priorityColor: Record<string, string> = { urgent: "#EF4444", high: "#F59E0B", normal: "#3B82F6", low: "#64748B" };
 
   return (
+    <DashboardShell>
     <div className="space-y-6 max-w-3xl mx-auto">
       {/* Back */}
       <Link href="/dashboard/complaints"
-        className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-[13px] transition-colors">
+        className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-sm transition-colors">
         <ArrowRight size={14} />
-        العودة للشكاوي
+        {t("complaints.backToList")}
       </Link>
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[20px] font-black text-text-primary">{complaint.subject}</h1>
+          <h1 className="text-xl font-black text-text-primary">{complaint.title}</h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold"
               style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
@@ -84,7 +88,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
           <MessageSquareWarning size={14} className="text-text-tertiary" />
           <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider">نص الشكوى</h3>
         </div>
-        <p className="text-text-secondary leading-relaxed">{complaint.message}</p>
+        <p className="text-text-secondary leading-relaxed">{complaint.description}</p>
       </div>
 
       {/* Existing Reply */}
@@ -109,5 +113,6 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         <ComplaintDetailClient complaintId={complaint.id} currentStatus={complaint.status} />
       )}
     </div>
+    </DashboardShell>
   );
 }

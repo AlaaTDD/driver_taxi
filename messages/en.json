@@ -1,0 +1,322 @@
+{
+  "metadata": {
+    "title": "Taxi - Admin Dashboard",
+    "description": "Taxi App Admin Management Dashboard"
+  },
+  "common": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "drivers": "Drivers",
+    "trips": "Trips",
+    "complaints": "Complaints",
+    "ratings": "Ratings",
+    "coupons": "Coupons",
+    "userCoupons": "User Coupons",
+    "notifications": "Notifications",
+    "vehicleTypes": "Vehicle Types",
+    "pricing": "Pricing",
+    "adminLogs": "Admin Logs",
+    "messages": "Messages",
+    "tripOffers": "Trip Offers",
+    "driverLocations": "Driver Locations",
+    "settings": "Settings",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "view": "View",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "blocked": "Blocked",
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "available": "Available",
+    "notAvailable": "Not Available",
+    "online": "Online",
+    "offline": "Offline",
+    "total": "Total",
+    "noData": "No data available",
+    "loading": "Loading",
+    "error": "An error occurred",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "date": "Date",
+    "time": "Time",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "actions": "Actions",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "details": "Details",
+    "submit": "Submit",
+    "send": "Send",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "logout": "Logout",
+    "profile": "Profile",
+    "all": "All"
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Taxi Admin Dashboard",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "submit": "Sign In",
+    "error": "Invalid email or password"
+  },
+  "sidebar": {
+    "sections": {
+      "operations": "Operations",
+      "marketing": "Marketing",
+      "system": "System"
+    }
+  },
+  "dashboard": {
+    "overview": "Overview",
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalDrivers": "Total Drivers",
+      "totalTrips": "Total Trips",
+      "completedTrips": "Completed Trips",
+      "activeTrips": "Active Trips",
+      "cancelledTrips": "Cancelled Trips",
+      "totalRevenue": "Total Revenue",
+      "verifiedDrivers": "Verified Drivers",
+      "availableDrivers": "Available Drivers",
+      "pendingDrivers": "Pending Drivers",
+      "blockedUsers": "Blocked Users",
+      "totalComplaints": "Total Complaints",
+      "pendingComplaints": "Pending Complaints",
+      "totalCoupons": "Total Coupons",
+      "activeCoupons": "Active Coupons"
+    },
+    "recentTrips": "Recent Trips",
+    "recentComplaints": "Recent Complaints",
+    "charts": {
+      "tripsByStatus": "Trips by Status",
+      "revenueByDay": "Revenue by Day",
+      "tripStatus": "Trips by Status",
+      "totalTrips": "trips total",
+      "tripsLabel": "trips",
+      "revenueByVehicle": "Revenue by Vehicle Type",
+      "totalLabel": "Total",
+      "revenueLabel": "Revenue"
+    }
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Full control over user accounts and permissions",
+    "addUser": "Add User",
+    "filterByRole": "Filter by Role",
+    "filterByStatus": "Filter by Status",
+    "roles": {
+      "user": "User",
+      "driver": "Driver",
+      "admin": "Admin",
+      "supervisor": "Supervisor"
+    },
+    "blockUser": "Block User",
+    "unblockUser": "Unblock User",
+    "blockReason": "Block Reason",
+    "setRole": "Set Role",
+    "userDetails": "User Details"
+  },
+  "drivers": {
+    "title": "Driver Management",
+    "subtitle": "Approve drivers and manage their documents",
+    "tabs": {
+      "pending": "Pending Approval",
+      "approved": "Approved",
+      "blocked": "Blocked",
+      "revision": "Needs Revision"
+    },
+    "verify": "Verify",
+    "revoke": "Revoke",
+    "requestRevision": "Request Revision",
+    "documents": {
+      "nationalId": "ID",
+      "license": "License",
+      "criminalRecord": "Record",
+      "vehicle": "Vehicle"
+    },
+    "vehicleInfo": "Vehicle Info",
+    "driverDetails": "Driver Details",
+    "backToList": "Back to List",
+    "registered": "Registered",
+    "status": {
+      "verified": "Verified",
+      "pending": "Pending",
+      "blocked": "Blocked"
+    }
+  },
+  "trips": {
+    "title": "Trip Management",
+    "subtitle": "Track and manage all trips",
+    "tripDetails": "Trip Details",
+    "cancelTrip": "Cancel Trip",
+    "cancelReason": "Cancellation Reason",
+    "statuses": {
+      "searching": "Searching",
+      "accepted": "Accepted",
+      "driver_arriving": "Driver Arriving",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "from": "From",
+    "to": "To",
+    "price": "Price",
+    "driver": "Driver",
+    "passenger": "Passenger"
+  },
+  "complaints": {
+    "title": "Complaint Management",
+    "subtitle": "Track and resolve user complaints",
+    "complaintDetails": "Complaint Details",
+    "reply": "Reply",
+    "resolve": "Resolve",
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "statuses": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "categories": {
+      "general": "General",
+      "trip": "Trip",
+      "driver": "Driver",
+      "payment": "Payment",
+      "technical": "Technical"
+    }
+  },
+  "ratings": {
+    "title": "Ratings",
+    "subtitle": "User ratings for drivers",
+    "rating": "Rating",
+    "comment": "Comment",
+    "deleteRating": "Delete Rating"
+  },
+  "coupons": {
+    "title": "Coupon Management",
+    "subtitle": "Create and manage discount coupons",
+    "addCoupon": "Add Coupon",
+    "code": "Code",
+    "discountType": "Discount Type",
+    "discountValue": "Discount Value",
+    "minTripPrice": "Min Trip Price",
+    "maxUses": "Max Uses",
+    "expiresAt": "Expires At",
+    "isActive": "Active",
+    "usedCount": "Used Count",
+    "discountTypes": {
+      "percentage": "Percentage",
+      "fixed": "Fixed Amount"
+    }
+  },
+  "userCoupons": {
+    "title": "User Coupons",
+    "subtitle": "Track user coupons and their usage",
+    "assignCoupon": "Assign Coupon",
+    "used": "Used",
+    "notUsed": "Not Used",
+    "assignedAt": "Assigned At",
+    "usedAt": "Used At"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Send and manage notifications",
+    "sendNotification": "Send Notification",
+    "sendBroadcast": "Send Broadcast",
+    "titleField": "Title",
+    "messageField": "Message",
+    "type": "Type",
+    "types": {
+      "general": "General",
+      "trip": "Trip",
+      "promo": "Promo",
+      "system": "System",
+      "trip_offer": "Trip Offer",
+      "trip_completed": "Completed",
+      "trip_cancelled": "Cancelled",
+      "account_verified": "Verified"
+    }
+  },
+  "pricing": {
+    "title": "Pricing & Rates",
+    "subtitle": "Manage vehicle pricing and fare configurations"
+  },
+  "vehicleTypes": {
+    "title": "Vehicle Types",
+    "subtitle": "Manage vehicle types and pricing",
+    "addType": "Add Type",
+    "name": "Name",
+    "displayName": "Display Name",
+    "baseFare": "Base Fare",
+    "pricePerKm": "Price per KM",
+    "sortOrder": "Sort Order",
+    "icon": "Icon"
+  },
+  "adminLogs": {
+    "title": "Admin Logs",
+    "subtitle": "Track all admin actions",
+    "action": "Action",
+    "tableName": "Table",
+    "recordId": "Record ID",
+    "admin": "Admin",
+    "ip": "IP Address",
+    "oldData": "Old Data",
+    "newData": "New Data"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Manage support messages"
+  },
+  "tripOffers": {
+    "title": "Trip Offers",
+    "subtitle": "Manage driver trip offers"
+  },
+  "driverLocations": {
+    "title": "Driver Locations",
+    "subtitle": "Track driver locations in real time",
+    "totalLocations": "Total Locations",
+    "onlineNow": "Online Now",
+    "offline": "Offline",
+    "onlineUsers": "Online Users",
+    "coordinates": "Coordinates",
+    "heading": "Heading",
+    "lastUpdate": "Last Update"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden"
+  }
+}

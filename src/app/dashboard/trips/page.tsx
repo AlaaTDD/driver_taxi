@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
 import TripsClient from "./trips-client";
-import { MapPin, ArrowRight, Car, Gauge, Eye } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { MapPin, Gauge, Eye } from "lucide-react";
 import Link from "next/link";
 
 export default async function TripsPage({
@@ -15,6 +17,7 @@ export default async function TripsPage({
   const vehicleFilter = params.vehicle || "";
   const pageSize = 10;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   let query = supabase
@@ -49,36 +52,29 @@ export default async function TripsPage({
     .reduce((s, t) => s + (Number(t.price) || 0), 0);
 
   return (
-    <div className="space-y-7">
-
-      {/* ===== PAGE HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-            <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
-            <span className="text-[11px] text-text-disabled">الرحلات</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("trips.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("trips.subtitle")}</p>
           </div>
-          <h1 className="page-title">الرحلات</h1>
-          <p className="page-subtitle">إدارة ومتابعة جميع الرحلات في المنصة</p>
-        </div>
 
-        {/* Total info */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-            style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#93C5FD" }}>
-            <MapPin size={11} />
-            {count || 0} رحلة
-          </div>
-          {!statusFilter && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-              style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34D399" }}>
-              <Gauge size={11} />
-              {formatCurrency(totalRevenue)}
+          {/* Total info */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 border border-primary/20 text-primary">
+              <MapPin size={11} />
+              {count || 0} {t("trips.title")}
             </div>
-          )}
+            {!statusFilter && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-success/5 border border-success/20 text-success">
+                <Gauge size={11} />
+                {formatCurrency(totalRevenue)}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
       {/* ===== FILTERS ===== */}
       <TripsClient
@@ -130,7 +126,7 @@ export default async function TripsPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["من", "إلى", "المسافة", "السعر", "النوع", "المستخدم", "السائق", "الحالة", "التاريخ", "إجراء"].map((h) => (
                   <th
                     key={h}
@@ -142,7 +138,7 @@ export default async function TripsPage({
               </tr>
             </thead>
             <tbody>
-              {(trips || []).map((trip, index) => (
+              {(trips || []).map((trip) => (
                 <tr
                   key={trip.id}
                   className="group/row table-row-hover"
@@ -151,7 +147,7 @@ export default async function TripsPage({
                   <td className="py-3.5 px-4 max-w-[140px] truncate text-[13px] text-text-primary">
                     <span className="flex items-center gap-2">
                       <span
-                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
                         style={{ background: "#10B981", boxShadow: "0 0 4px rgba(16,185,129,0.6)" }}
                       />
                       <span className="truncate">{trip.pickup_address}</span>
@@ -183,7 +179,7 @@ export default async function TripsPage({
                     <span
                       className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium max-w-[100px] truncate"
                       style={{
-                        background: "rgba(15,30,53,0.8)",
+                        background: "var(--surface-glass)",
                         color: "var(--text-secondary)",
                         border: "1px solid var(--divider)",
                       }}
@@ -196,7 +192,7 @@ export default async function TripsPage({
                       <span
                         className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium max-w-[100px] truncate"
                         style={{
-                          background: "rgba(15,30,53,0.8)",
+                          background: "var(--surface-glass)",
                           color: "var(--text-secondary)",
                           border: "1px solid var(--divider)",
                         }}
@@ -235,7 +231,7 @@ export default async function TripsPage({
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
                       <div
                         className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                        style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                        style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                       >
                         <MapPin size={24} className="opacity-40" />
                       </div>
@@ -251,6 +247,7 @@ export default async function TripsPage({
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

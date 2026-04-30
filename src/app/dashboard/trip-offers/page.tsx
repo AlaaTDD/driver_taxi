@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, getStatusColor, getStatusLabel } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { ArrowLeftRight, Clock, User, Car, Eye, Filter, X } from "lucide-react";
+import { ArrowLeftRight, User, Car, Eye, X } from "lucide-react";
 
 export default async function TripOffersPage({
   searchParams,
@@ -13,6 +15,7 @@ export default async function TripOffersPage({
   const statusFilter = params.status || "";
   const pageSize = 15;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   let query = supabase
@@ -71,19 +74,15 @@ export default async function TripOffersPage({
   ];
 
   return (
-    <div className="space-y-7">
-      {/* ===== PAGE HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-            <span className="w-1 h-1 rounded-full bg-purple-500/60" />
-            <span className="text-[11px] text-text-disabled">عروض الرحلات</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("tripOffers.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("tripOffers.subtitle")}</p>
           </div>
-          <h1 className="page-title">عروض الرحلات</h1>
-          <p className="page-subtitle">متابعة جميع عروض الرحلات المرسلة للسائقين</p>
         </div>
-      </div>
 
       {/* ===== STAT CARDS ===== */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -135,7 +134,7 @@ export default async function TripOffersPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["السائق", "الراكب", "العنوان", "حالة العرض", "حالة الرحلة", "تاريخ الإرسال", "تاريخ الرد", "إجراء"].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">
                     {h}
@@ -149,13 +148,13 @@ export default async function TripOffersPage({
                 return (
                   <tr key={offer.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "rgba(15,30,53,0.8)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
                         <Car size={11} className="text-cyan-400" />
                         {driverMap.get(offer.driver_id) || "—"}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "rgba(15,30,53,0.8)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
                         <User size={11} className="text-violet-400" />
                         {trip ? tripUserMap.get(trip.user_id) || "—" : "—"}
                       </span>
@@ -201,7 +200,7 @@ export default async function TripOffersPage({
                 <tr>
                   <td colSpan={8} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                         <ArrowLeftRight size={24} className="opacity-40" />
                       </div>
                       <div>
@@ -241,6 +240,7 @@ export default async function TripOffersPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

@@ -36,7 +36,7 @@ interface UsersClientProps {
 }
 
 const selectStyle: React.CSSProperties = {
-  background: "rgba(15,30,53,0.6)",
+  background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };
@@ -175,7 +175,7 @@ export default function UsersClient({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["المستخدم", "التليفون", "الدور", "الرحلات", "الحالة", "إجراءات"].map(h => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -417,7 +417,7 @@ export default function UsersClient({
                     placeholder="اكتب سبب الحظر..."
                     rows={3}
                     className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none"
-                    style={{ background: "rgba(15,30,53,0.7)", border: "1px solid var(--divider)", color: "var(--text-primary)" }} />
+                    style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }} />
                 </div>
               )}
 
@@ -432,7 +432,7 @@ export default function UsersClient({
               <div className="flex gap-3">
                 <button onClick={() => { setBlockModal(null); setBlockReason(""); }}
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                   إلغاء
                 </button>
                 <button onClick={handleBlock} disabled={actionLoading}
@@ -491,7 +491,7 @@ export default function UsersClient({
               <div className="flex gap-3">
                 <button onClick={() => setRoleModal(null)}
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                   إلغاء
                 </button>
                 <button onClick={handleSetRole} disabled={actionLoading}

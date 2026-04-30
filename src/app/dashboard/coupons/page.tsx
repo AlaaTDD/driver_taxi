@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
+import { DashboardShell } from "@/components/dashboard-shell";
 import CouponsClient from "./coupons-client";
+import { getTranslations } from "next-intl/server";
 import { Tag, Percent, Hash, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default async function CouponsPage({
@@ -13,6 +15,7 @@ export default async function CouponsPage({
   const page = Number(params.page) || 1;
   const pageSize = 10;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   const { data: coupons, count } = await supabase
@@ -26,27 +29,19 @@ export default async function CouponsPage({
   const activeCount = (coupons || []).filter((c) => c.is_active).length;
 
   return (
-    <div className="space-y-7">
-
-      {/* ===== PAGE HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-            <span className="w-1 h-1 rounded-full bg-amber-500/60" />
-            <span className="text-[11px] text-text-disabled">الكوبونات</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("coupons.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("coupons.subtitle")}</p>
           </div>
-          <h1 className="page-title">الكوبونات</h1>
-          <p className="page-subtitle">إدارة كوبونات الخصم وعروض المستخدمين</p>
-        </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-            style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34D399" }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-success" style={{ boxShadow: "0 0 5px rgba(16,185,129,0.5)" }} />
-            {activeCount} نشط
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-success/5 border border-success/20 text-success">
+            <span className="w-1.5 h-1.5 rounded-full bg-success" />
+            {activeCount} {t("common.active")}
           </div>
           {/* Add New Coupon Button */}
           <CouponsClient />
@@ -85,7 +80,7 @@ export default async function CouponsPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["الكود", "نوع الخصم", "قيمة الخصم", "حد أدنى", "الاستخدامات", "تاريخ الانتهاء", "الحالة", "إجراءات"].map((h) => (
                   <th
                     key={h}
@@ -214,7 +209,7 @@ export default async function CouponsPage({
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
                       <div
                         className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                        style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                        style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                       >
                         <Tag size={24} className="opacity-40" />
                       </div>
@@ -237,7 +232,7 @@ export default async function CouponsPage({
           <a
             href={`/dashboard/coupons?page=${page - 1}`}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page <= 1 ? "pointer-events-none opacity-30" : ""}`}
-            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
           >
             <ChevronRight size={14} />
           </a>
@@ -250,7 +245,7 @@ export default async function CouponsPage({
               style={
                 p === page
                   ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
-                  : { background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
+                  : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
               }
             >
               {p}
@@ -260,12 +255,13 @@ export default async function CouponsPage({
           <a
             href={`/dashboard/coupons?page=${page + 1}`}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page >= totalPages ? "pointer-events-none opacity-30" : ""}`}
-            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
           >
             <ChevronLeft size={14} />
           </a>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

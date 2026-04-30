@@ -13,7 +13,7 @@ interface ComplaintsClientProps {
 }
 
 const selectStyle: React.CSSProperties = {
-  background: "rgba(15,30,53,0.6)",
+  background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };

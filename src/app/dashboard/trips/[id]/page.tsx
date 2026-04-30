@@ -1,14 +1,17 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
 import { notFound } from "next/navigation";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { 
-  ArrowRight, MapPin, Car, User, Navigation, DollarSign, 
-  Clock, AlertTriangle, ShieldAlert, CheckCircle, XCircle 
+  ArrowRight, Car, User, Navigation, DollarSign, 
+  Clock, ShieldAlert, CheckCircle, XCircle 
 } from "lucide-react";
 
 export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   // 1. Fetch Trip Data
@@ -43,6 +46,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const driverProfile = driver?.drivers_profile as any;
 
   return (
+    <DashboardShell>
     <div className="space-y-6 max-w-5xl mx-auto">
       
       {/* ===== HEADER ===== */}
@@ -50,10 +54,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         <div className="space-y-1.5">
           <Link href="/dashboard/trips"
             className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-[12px] font-bold transition-colors">
-            <ArrowRight size={14} /> العودة لقائمة الرحلات
+            <ArrowRight size={14} /> {t("trips.backToList")}
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-[20px] font-black text-text-primary">تفاصيل الرحلة</h1>
+            <h1 className="text-xl font-black text-text-primary">{t("trips.tripDetails")}</h1>
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold ${getStatusColor(trip.status)}`}>
               {getStatusLabel(trip.status)}
             </span>
@@ -61,7 +65,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           <p className="text-text-disabled text-[12px] num font-mono">{trip.id}</p>
         </div>
 
-        <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: "rgba(15,30,53,0.5)", border: "1px solid var(--divider)" }}>
+        <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
           <div>
             <p className="text-text-tertiary text-[11px] font-bold uppercase tracking-wider mb-1">تاريخ الطلب</p>
             <div className="flex items-center gap-1.5 text-text-secondary text-[13px] font-medium">
@@ -142,7 +146,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             </div>
             <div className="flex justify-between items-center">
               <span className="text-text-tertiary text-[13px] font-medium">طريقة الدفع</span>
-              <span className="text-[13px] font-bold text-text-secondary px-2.5 py-1 rounded-lg" style={{ background: "rgba(15,30,53,0.8)" }}>
+              <span className="text-[13px] font-bold text-text-secondary px-2.5 py-1 rounded-lg" style={{ background: "var(--surface-glass)" }}>
                 {trip.payment_method === 'cash' ? 'كاش' : 'محفظة'}
               </span>
             </div>
@@ -205,7 +209,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                   <div className="text-[12px] text-text-secondary font-bold"><span className="text-text-tertiary font-medium">الرحلات:</span> {driver.total_trips}</div>
                 </div>
                 {driverProfile && (
-                  <div className="p-2.5 rounded-xl text-[11px] font-medium flex items-center justify-between" style={{ background: "rgba(15,30,53,0.5)", border: "1px solid var(--divider)" }}>
+                  <div className="p-2.5 rounded-xl text-[11px] font-medium flex items-center justify-between" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                     <span className="text-text-secondary">
                       {driverProfile.vehicle_brand} {driverProfile.vehicle_model} {driverProfile.vehicle_type === "car" ? "🚗" : "🏍"}
                     </span>
@@ -231,7 +235,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
           <div className="space-y-4">
             {complaints.map(comp => (
-              <div key={comp.id} className="p-4 rounded-xl border" style={{ borderColor: "var(--divider)", background: "rgba(15,30,53,0.3)" }}>
+              <div key={comp.id} className="p-4 rounded-xl border" style={{ borderColor: "var(--divider)", background: "var(--surface-glass)" }}>
                 <div className="flex justify-between items-start gap-4 mb-2">
                   <h4 className="font-bold text-[14px] text-text-primary">{comp.subject}</h4>
                   <div className="flex gap-2">
@@ -260,5 +264,6 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       )}
 
     </div>
+    </DashboardShell>
   );
 }

@@ -27,10 +27,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "الكوبون وصل الحد الأقصى للاستخدام" }, { status: 400 });
     }
 
-    // Assign coupon to user
+    // Assign coupon to user (is_used is synced by DB trigger from used_at)
     const { error } = await supabase
       .from("user_coupons")
-      .insert({ user_id, coupon_id, is_used: false });
+      .insert({ user_id, coupon_id });
 
     if (error) {
       if (error.code === "23505") {

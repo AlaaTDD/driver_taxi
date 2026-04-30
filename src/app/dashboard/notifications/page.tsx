@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
+import { DashboardShell } from "@/components/dashboard-shell";
 import NotificationsClient from "./notifications-client";
+import { getTranslations } from "next-intl/server";
 import { Bell, Eye, Clock, User } from "lucide-react";
 
 export default async function NotificationsPage({
@@ -29,6 +31,7 @@ export default async function NotificationsPage({
   const { data: notifications, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
+  const t = await getTranslations();
   const unreadCount = (notifications || []).filter((n) => !n.is_read).length;
 
   const typeLabels: Record<string, string> = {
@@ -56,19 +59,14 @@ export default async function NotificationsPage({
   };
 
   return (
-    <div className="space-y-7">
-
-      {/* ===== PAGE HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-            <span className="w-1 h-1 rounded-full bg-rose-500/60" />
-            <span className="text-[11px] text-text-disabled">الإشعارات</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("notifications.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("notifications.subtitle")}</p>
           </div>
-          <h1 className="page-title">الإشعارات</h1>
-          <p className="page-subtitle">عرض وإدارة إشعارات النظام</p>
-        </div>
 
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
@@ -102,7 +100,7 @@ export default async function NotificationsPage({
 
       {/* ===== NOTIFICATIONS LIST ===== */}
       <div className="space-y-3">
-        {(notifications || []).map((notif, index) => {
+        {(notifications || []).map((notif) => {
           const user = notif.users as unknown as { name: string } | null;
           const isUnread = !notif.is_read;
 
@@ -112,7 +110,7 @@ export default async function NotificationsPage({
               className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
               style={{
                 background: isUnread
-                  ? "linear-gradient(145deg, rgba(15,30,53,0.9) 0%, rgba(10,22,40,0.9) 100%)"
+                  ? "linear-gradient(145deg, var(--surface-glass) 0%, var(--bg-secondary),0.9) 100%)"
                   : "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
                 border: isUnread
                   ? "1px solid rgba(59,130,246,0.2)"
@@ -143,9 +141,9 @@ export default async function NotificationsPage({
                 <div className="flex items-start gap-4">
                   {/* Notification icon */}
                   <div
-                    className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5"
+                    className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5"
                     style={{
-                      background: isUnread ? "rgba(59,130,246,0.12)" : "rgba(15,30,53,0.6)",
+                      background: isUnread ? "rgba(59,130,246,0.12)" : "var(--surface-glass)",
                       border: `1px solid ${isUnread ? "rgba(59,130,246,0.2)" : "var(--divider)"}`,
                     }}
                   >
@@ -211,7 +209,7 @@ export default async function NotificationsPage({
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div
               className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+              style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
             >
               <Bell size={32} className="text-text-disabled opacity-40" />
             </div>
@@ -222,6 +220,7 @@ export default async function NotificationsPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

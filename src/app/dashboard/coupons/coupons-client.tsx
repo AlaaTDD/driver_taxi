@@ -6,7 +6,7 @@ import { createCoupon } from "./actions";
 import { useRouter } from "next/navigation";
 
 const inputStyle = {
-  background: "rgba(15,30,53,0.7)",
+  background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };
@@ -104,7 +104,7 @@ export default function CouponsClient() {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-text-tertiary hover:text-text-primary transition-colors"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   <X size={15} />
                 </button>
@@ -198,7 +198,7 @@ export default function CouponsClient() {
                     type="button"
                     onClick={() => setIsOpen(false)}
                     className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary transition-all hover:text-text-primary"
-                    style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                    style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                   >
                     إلغاء
                   </button>

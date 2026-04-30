@@ -12,7 +12,7 @@ interface TripsClientProps {
 }
 
 const selectStyle = {
-  background: "rgba(15,30,53,0.6)",
+  background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };
@@ -44,7 +44,7 @@ export default function TripsClient({
       {/* Total count label */}
       <div
         className="px-3 py-2 rounded-xl text-[12px] font-semibold whitespace-nowrap"
-        style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+        style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
       >
         إجمالي: <span className="text-text-primary font-black num">{totalCount}</span>
       </div>
@@ -67,8 +67,6 @@ export default function TripsClient({
             <option value="in_progress">جارية</option>
             <option value="completed">مكتملة</option>
             <option value="cancelled">ملغية</option>
-            <option value="no_drivers">لا سائقين</option>
-            <option value="problem">مشكلة</option>
           </select>
           <ChevronLeft size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
         </div>

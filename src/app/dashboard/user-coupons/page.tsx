@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { Ticket, User, CheckCircle, XCircle, Clock, Gift } from "lucide-react";
+import { Ticket, User, CheckCircle, Clock, Gift } from "lucide-react";
 
 export default async function UserCouponsPage({
   searchParams,
@@ -13,6 +15,7 @@ export default async function UserCouponsPage({
   const usedFilter = params.used || "";
   const pageSize = 15;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   let query = supabase
@@ -44,21 +47,17 @@ export default async function UserCouponsPage({
   const totalAssigned = count || 0;
   const totalUsed = (userCoupons || []).filter((uc) => uc.is_used).length;
   const totalUnused = (userCoupons || []).filter((uc) => !uc.is_used).length;
-  const totalUsages = usages?.length || 0;
+  // totalUsages not used in current UI
   const totalDiscount = (usages || []).reduce((s, u) => s + (Number(u.discount_amount) || 0), 0);
 
   return (
-    <div className="space-y-7">
-      {/* ===== PAGE HEADER ===== */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-          <span className="w-1 h-1 rounded-full bg-amber-500/60" />
-          <span className="text-[11px] text-text-disabled">كوبونات المستخدمين</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("userCoupons.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("userCoupons.subtitle")}</p>
         </div>
-        <h1 className="page-title">كوبونات المستخدمين</h1>
-        <p className="page-subtitle">متابعة الكوبونات المعينة للمستخدمين وسجل الاستخدام</p>
-      </div>
 
       {/* ===== STATS ===== */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -96,7 +95,7 @@ export default async function UserCouponsPage({
             href={`/dashboard/user-coupons${f.value ? `?used=${f.value}` : ""}`}
             className="px-4 py-2 rounded-xl text-[12px] font-semibold transition-all"
             style={{
-              background: usedFilter === f.value ? "rgba(59,130,246,0.15)" : "rgba(15,30,53,0.5)",
+              background: usedFilter === f.value ? "rgba(59,130,246,0.15)" : "var(--surface-glass)",
               color: usedFilter === f.value ? "#60A5FA" : "var(--text-tertiary)",
               border: `1px solid ${usedFilter === f.value ? "rgba(59,130,246,0.3)" : "var(--divider)"}`,
             }}
@@ -125,7 +124,7 @@ export default async function UserCouponsPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["المستخدم", "الهاتف", "كود الكوبون", "نوع الخصم", "القيمة", "الحالة", "تاريخ التعيين", "تاريخ الاستخدام"].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -189,7 +188,7 @@ export default async function UserCouponsPage({
                 <tr>
                   <td colSpan={8} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                         <Ticket size={24} className="opacity-40" />
                       </div>
                       <p className="text-text-secondary font-semibold">لا توجد كوبونات معينة</p>
@@ -220,6 +219,7 @@ export default async function UserCouponsPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

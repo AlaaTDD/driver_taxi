@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import { Shield, Clock, User, Database, FileText } from "lucide-react";
 
 export default async function AdminLogsPage({
@@ -13,6 +15,7 @@ export default async function AdminLogsPage({
   const actionFilter = params.action || "";
   const pageSize = 20;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   // Get list of admins for filter
@@ -62,17 +65,13 @@ export default async function AdminLogsPage({
   };
 
   return (
-    <div className="space-y-7">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">نظام</span>
-          <span className="w-1 h-1 rounded-full bg-amber-500/60" />
-          <span className="text-[11px] text-text-disabled">المراقبة</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("adminLogs.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("adminLogs.subtitle")}</p>
         </div>
-        <h1 className="page-title">سجل نشاط الأدمن</h1>
-        <p className="page-subtitle">تتبع كل التغييرات والإجراءات التي تمت بواسطة المشرفين</p>
-      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -111,7 +110,7 @@ export default async function AdminLogsPage({
           defaultValue={adminFilter}
           className="px-4 py-2.5 rounded-xl text-[13px] outline-none"
           style={{
-            background: "rgba(15,30,53,0.6)",
+            background: "var(--surface-glass)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
@@ -129,7 +128,7 @@ export default async function AdminLogsPage({
           defaultValue={actionFilter}
           className="px-4 py-2.5 rounded-xl text-[13px] outline-none"
           style={{
-            background: "rgba(15,30,53,0.6)",
+            background: "var(--surface-glass)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
@@ -195,14 +194,14 @@ export default async function AdminLogsPage({
                 const action = actionLabels[log.action] || {
                   label: log.action,
                   color: "var(--text-secondary)",
-                  bg: "rgba(15,30,53,0.5)",
+                  bg: "var(--surface-glass)",
                 };
                 const admin = log.users as unknown as { name: string; email: string } | null;
 
                 return (
                   <tr
                     key={log.id}
-                    className="group hover:bg-white/[0.02] transition-colors"
+                    className="group hover:bg-white/2 transition-colors"
                     style={{ borderBottom: "1px solid var(--divider)" }}
                   >
                     <td className="px-5 py-4">
@@ -262,7 +261,7 @@ export default async function AdminLogsPage({
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+              style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
             >
               <Shield size={28} className="text-text-disabled opacity-40" />
             </div>
@@ -287,7 +286,7 @@ export default async function AdminLogsPage({
                 <a
                   href={`?page=${page - 1}${adminFilter ? `&admin_id=${adminFilter}` : ""}${actionFilter ? `&action=${actionFilter}` : ""}`}
                   className="px-3 py-1.5 rounded-lg text-[12px] text-text-secondary hover:text-text-primary transition-colors"
-                  style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   السابق
                 </a>
@@ -296,7 +295,7 @@ export default async function AdminLogsPage({
                 <a
                   href={`?page=${page + 1}${adminFilter ? `&admin_id=${adminFilter}` : ""}${actionFilter ? `&action=${actionFilter}` : ""}`}
                   className="px-3 py-1.5 rounded-lg text-[12px] text-text-secondary hover:text-text-primary transition-colors"
-                  style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   التالي
                 </a>
@@ -305,6 +304,7 @@ export default async function AdminLogsPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

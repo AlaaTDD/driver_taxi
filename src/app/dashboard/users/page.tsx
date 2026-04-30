@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardShell } from "@/components/dashboard-shell";
 import UsersClient from "./users-client";
-import { Users, ShieldBan, Shield, UserCheck, Crown } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { Users, ShieldBan, Shield, Crown } from "lucide-react";
 
 export default async function UsersPage({
   searchParams,
@@ -15,6 +17,7 @@ export default async function UsersPage({
   const filterRole = params.role || "";
   const filterStatus = params.status || "";
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
   const authClient = await createClient();
   const { data: { user: currentUser } } = await authClient.auth.getUser();
@@ -51,72 +54,63 @@ export default async function UsersPage({
   ]);
 
   const stats = [
-    { label: "إجمالي المستخدمين", value: totalRes.count || 0, icon: <Users size={18} />, color: "#3B82F6" },
-    { label: "محظورون", value: blockedRes.count || 0, icon: <ShieldBan size={18} />, color: "#EF4444" },
-    { label: "المشرفون", value: supervisorRes.count || 0, icon: <Shield size={18} />, color: "#8B5CF6" },
-    { label: "الأدمن", value: adminsRes.count || 0, icon: <Crown size={18} />, color: "#F59E0B" },
+    { label: t("dashboard.stats.totalUsers"), value: totalRes.count || 0, icon: <Users size={18} />, color: "#3B82F6" },
+    { label: t("common.blocked"), value: blockedRes.count || 0, icon: <ShieldBan size={18} />, color: "#EF4444" },
+    { label: t("users.roles.supervisor"), value: supervisorRes.count || 0, icon: <Shield size={18} />, color: "#8B5CF6" },
+    { label: t("users.roles.admin"), value: adminsRes.count || 0, icon: <Crown size={18} />, color: "#F59E0B" },
   ];
 
   return (
-    <div className="space-y-6">
-
-      {/* ===== PAGE HEADER ===== */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-          <span className="w-1 h-1 rounded-full bg-blue-500/60" />
-          <span className="text-[11px] text-text-disabled">المستخدمون</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("users.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("users.subtitle")}</p>
         </div>
-        <h1 className="page-title">إدارة المستخدمين</h1>
-        <p className="page-subtitle">التحكم الكامل في حسابات المستخدمين والصلاحيات</p>
-      </div>
 
-      {/* ===== STATS ===== */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, i) => (
-          <div key={i} className="group relative rounded-xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1"
-            style={{
-              background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-              border: "1px solid rgba(255,255,255,0.05)",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
-            }}>
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(to left, transparent, ${stat.color}, transparent)`, opacity: 0.6 }} />
-            <div className="flex items-center justify-between">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}25`, color: stat.color }}>
-                {stat.icon}
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, i) => (
+            <div key={i} className="group relative rounded-xl overflow-hidden p-4 bg-surface border border-divider hover:border-divider-strong hover:-translate-y-0.5 transition-all duration-300 shadow-sm">
+              <div className="absolute top-0 left-0 right-0 h-[2px]"
+                style={{ background: `linear-gradient(to left, transparent, ${stat.color}, transparent)`, opacity: 0.6 }} />
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}25`, color: stat.color }}>
+                  {stat.icon}
+                </div>
+                <span className="text-2xl font-black num" style={{ color: stat.color }}>{stat.value}</span>
               </div>
-              <span className="text-2xl font-black num" style={{ color: stat.color }}>{stat.value}</span>
+              <p className="text-text-tertiary text-xs mt-2 font-medium">{stat.label}</p>
             </div>
-            <p className="text-text-tertiary text-[12px] mt-2 font-medium">{stat.label}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* ===== CLIENT (search, table, pagination, modals) ===== */}
-      <UsersClient
-        users={(users || []).map((u) => ({
-          id: u.id,
-          name: u.name,
-          email: u.email,
-          phone: u.phone,
-          role: u.role,
-          is_admin: u.is_admin,
-          is_active: u.is_active,
-          is_blocked: u.is_blocked ?? false,
-          blocked_reason: u.blocked_reason,
-          rating: u.rating,
-          total_trips: u.total_trips,
-        }))}
-        totalCount={count || 0}
-        currentPage={page}
-        totalPages={totalPages}
-        searchQuery={searchQuery}
-        filterRole={filterRole}
-        filterStatus={filterStatus}
-        currentUserId={currentUser?.id || ""}
-      />
-    </div>
+        {/* Client */}
+        <UsersClient
+          users={(users || []).map((u) => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            phone: u.phone,
+            role: u.role,
+            is_admin: u.is_admin,
+            is_active: u.is_active,
+            is_blocked: u.is_blocked ?? false,
+            blocked_reason: u.blocked_reason,
+            rating: u.rating,
+            total_trips: u.total_trips,
+          }))}
+          totalCount={count || 0}
+          currentPage={page}
+          totalPages={totalPages}
+          searchQuery={searchQuery}
+          filterRole={filterRole}
+          filterStatus={filterStatus}
+          currentUserId={currentUser?.id || ""}
+        />
+      </div>
+    </DashboardShell>
   );
 }

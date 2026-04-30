@@ -159,7 +159,7 @@ export default function VehicleTypesClient({
                 disabled={!!editId}
                 placeholder="مثال: car, truck"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="space-y-1.5">
@@ -171,7 +171,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, display_name: e.target.value })}
                 placeholder="مثال: سيارة"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="space-y-1.5">
@@ -183,7 +183,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, icon: e.target.value })}
                 placeholder="directions_car"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="space-y-1.5">
@@ -196,7 +196,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, base_fare: e.target.value })}
                 placeholder="10.00"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="space-y-1.5">
@@ -209,7 +209,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, price_per_km: e.target.value })}
                 placeholder="3.50"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="space-y-1.5">
@@ -221,7 +221,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
                 placeholder="0"
                 className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               />
             </div>
             <div className="sm:col-span-2 lg:col-span-3 flex justify-end gap-3 pt-2">
@@ -261,7 +261,7 @@ export default function VehicleTypesClient({
                 <div
                   className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
                   style={{
-                    background: vt.is_active ? "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15))" : "rgba(15,30,53,0.6)",
+                    background: vt.is_active ? "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15))" : "var(--surface-glass)",
                     border: `1px solid ${vt.is_active ? "rgba(59,130,246,0.2)" : "var(--divider)"}`,
                   }}
                 >
@@ -334,7 +334,7 @@ export default function VehicleTypesClient({
         {vehicleTypes.length === 0 && (
           <div className="py-20 text-center">
             <div className="flex flex-col items-center gap-3 text-text-disabled">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                 <Car size={24} className="opacity-40" />
               </div>
               <div>

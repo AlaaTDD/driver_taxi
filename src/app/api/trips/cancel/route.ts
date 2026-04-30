@@ -16,7 +16,6 @@ export async function POST(req: Request) {
         status: "cancelled",
         cancel_reason: cancel_reason || "تم الإلغاء بواسطة الأدمن",
         cancelled_at: new Date().toISOString(),
-        cancelled_by: "admin",
       })
       .eq("id", trip_id)
       .in("status", ["searching", "accepted", "in_progress"]);

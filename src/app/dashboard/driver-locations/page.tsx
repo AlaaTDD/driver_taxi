@@ -1,8 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { MapPin, Navigation, Clock, Wifi, WifiOff, Hash } from "lucide-react";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
+import { MapPin, Navigation, Wifi, WifiOff, Hash } from "lucide-react";
 
 export default async function DriverLocationsPage() {
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   // Fetch driver locations with driver profiles
@@ -43,17 +46,13 @@ export default async function DriverLocationsPage() {
   const totalCount = locations?.length || 0;
 
   return (
-    <div className="space-y-7">
-      {/* ===== PAGE HEADER ===== */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">مراقبة</span>
-          <span className="w-1 h-1 rounded-full bg-cyan-500/60" />
-          <span className="text-[11px] text-text-disabled">مواقع السائقين</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("driverLocations.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("driverLocations.subtitle")}</p>
         </div>
-        <h1 className="page-title">مواقع السائقين</h1>
-        <p className="page-subtitle">تتبع مواقع السائقين في الوقت الفعلي</p>
-      </div>
 
       {/* ===== STATS ===== */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -96,7 +95,7 @@ export default async function DriverLocationsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["الحالة", "السائق", "الهاتف", "المركبة", "اللوحة", "الإحداثيات", "الاتجاه", "Geohash", "آخر تحديث"].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -112,7 +111,7 @@ export default async function DriverLocationsPage() {
                     <td className="py-3.5 px-4">
                       <span className="relative flex items-center gap-2">
                         <span
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
                           style={{
                             background: online ? "#34D399" : "#6B7280",
                             boxShadow: online ? "0 0 8px rgba(52,211,153,0.6)" : "none",
@@ -130,7 +129,7 @@ export default async function DriverLocationsPage() {
                     </td>
                     <td className="py-3.5 px-4">
                       {profile?.vehicle_plate ? (
-                        <span className="inline-flex px-2 py-0.5 rounded-lg text-[11px] font-bold font-mono" style={{ background: "rgba(15,30,53,0.8)", color: "#FBBF24", border: "1px solid rgba(245,158,11,0.2)" }}>
+                        <span className="inline-flex px-2 py-0.5 rounded-lg text-[11px] font-bold font-mono" style={{ background: "var(--surface-glass)", color: "#FBBF24", border: "1px solid rgba(245,158,11,0.2)" }}>
                           {profile.vehicle_plate}
                         </span>
                       ) : "—"}
@@ -158,7 +157,7 @@ export default async function DriverLocationsPage() {
                 <tr>
                   <td colSpan={9} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}>
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                         <MapPin size={24} className="opacity-40" />
                       </div>
                       <p className="text-text-secondary font-semibold">لا توجد مواقع مسجلة</p>
@@ -193,7 +192,7 @@ export default async function DriverLocationsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["الحالة", "المستخدم", "الإحداثيات", "آخر ظهور"].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -227,6 +226,7 @@ export default async function DriverLocationsPage() {
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

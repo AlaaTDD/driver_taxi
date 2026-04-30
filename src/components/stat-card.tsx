@@ -8,7 +8,6 @@ interface StatCardProps {
   iconBg?: string;
   trend?: { value: number; label: string };
   className?: string;
-  glowColor?: string;
   accentColor?: string;
   subtitle?: string;
 }
@@ -21,7 +20,6 @@ export function StatCard({
   iconBg = "bg-primary/10",
   trend,
   className,
-  glowColor = "rgba(59,130,246,0.2)",
   accentColor = "#3B82F6",
   subtitle,
 }: StatCardProps) {
@@ -33,9 +31,9 @@ export function StatCard({
         className
       )}
       style={{
-        background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-        border: `1px solid rgba(255,255,255,0.05)`,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
+        background: "var(--surface)",
+        border: "1px solid var(--divider)",
+        boxShadow: "var(--shadow-md)",
       }}
     >
       {/* Top accent line */}
@@ -47,19 +45,6 @@ export function StatCard({
         }}
       />
 
-      {/* Corner glow on hover */}
-      <div
-        className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-2xl"
-        style={{ background: glowColor }}
-      />
-
-      {/* Hover border glow */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
-        style={{
-          boxShadow: `0 0 0 1px ${glowColor}, 0 8px 32px rgba(0,0,0,0.4), 0 0 40px ${glowColor}`,
-        }}
-      />
 
       <div className="relative p-5 z-10">
         {/* Header: title + icon */}
@@ -70,13 +55,13 @@ export function StatCard({
           </div>
           <div
             className={cn(
-              "relative w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110",
+              "relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110",
               iconBg,
               iconColor
             )}
             style={{
-              boxShadow: `0 4px 12px ${glowColor}`,
-              border: `1px solid ${glowColor}`,
+              boxShadow: "var(--shadow-sm)",
+              border: "1px solid var(--divider)",
             }}
           >
             {icon}
@@ -84,12 +69,7 @@ export function StatCard({
         </div>
 
         {/* Value */}
-        <div
-          className="text-3xl font-black tracking-tight text-text-primary transition-all duration-300 num"
-          style={{
-            textShadow: `0 0 20px ${glowColor}`,
-          }}
-        >
+        <div className="text-3xl font-black tracking-tight text-text-primary transition-all duration-300 num">
           {value}
         </div>
 

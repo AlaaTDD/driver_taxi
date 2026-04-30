@@ -42,11 +42,11 @@ export async function TopBar() {
     <header
       className="sticky top-0 z-30"
       style={{
-        background: "rgba(4, 8, 16, 0.85)",
+        background: "var(--topbar-bg)",
         backdropFilter: "blur(24px) saturate(180%)",
         WebkitBackdropFilter: "blur(24px) saturate(180%)",
-        borderBottom: "1px solid rgba(26, 45, 71, 0.8)",
-        boxShadow: "0 1px 0 rgba(255,255,255,0.02) inset, 0 4px 20px rgba(0,0,0,0.3)",
+        borderBottom: "1px solid var(--topbar-border)",
+        boxShadow: "var(--shadow-sm)",
       }}
     >
       <div className="flex items-center justify-between h-16 px-4 lg:px-7">
@@ -59,7 +59,7 @@ export async function TopBar() {
 
           {/* Date Badge */}
           <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-text-tertiary font-medium"
-            style={{ background: "rgba(15, 30, 53, 0.5)", border: "1px solid var(--divider)" }}>
+            style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
             {today}
           </div>
 
@@ -69,7 +69,7 @@ export async function TopBar() {
             id="topbar-notifications"
             className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 group hover:border-primary/40 hover:bg-primary/10"
             style={{
-              background: "rgba(15, 30, 53, 0.6)",
+              background: "var(--surface-elevated)",
               border: "1px solid var(--divider)",
             }}
           >
@@ -78,8 +78,7 @@ export async function TopBar() {
               <span
                 className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center text-white text-[9px] font-bold rounded-full px-1"
                 style={{
-                  background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
-                  boxShadow: "0 0 10px rgba(239,68,68,0.5), 0 2px 4px rgba(0,0,0,0.3)",
+                  background: "var(--error)",
                   border: "2px solid var(--background)",
                 }}
               >
@@ -94,7 +93,7 @@ export async function TopBar() {
             id="topbar-settings"
             className="flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-primary transition-all duration-200"
             style={{
-              background: "rgba(15, 30, 53, 0.6)",
+              background: "var(--surface-elevated)",
               border: "1px solid var(--divider)",
             }}
           >
@@ -109,14 +108,9 @@ export async function TopBar() {
             {/* Avatar */}
             <div className="relative">
               <div
-                className="absolute inset-0 rounded-full blur-md opacity-70 scale-110"
-                style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.4), rgba(139,92,246,0.3))" }}
-              />
-              <div
-                className="relative w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-white/10"
+                className="relative w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-divider"
                 style={{
-                  background: "linear-gradient(135deg, #3B82F6 0%, #6366F1 50%, #8B5CF6 100%)",
-                  boxShadow: "0 4px 14px rgba(59,130,246,0.35)",
+                  background: "var(--primary)",
                 }}
               >
                 {userInitial}
@@ -129,7 +123,7 @@ export async function TopBar() {
                 {userName}
               </div>
               <div className="text-[10px] text-text-tertiary mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" style={{ boxShadow: "0 0 6px rgba(16,185,129,0.6)" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
                 مدير النظام
               </div>
             </div>

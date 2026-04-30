@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import { Star, MessageSquare, Trash2, Car } from "lucide-react";
 
 export default async function RatingsPage({
@@ -13,6 +15,7 @@ export default async function RatingsPage({
   const minRating = params.min_rating ? Number(params.min_rating) : 0;
   const pageSize = 15;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   // Get drivers list for filter
@@ -52,52 +55,50 @@ export default async function RatingsPage({
   });
 
   return (
-    <div className="space-y-7">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-          <span className="w-1 h-1 rounded-full bg-yellow-500/60" />
-          <span className="text-[11px] text-text-disabled">التقييمات</span>
-        </div>
-        <h1 className="page-title">تقييمات الرحلات</h1>
-        <p className="page-subtitle">عرض وإدارة تقييمات المستخدمين للسائقين</p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "إجمالي التقييمات", value: count || 0, icon: MessageSquare, color: "#3B82F6" },
-          { label: "متوسط التقييم", value: avgRating, icon: Star, color: "#F59E0B" },
-          { label: "5 نجوم", value: ratingCounts[5], icon: Star, color: "#10B981" },
-          { label: "1-2 نجوم", value: ratingCounts[1] + ratingCounts[2], icon: Star, color: "#EF4444" },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl p-4"
-            style={{
-              background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-              border: "1px solid rgba(255,255,255,0.05)",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}
-              >
-                <stat.icon size={18} style={{ color: stat.color }} />
-              </div>
-              <div>
-                <p className="text-[11px] text-text-tertiary">{stat.label}</p>
-                <p className="text-[18px] font-black text-text-primary">{stat.value}</p>
-              </div>
-            </div>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("ratings.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("ratings.subtitle")}</p>
           </div>
-        ))}
-      </div>
 
-      {/* Rating Distribution */}
-      <div
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "إجمالي التقييمات", value: count || 0, icon: MessageSquare, color: "#3B82F6" },
+              { label: "متوسط التقييم", value: avgRating, icon: Star, color: "#F59E0B" },
+              { label: "5 نجوم", value: ratingCounts[5], icon: Star, color: "#10B981" },
+              { label: "1-2 نجوم", value: ratingCounts[1] + ratingCounts[2], icon: Star, color: "#EF4444" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl p-4"
+                style={{
+                  background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}
+                  >
+                    <stat.icon size={18} style={{ color: stat.color }} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-text-tertiary">{stat.label}</p>
+                    <p className="text-[18px] font-black text-text-primary">{stat.value}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Rating Distribution */}
+        <div
         className="rounded-2xl p-5"
         style={{
           background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
@@ -124,7 +125,7 @@ export default async function RatingsPage({
                   <span className="text-[12px] font-bold text-text-secondary">{stars}</span>
                   <Star size={12} style={{ color: colors[stars as keyof typeof colors] }} />
                 </div>
-                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(15,30,53,0.6)" }}>
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-glass)" }}>
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -147,7 +148,7 @@ export default async function RatingsPage({
           defaultValue={driverFilter}
           className="px-4 py-2.5 rounded-xl text-[13px] outline-none"
           style={{
-            background: "rgba(15,30,53,0.6)",
+            background: "var(--surface-glass)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
@@ -165,7 +166,7 @@ export default async function RatingsPage({
           defaultValue={minRating || ""}
           className="px-4 py-2.5 rounded-xl text-[13px] outline-none"
           style={{
-            background: "rgba(15,30,53,0.6)",
+            background: "var(--surface-glass)",
             border: "1px solid var(--divider)",
             color: "var(--text-primary)",
           }}
@@ -284,7 +285,7 @@ export default async function RatingsPage({
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
           >
             <Star size={28} className="text-text-disabled opacity-40" />
           </div>
@@ -306,7 +307,7 @@ export default async function RatingsPage({
               <a
                 href={`?page=${page - 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`}
                 className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               >
                 السابق
               </a>
@@ -315,7 +316,7 @@ export default async function RatingsPage({
               <a
                 href={`?page=${page + 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`}
                 className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors"
-                style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)" }}
+                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
               >
                 التالي
               </a>
@@ -323,6 +324,7 @@ export default async function RatingsPage({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

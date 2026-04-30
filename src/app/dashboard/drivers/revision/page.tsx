@@ -119,7 +119,7 @@ function DriverRevisionForm() {
                       onClick={() => toggleField(opt.key)}
                       className="px-3 py-2 rounded-xl text-[12px] font-bold transition-all"
                       style={{
-                        background: active ? "rgba(139,92,246,0.15)" : "rgba(15,30,53,0.6)",
+                        background: active ? "rgba(139,92,246,0.15)" : "var(--surface-glass)",
                         border: active ? "1px solid rgba(139,92,246,0.4)" : "1px solid var(--divider)",
                         color: active ? "#C4B5FD" : "var(--text-secondary)",
                         boxShadow: active ? "0 0 12px rgba(139,92,246,0.1)" : "none",
@@ -146,7 +146,7 @@ function DriverRevisionForm() {
                 placeholder="اكتب تفاصيل طلب المراجعة..."
                 className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none transition-all leading-relaxed"
                 style={{
-                  background: "rgba(15,30,53,0.7)",
+                  background: "var(--surface-glass)",
                   border: "1px solid var(--divider)",
                   color: "var(--text-primary)",
                 }}

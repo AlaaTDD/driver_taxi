@@ -243,7 +243,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     <div
                       className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
-                        background: isActive ? "rgba(16,185,129,0.15)" : "rgba(15,30,53,0.6)",
+                        background: isActive ? "rgba(16,185,129,0.15)" : "var(--surface-glass)",
                         border: `1px solid ${isActive ? "rgba(16,185,129,0.3)" : "var(--divider)"}`,
                       }}
                     >
@@ -290,7 +290,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 <div className="space-y-2">
                   <div
                     className="flex items-center justify-between p-3 rounded-xl"
-                    style={{ background: "rgba(15,30,53,0.5)" }}
+                    style={{ background: "var(--surface-glass)" }}
                   >
                     <span className="text-[12px] text-text-secondary">الأجرة الأساسية</span>
                     <span className="text-[14px] font-bold text-success">
@@ -299,7 +299,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   </div>
                   <div
                     className="flex items-center justify-between p-3 rounded-xl"
-                    style={{ background: "rgba(15,30,53,0.5)" }}
+                    style={{ background: "var(--surface-glass)" }}
                   >
                     <span className="text-[12px] text-text-secondary">السعر/كم</span>
                     <span className="text-[14px] font-bold text-success">
@@ -332,7 +332,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
           >
             <Car size={28} className="text-text-disabled opacity-40" />
           </div>
@@ -387,7 +387,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   placeholder="مثال: luxury_car"
                   className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                   style={{
-                    background: "rgba(15,30,53,0.6)",
+                    background: "var(--surface-glass)",
                     border: "1px solid var(--divider)",
                     color: "var(--text-primary)",
                   }}
@@ -410,7 +410,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   placeholder="مثال: سيارة فاخرة"
                   className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                   style={{
-                    background: "rgba(15,30,53,0.6)",
+                    background: "var(--surface-glass)",
                     border: "1px solid var(--divider)",
                     color: "var(--text-primary)",
                   }}
@@ -434,7 +434,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                         onClick={() => setForm({ ...form, icon: iconOpt.value })}
                         className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all"
                         style={{
-                          background: isSelected ? "rgba(16,185,129,0.15)" : "rgba(15,30,53,0.6)",
+                          background: isSelected ? "rgba(16,185,129,0.15)" : "var(--surface-glass)",
                           border: isSelected ? "1px solid rgba(16,185,129,0.4)" : "1px solid var(--divider)",
                           color: isSelected ? "#10B981" : "var(--text-secondary)",
                           minWidth: "60px",
@@ -461,7 +461,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                       onClick={() => setSelectedColor(color.value)}
                       className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all"
                       style={{
-                        background: selectedColor === color.value ? "rgba(15,30,53,0.8)" : "rgba(15,30,53,0.6)",
+                        background: selectedColor === color.value ? "var(--surface-glass)" : "var(--surface-glass)",
                         border: `1px solid ${selectedColor === color.value ? color.value : "var(--divider)"}`,
                       }}
                     >
@@ -489,7 +489,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     placeholder="15.00"
                     className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                     style={{
-                      background: "rgba(15,30,53,0.6)",
+                      background: "var(--surface-glass)",
                       border: "1px solid var(--divider)",
                       color: "var(--text-primary)",
                     }}
@@ -509,7 +509,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     placeholder="5.00"
                     className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                     style={{
-                      background: "rgba(15,30,53,0.6)",
+                      background: "var(--surface-glass)",
                       border: "1px solid var(--divider)",
                       color: "var(--text-primary)",
                     }}
@@ -530,7 +530,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                   style={{
-                    background: "rgba(15,30,53,0.6)",
+                    background: "var(--surface-glass)",
                     border: "1px solid var(--divider)",
                     color: "var(--text-primary)",
                   }}
@@ -544,7 +544,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   type="button"
                   onClick={() => setShowModal(false)}
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary transition-all hover:text-text-primary"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   إلغاء
                 </button>

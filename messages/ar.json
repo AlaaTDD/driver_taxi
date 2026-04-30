@@ -1,0 +1,322 @@
+{
+  "metadata": {
+    "title": "تاكسي - لوحة تحكم الأدمن",
+    "description": "لوحة تحكم إدارة تطبيق تاكسي"
+  },
+  "common": {
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمين",
+    "drivers": "السائقين",
+    "trips": "الرحلات",
+    "complaints": "الشكاوى",
+    "ratings": "التقييمات",
+    "coupons": "الكوبونات",
+    "userCoupons": "كوبونات المستخدمين",
+    "notifications": "الإشعارات",
+    "vehicleTypes": "أنواع المركبات",
+    "pricing": "التسعير",
+    "adminLogs": "سجلات الأدمن",
+    "messages": "الرسائل",
+    "tripOffers": "عروض الرحلات",
+    "driverLocations": "مواقع السائقين",
+    "settings": "الإعدادات",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "add": "إضافة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "view": "عرض",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "pending": "معلق",
+    "completed": "مكتمل",
+    "cancelled": "ملغى",
+    "blocked": "محظور",
+    "verified": "معتمد",
+    "notVerified": "غير معتمد",
+    "available": "متاح",
+    "notAvailable": "غير متاح",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "total": "الإجمالي",
+    "noData": "لا توجد بيانات",
+    "loading": "جاري التحميل",
+    "error": "حدث خطأ",
+    "success": "تم بنجاح",
+    "warning": "تحذير",
+    "info": "معلومة",
+    "yes": "نعم",
+    "no": "لا",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "actions": "إجراءات",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "تاريخ التحديث",
+    "details": "التفاصيل",
+    "submit": "إرسال",
+    "send": "إرسال",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام",
+    "logout": "تسجيل الخروج",
+    "profile": "الملف الشخصي",
+    "all": "الكل"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "لوحة تحكم تاكسي",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة المرور",
+    "submit": "دخول",
+    "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+  },
+  "sidebar": {
+    "sections": {
+      "operations": "العمليات",
+      "marketing": "التسويق",
+      "system": "النظام"
+    }
+  },
+  "dashboard": {
+    "overview": "نظرة عامة",
+    "stats": {
+      "totalUsers": "إجمالي المستخدمين",
+      "totalDrivers": "إجمالي السائقين",
+      "totalTrips": "إجمالي الرحلات",
+      "completedTrips": "رحلات مكتملة",
+      "activeTrips": "رحلات نشطة",
+      "cancelledTrips": "رحلات ملغاة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "verifiedDrivers": "سائقين معتمدين",
+      "availableDrivers": "سائقين متاحين",
+      "pendingDrivers": "سائقين بانتظار الاعتماد",
+      "blockedUsers": "مستخدمين محظورين",
+      "totalComplaints": "إجمالي الشكاوى",
+      "pendingComplaints": "شكاوى معلقة",
+      "totalCoupons": "إجمالي الكوبونات",
+      "activeCoupons": "كوبونات نشطة"
+    },
+    "recentTrips": "أحدث الرحلات",
+    "recentComplaints": "أحدث الشكاوى",
+    "charts": {
+      "tripsByStatus": "الرحلات حسب الحالة",
+      "revenueByDay": "الإيرادات حسب اليوم",
+      "tripStatus": "توزيع حالات الرحلات",
+      "totalTrips": "رحلة إجمالاً",
+      "tripsLabel": "رحلة",
+      "revenueByVehicle": "الإيرادات حسب نوع المركبة",
+      "totalLabel": "إجمالي",
+      "revenueLabel": "الإيرادات"
+    }
+  },
+  "users": {
+    "title": "إدارة المستخدمين",
+    "subtitle": "التحكم الكامل في حسابات المستخدمين والصلاحيات",
+    "addUser": "إضافة مستخدم",
+    "filterByRole": "تصفية حسب الدور",
+    "filterByStatus": "تصفية حسب الحالة",
+    "roles": {
+      "user": "مستخدم",
+      "driver": "سائق",
+      "admin": "أدمن",
+      "supervisor": "مشرف"
+    },
+    "blockUser": "حظر مستخدم",
+    "unblockUser": "إلغاء الحظر",
+    "blockReason": "سبب الحظر",
+    "setRole": "تعيين الدور",
+    "userDetails": "تفاصيل المستخدم"
+  },
+  "drivers": {
+    "title": "إدارة السائقين",
+    "subtitle": "اعتماد السائقين وإدارة ملفاتهم وطلب مراجعة الوثائق",
+    "tabs": {
+      "pending": "بانتظار الاعتماد",
+      "approved": "معتمدون",
+      "blocked": "محظورون",
+      "revision": "يحتاج مراجعة"
+    },
+    "verify": "اعتماد",
+    "revoke": "إلغاء الاعتماد",
+    "requestRevision": "طلب مراجعة",
+    "documents": {
+      "nationalId": "هوية",
+      "license": "رخصة",
+      "criminalRecord": "سجل",
+      "vehicle": "مركبة"
+    },
+    "vehicleInfo": "معلومات المركبة",
+    "driverDetails": "تفاصيل السائق",
+    "backToList": "العودة للقائمة",
+    "registered": "تاريخ التسجيل",
+    "status": {
+      "verified": "معتمد",
+      "pending": "بانتظار الاعتماد",
+      "blocked": "محظور"
+    }
+  },
+  "trips": {
+    "title": "إدارة الرحلات",
+    "subtitle": "متابعة وإدارة جميع الرحلات",
+    "tripDetails": "تفاصيل الرحلة",
+    "cancelTrip": "إلغاء الرحلة",
+    "cancelReason": "سبب الإلغاء",
+    "statuses": {
+      "searching": "جاري البحث",
+      "accepted": "تم القبول",
+      "driver_arriving": "السائق قادم",
+      "in_progress": "جارية",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "from": "من",
+    "to": "إلى",
+    "price": "السعر",
+    "driver": "السائق",
+    "passenger": "الراكب"
+  },
+  "complaints": {
+    "title": "إدارة الشكاوى",
+    "subtitle": "متابعة وحل شكاوى المستخدمين",
+    "complaintDetails": "تفاصيل الشكوى",
+    "reply": "رد",
+    "resolve": "حل",
+    "priority": {
+      "low": "منخفضة",
+      "normal": "عادية",
+      "high": "عالية",
+      "urgent": "عاجلة"
+    },
+    "statuses": {
+      "open": "مفتوحة",
+      "in_progress": "قيد المعالجة",
+      "resolved": "محلولة",
+      "closed": "مغلقة"
+    },
+    "categories": {
+      "general": "عام",
+      "trip": "رحلة",
+      "driver": "سائق",
+      "payment": "دفع",
+      "technical": "تقني"
+    }
+  },
+  "ratings": {
+    "title": "التقييمات",
+    "subtitle": "تقييمات المستخدمين للسائقين",
+    "rating": "التقييم",
+    "comment": "التعليق",
+    "deleteRating": "حذف التقييم"
+  },
+  "coupons": {
+    "title": "إدارة الكوبونات",
+    "subtitle": "إنشاء وإدارة كوبونات الخصم",
+    "addCoupon": "إضافة كوبون",
+    "code": "الكود",
+    "discountType": "نوع الخصم",
+    "discountValue": "قيمة الخصم",
+    "minTripPrice": "الحد الأدنى لسعر الرحلة",
+    "maxUses": "الحد الأقصى للاستخدام",
+    "expiresAt": "تاريخ الانتهاء",
+    "isActive": "نشط",
+    "usedCount": "عدد الاستخدامات",
+    "discountTypes": {
+      "percentage": "نسبة مئوية",
+      "fixed": "قيمة ثابتة"
+    }
+  },
+  "userCoupons": {
+    "title": "كوبونات المستخدمين",
+    "subtitle": "تتبع كوبونات المستخدمين واستخداماتها",
+    "assignCoupon": "تعيين كوبون",
+    "used": "مستخدم",
+    "notUsed": "غير مستخدم",
+    "assignedAt": "تاريخ التعيين",
+    "usedAt": "تاريخ الاستخدام"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "subtitle": "إرسال وإدارة الإشعارات",
+    "sendNotification": "إرسال إشعار",
+    "sendBroadcast": "إرسال إشعار جماعي",
+    "titleField": "العنوان",
+    "messageField": "الرسالة",
+    "type": "النوع",
+    "types": {
+      "general": "عام",
+      "trip": "رحلة",
+      "promo": "عرض",
+      "system": "نظام",
+      "trip_offer": "عرض رحلة",
+      "trip_completed": "مكتملة",
+      "trip_cancelled": "ملغاة",
+      "account_verified": "اعتماد"
+    }
+  },
+  "pricing": {
+    "title": "التسعير والأسعار",
+    "subtitle": "إدارة أسعار المركبات وتكوينات الأجرة"
+  },
+  "vehicleTypes": {
+    "title": "أنواع المركبات",
+    "subtitle": "إدارة أنواع المركبات والتسعير",
+    "addType": "إضافة نوع",
+    "name": "الاسم",
+    "displayName": "الاسم المعروض",
+    "baseFare": "الأجرة الأساسية",
+    "pricePerKm": "السعر لكل كم",
+    "sortOrder": "الترتيب",
+    "icon": "الأيقونة"
+  },
+  "adminLogs": {
+    "title": "سجلات الأدمن",
+    "subtitle": "تتبع جميع إجراءات الأدمن",
+    "action": "الإجراء",
+    "tableName": "الجدول",
+    "recordId": "معرف السجل",
+    "admin": "الأدمن",
+    "ip": "عنوان IP",
+    "oldData": "البيانات القديمة",
+    "newData": "البيانات الجديدة"
+  },
+  "messages": {
+    "title": "الرسائل",
+    "subtitle": "إدارة رسائل الدعم"
+  },
+  "tripOffers": {
+    "title": "عروض الرحلات",
+    "subtitle": "إدارة عروض السائقين للرحلات"
+  },
+  "driverLocations": {
+    "title": "مواقع السائقين",
+    "subtitle": "تتبع مواقع السائقين في الوقت الفعلي",
+    "totalLocations": "إجمالي المواقع",
+    "onlineNow": "متصل الآن",
+    "offline": "غير متصل",
+    "onlineUsers": "مستخدمين أونلاين",
+    "coordinates": "الإحداثيات",
+    "heading": "الاتجاه",
+    "lastUpdate": "آخر تحديث"
+  },
+  "errors": {
+    "generic": "حدث خطأ غير متوقع",
+    "notFound": "الصفحة غير موجودة",
+    "unauthorized": "غير مصرح",
+    "forbidden": "غير مسموح"
+  }
+}

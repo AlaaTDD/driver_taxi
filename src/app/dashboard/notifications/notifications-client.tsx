@@ -11,7 +11,7 @@ interface NotificationsClientProps {
 }
 
 const selectStyle = {
-  background: "rgba(15,30,53,0.6)",
+  background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };
@@ -173,7 +173,7 @@ export default function NotificationsClient({
                 <button
                   onClick={() => setShowSendModal(false)}
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-text-tertiary hover:text-text-primary transition-colors"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   <X size={15} />
                 </button>
@@ -232,7 +232,7 @@ export default function NotificationsClient({
                 <button
                   onClick={() => setShowSendModal(false)}
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary transition-all hover:text-text-primary"
-                  style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
                   إلغاء
                 </button>

@@ -70,7 +70,7 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
                   border: `1px solid ${opt.color}40`,
                   boxShadow: `0 0 12px ${opt.color}15`,
                 } : {
-                  background: "rgba(15,30,53,0.6)",
+                  background: "var(--surface-glass)",
                   border: "1px solid var(--divider)",
                   color: "var(--text-tertiary)",
                 }}>
@@ -92,7 +92,7 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
             id="complaint-reply-text"
             className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none transition-all leading-relaxed"
             style={{
-              background: "rgba(15,30,53,0.7)",
+              background: "var(--surface-glass)",
               border: "1px solid var(--divider)",
               color: "var(--text-primary)",
             }}

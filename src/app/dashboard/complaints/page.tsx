@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
+import { DashboardShell } from "@/components/dashboard-shell";
 import ComplaintsClient from "@/app/dashboard/complaints/complaints-client";
+import { getTranslations } from "next-intl/server";
 import { MessageSquareWarning, CheckCircle, Clock, AlertTriangle, Zap } from "lucide-react";
 
 export default async function ComplaintsPage({
@@ -16,12 +18,13 @@ export default async function ComplaintsPage({
   const filterPriority = params.priority || "";
   const filterCategory = params.category || "";
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   let query = supabase
     .from("complaints")
     .select(`
-      id, subject, message, category, status, priority,
+      id, title, description, category, status, priority,
       admin_reply, replied_at, resolved_at, created_at,
       users!user_id(id, name, phone),
       admin:users!admin_id(name)
@@ -46,10 +49,10 @@ export default async function ComplaintsPage({
   ]);
 
   const stats = [
-    { label: "مفتوحة", value: openRes.count || 0, icon: <Clock size={18} />, color: "#F59E0B" },
-    { label: "قيد المعالجة", value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "#3B82F6" },
-    { label: "محلولة", value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "#10B981" },
-    { label: "عاجلة", value: urgentRes.count || 0, icon: <Zap size={18} />, color: "#EF4444" },
+    { label: t("complaints.statuses.open"), value: openRes.count || 0, icon: <Clock size={18} />, color: "#F59E0B" },
+    { label: t("complaints.statuses.in_progress"), value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "#3B82F6" },
+    { label: t("complaints.statuses.resolved"), value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "#10B981" },
+    { label: t("complaints.priority.urgent"), value: urgentRes.count || 0, icon: <Zap size={18} />, color: "#EF4444" },
   ];
 
   const statusVariant = (s: string) => {
@@ -77,18 +80,13 @@ export default async function ComplaintsPage({
   };
 
   return (
-    <div className="space-y-6">
-
-      {/* ===== HEADER ===== */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-          <span className="w-1 h-1 rounded-full bg-red-500/60" />
-          <span className="text-[11px] text-text-disabled">الشكاوي</span>
+    <DashboardShell>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("complaints.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("complaints.subtitle")}</p>
         </div>
-        <h1 className="page-title">الشكاوي</h1>
-        <p className="page-subtitle">عرض وإدارة الرد على شكاوي المستخدمين</p>
-      </div>
 
       {/* ===== STATS ===== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -142,7 +140,7 @@ export default async function ComplaintsPage({
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "rgba(15,30,53,0.4)", borderBottom: "1px solid var(--divider)" }}>
+              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
                 {["المستخدم", "الموضوع", "التصنيف", "الأولوية", "الحالة", "التاريخ", "إجراء"].map(h => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -159,7 +157,7 @@ export default async function ComplaintsPage({
                       <p className="text-text-disabled text-[11px] num">{user?.phone}</p>
                     </td>
                     <td className="py-3 px-4">
-                      <p className="text-text-secondary text-[13px] max-w-[200px] truncate">{complaint.subject}</p>
+                      <p className="text-text-secondary text-[13px] max-w-[200px] truncate">{complaint.title}</p>
                     </td>
                     <td className="py-3 px-4">
                       <span className="px-2 py-1 rounded-lg text-[11px] font-bold"
@@ -207,13 +205,13 @@ export default async function ComplaintsPage({
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-bold text-text-primary text-[14px]">{user?.name}</p>
-                    <p className="text-text-tertiary text-[12px]">{complaint.subject}</p>
+                    <p className="text-text-tertiary text-[12px]">{complaint.title}</p>
                   </div>
                   <Badge variant={statusVariant(complaint.status) as "success" | "warning" | "info" | "error" | "default"} dot>
                     {statusLabel(complaint.status)}
                   </Badge>
                 </div>
-                <p className="text-text-secondary text-[12px] line-clamp-2">{complaint.message}</p>
+                <p className="text-text-secondary text-[12px] line-clamp-2">{complaint.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px]" style={{ color: priorityColor(complaint.priority) }}>
                     {complaint.priority === "urgent" ? "⚡ عاجل" : "— " + complaint.priority}
@@ -226,11 +224,12 @@ export default async function ComplaintsPage({
           })}
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
 
-function ComplaintReplyButton({ complaint }: { complaint: { id: string; subject: string; status: string; message: string } }) {
+function ComplaintReplyButton({ complaint }: { complaint: { id: string; title: string; status: string; description: string } }) {
   if (complaint.status === "closed") return null;
   return (
     <a href={`/dashboard/complaints/${complaint.id}`}

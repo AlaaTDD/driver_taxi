@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { getTranslations } from "next-intl/server";
 import { MessageSquare, User, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default async function MessagesPage({
@@ -11,6 +13,7 @@ export default async function MessagesPage({
   const page = Number(params.page) || 1;
   const pageSize = 20;
 
+  const t = await getTranslations();
   const supabase = createAdminClient();
 
   const query = supabase
@@ -31,28 +34,21 @@ export default async function MessagesPage({
   ];
 
   return (
-    <div className="space-y-7">
+    <DashboardShell>
+      <div className="space-y-6">
 
-      {/* ===== PAGE HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
-            <span className="w-1 h-1 rounded-full bg-sky-500/60" />
-            <span className="text-[11px] text-text-disabled">الرسائل</span>
+        {/* ===== PAGE HEADER ===== */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("messages.title")}</h1>
+            <p className="text-sm text-text-secondary mt-1">{t("messages.subtitle")}</p>
           </div>
-          <h1 className="page-title">الرسائل</h1>
-          <p className="page-subtitle">عرض رسائل الدعم والمحادثات بين المستخدمين والسائقين</p>
-        </div>
 
-        <div
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-          style={{ background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.2)", color: "#22D3EE" }}
-        >
-          <MessageSquare size={11} />
-          {count || 0} رسالة
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/5 border border-cyan-500/20 text-cyan-500">
+            <MessageSquare size={11} />
+            {count || 0} {t("messages.title")}
+          </div>
         </div>
-      </div>
 
       {/* ===== MESSAGES LIST ===== */}
       <div className="space-y-3">
@@ -79,13 +75,13 @@ export default async function MessagesPage({
 
               {/* Top accent */}
               <div
-                className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ background: "linear-gradient(to left, transparent, rgba(6,182,212,0.4), transparent)" }}
               />
 
               <div className="relative flex items-start gap-4 p-5">
                 {/* Avatar */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-white/10"
                     style={{ background: avatarBg, boxShadow: "0 2px 10px rgba(0,0,0,0.3)" }}
@@ -120,7 +116,7 @@ export default async function MessagesPage({
 
                 {/* Message bubble decoration */}
                 <div
-                  className="flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity"
+                  className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity"
                   style={{ background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.15)" }}
                 >
                   <MessageSquare size={14} className="text-info" />
@@ -135,7 +131,7 @@ export default async function MessagesPage({
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div
               className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: "rgba(15,30,53,0.8)", border: "1px solid var(--divider)" }}
+              style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
             >
               <MessageSquare size={32} className="text-text-disabled opacity-40" />
             </div>
@@ -153,7 +149,7 @@ export default async function MessagesPage({
           <a
             href={`/dashboard/messages?page=${page - 1}`}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page <= 1 ? "pointer-events-none opacity-30" : "hover:bg-surface-elevated"}`}
-            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
           >
             <ChevronRight size={14} />
           </a>
@@ -166,7 +162,7 @@ export default async function MessagesPage({
               style={
                 p === page
                   ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
-                  : { background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
+                  : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
               }
             >
               {p}
@@ -176,12 +172,13 @@ export default async function MessagesPage({
           <a
             href={`/dashboard/messages?page=${page + 1}`}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${page >= totalPages ? "pointer-events-none opacity-30" : "hover:bg-surface-elevated"}`}
-            style={{ background: "rgba(15,30,53,0.6)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
           >
             <ChevronLeft size={14} />
           </a>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
