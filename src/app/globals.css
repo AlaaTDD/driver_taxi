@@ -481,13 +481,7 @@ body {
     transition: all 0.3s ease;
   }
 
-  .sidebar-logo-glow {
-    background: var(--sb-logo-glow);
-  }
 
-  .sidebar-status-dot {
-    border: 2px solid var(--sb-status-dot-border);
-  }
 
   .sidebar-brand-name {
     background: var(--sb-brand-gradient);

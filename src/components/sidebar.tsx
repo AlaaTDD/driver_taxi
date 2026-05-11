@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, Users, Car, MapPin, Tag, DollarSign,
   Bell, MessageSquare, MessageSquareWarning, LogOut, Menu,
-  X, Zap, Star, Shield, Truck, ArrowLeftRight, Ticket,
+  X, Star, Shield, Truck, ArrowLeftRight, Ticket,
   Navigation, Wallet, Banknote, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -313,33 +313,45 @@ function SidebarContent({
       >
         {/* logomark */}
         <div className="relative flex-shrink-0">
-          {/* glow behind logo */}
-          <div
-            className="absolute inset-0 rounded-xl blur-md scale-125 opacity-40 sidebar-logo-glow"
-          />
           <div
             className="relative flex items-center justify-center rounded-xl border sidebar-logo"
             style={{
-              width:  collapsed ? 38 : 40,
-              height: collapsed ? 38 : 40,
+              width:  collapsed ? 38 : 42,
+              height: collapsed ? 38 : 42,
             }}
           >
-            <Zap
-              size={18}
-              className="text-white"
-              style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.6))" }}
-            />
+            {/* inline taxi SVG */}
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ width: collapsed ? 18 : 20, height: collapsed ? 18 : 20 }}
+            >
+              {/* car body */}
+              <path
+                d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z"
+                fill="rgba(255,255,255,0.95)"
+              />
+              {/* car roof / windshield */}
+              <path
+                d="M5.5 14l2-5h9l2 5"
+                stroke="rgba(255,255,255,0.95)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="rgba(255,255,255,0.15)"
+              />
+              {/* taxi sign on top */}
+              <rect x="9" y="6" width="6" height="3" rx="1" fill="#FBBF24" />
+              <rect x="10.5" y="6.7" width="3" height="1.5" rx="0.5" fill="#F59E0B" opacity="0.6" />
+              {/* wheels */}
+              <circle cx="7" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
+              <circle cx="17" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
+              {/* headlights */}
+              <rect x="19" y="14.5" width="1.5" height="1" rx="0.5" fill="#FBBF24" opacity="0.8" />
+              <rect x="3.5" y="14.5" width="1.5" height="1" rx="0.5" fill="#FCA5A5" opacity="0.7" />
+            </svg>
           </div>
-          {/* live status dot */}
-          <span className="absolute -bottom-[3px] -left-[3px] flex h-3 w-3">
-            <span
-              className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-55 animate-ping"
-              style={{ animationDuration: "2.5s" }}
-            />
-            <span
-              className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500 sidebar-status-dot"
-            />
-          </span>
         </div>
 
         {/* brand text */}
