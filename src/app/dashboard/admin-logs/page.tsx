@@ -18,7 +18,7 @@ export default async function AdminLogsPage({
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  // Get list of admins for filter
+  
   const { data: admins } = await supabase
     .from("users")
     .select("id, name")
@@ -67,13 +67,13 @@ export default async function AdminLogsPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Header */}
+        
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("adminLogs.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("adminLogs.subtitle")}</p>
         </div>
 
-      {/* Stats */}
+      
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "إجمالي السجلات", value: count || 0, icon: FileText, color: "#3B82F6" },
@@ -103,7 +103,7 @@ export default async function AdminLogsPage({
         ))}
       </div>
 
-      {/* Filters */}
+      
       <form className="flex flex-wrap gap-3 items-center">
         <select
           name="admin_id"
@@ -160,7 +160,7 @@ export default async function AdminLogsPage({
         )}
       </form>
 
-      {/* Logs Table */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -256,7 +256,7 @@ export default async function AdminLogsPage({
           </table>
         </div>
 
-        {/* Empty State */}
+        
         {(!logs || logs.length === 0) && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div
@@ -272,7 +272,7 @@ export default async function AdminLogsPage({
           </div>
         )}
 
-        {/* Pagination */}
+        
         {totalPages > 1 && (
           <div
             className="flex items-center justify-between px-5 py-4"

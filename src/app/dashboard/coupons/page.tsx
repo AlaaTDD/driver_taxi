@@ -31,7 +31,7 @@ export default async function CouponsPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("coupons.title")}</h1>
@@ -43,12 +43,12 @@ export default async function CouponsPage({
             <span className="w-1.5 h-1.5 rounded-full bg-success" />
             {activeCount} {t("common.active")}
           </div>
-          {/* Add New Coupon Button */}
+          
           <CouponsClient />
         </div>
       </div>
 
-      {/* ===== COUPONS TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -57,7 +57,7 @@ export default async function CouponsPage({
           boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
-        {/* Header bar */}
+        
         <div
           className="flex items-center justify-between px-6 py-4"
           style={{ borderBottom: "1px solid var(--divider)" }}
@@ -101,7 +101,7 @@ export default async function CouponsPage({
                     className="group/row table-row-hover"
                     style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}
                   >
-                    {/* Coupon Code */}
+                    
                     <td className="py-3.5 px-4">
                       <div
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-[12px] mono"
@@ -117,7 +117,7 @@ export default async function CouponsPage({
                       </div>
                     </td>
 
-                    {/* Discount Type */}
+                    
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-1.5">
                         {coupon.discount_type === "percentage" ? (
@@ -131,7 +131,7 @@ export default async function CouponsPage({
                       </div>
                     </td>
 
-                    {/* Discount Value */}
+                    
                     <td className="py-3.5 px-4">
                       <span className="text-[14px] font-black num"
                         style={{ color: "#34D399" }}>
@@ -141,12 +141,12 @@ export default async function CouponsPage({
                       </span>
                     </td>
 
-                    {/* Min Price */}
+                    
                     <td className="py-3.5 px-4 text-text-tertiary text-[13px] num">
                       {coupon.min_trip_price ? formatCurrency(Number(coupon.min_trip_price)) : "—"}
                     </td>
 
-                    {/* Usage */}
+                    
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-1.5">
                         <span className="text-text-primary font-bold text-[13px] num">{coupon.used_count}</span>
@@ -155,7 +155,7 @@ export default async function CouponsPage({
                       </div>
                     </td>
 
-                    {/* Expiry */}
+                    
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       {coupon.expires_at ? (
                         <span className={`text-[12px] font-medium ${isExpired ? "text-error" : "text-text-tertiary"}`}>
@@ -166,14 +166,14 @@ export default async function CouponsPage({
                       )}
                     </td>
 
-                    {/* Status */}
+                    
                     <td className="py-3.5 px-4">
                       <Badge variant={coupon.is_active ? "success" : "error"} dot>
                         {coupon.is_active ? "نشط" : "معطّل"}
                       </Badge>
                     </td>
 
-                    {/* Actions */}
+                    
                     <td className="py-3.5 px-4">
                       <div className="flex gap-2">
                         <form action={`/api/coupons/toggle`} method="POST">
@@ -226,7 +226,7 @@ export default async function CouponsPage({
         </div>
       </div>
 
-      {/* ===== PAGINATION ===== */}
+      
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <a

@@ -51,19 +51,19 @@ export async function TopBar() {
     >
       <div className="flex items-center justify-between h-16 px-4 lg:px-7">
 
-        {/* Search Bar */}
+        
         <TopBarSearch />
 
-        {/* Right-side Actions */}
+        
         <div className="flex items-center gap-2 mr-auto">
 
-          {/* Date Badge */}
+          
           <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-text-tertiary font-medium"
             style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
             {today}
           </div>
 
-          {/* Notifications Bell */}
+          
           <Link
             href="/dashboard/notifications"
             id="topbar-notifications"
@@ -87,7 +87,7 @@ export async function TopBar() {
             )}
           </Link>
 
-          {/* Settings */}
+          
           <Link
             href="/dashboard"
             id="topbar-settings"
@@ -100,12 +100,12 @@ export async function TopBar() {
             <Settings size={15} />
           </Link>
 
-          {/* Divider */}
+          
           <div className="w-px h-6 bg-divider mx-1" />
 
-          {/* User Profile */}
+          
           <div className="flex items-center gap-2.5 pl-1 cursor-pointer group">
-            {/* Avatar */}
+            
             <div className="relative">
               <div
                 className="relative w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-divider"
@@ -117,7 +117,7 @@ export async function TopBar() {
               </div>
             </div>
 
-            {/* Info */}
+            
             <div className="hidden md:block">
               <div className="text-[13px] font-bold text-text-primary leading-none group-hover:text-primary transition-colors">
                 {userName}

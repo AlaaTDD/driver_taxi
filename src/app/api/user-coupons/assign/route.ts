@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
-    // Check if coupon exists and is active
+    
     const { data: coupon, error: couponError } = await supabase
       .from("coupons")
       .select("id, is_active, max_uses, used_count")
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "الكوبون وصل الحد الأقصى للاستخدام" }, { status: 400 });
     }
 
-    // Assign coupon to user (is_used is synced by DB trigger from used_at)
+    
     const { error } = await supabase
       .from("user_coupons")
       .insert({ user_id, coupon_id });

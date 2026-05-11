@@ -1,8 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-// POST /api/notifications/send
-// Body: { title, message, type, user_id? } — if no user_id, sends to ALL users
+
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
 
     if (user_id) {
-      // Send to single user
+      
       const { error } = await supabase.from("notifications").insert({
         user_id,
         title,
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       if (error) throw error;
       return NextResponse.json({ success: true, sent: 1 });
     } else {
-      // Broadcast to ALL users
+      
       const { data: users, error: usersError } = await supabase
         .from("users")
         .select("id")
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, sent: 0 });
       }
 
-      // Insert in batches of 500
+      
       const batchSize = 500;
       let totalSent = 0;
       for (let i = 0; i < notifications.length; i += batchSize) {

@@ -109,7 +109,7 @@ export default function VehicleTypesClient({
 
   return (
     <div className="space-y-7">
-      {/* ===== PAGE HEADER ===== */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -130,7 +130,7 @@ export default function VehicleTypesClient({
         </button>
       </div>
 
-      {/* ===== ADD/EDIT FORM ===== */}
+      
       {showForm && (
         <div
           className="rounded-2xl p-6 space-y-5"
@@ -242,7 +242,7 @@ export default function VehicleTypesClient({
         </div>
       )}
 
-      {/* ===== VEHICLE TYPES LIST ===== */}
+      
       <div className="grid gap-4">
         {vehicleTypes.map((vt) => (
           <div
@@ -256,7 +256,7 @@ export default function VehicleTypesClient({
             }}
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              {/* Icon + Name */}
+              
               <div className="flex items-center gap-4 flex-1">
                 <div
                   className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -285,7 +285,7 @@ export default function VehicleTypesClient({
                 </div>
               </div>
 
-              {/* Pricing */}
+              
               <div className="flex items-center gap-6">
                 <div className="text-center">
                   <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">أجرة البدء</div>
@@ -298,7 +298,7 @@ export default function VehicleTypesClient({
                 </div>
               </div>
 
-              {/* Actions */}
+              
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => handleToggle(vt.id, vt.is_active)}

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const userId = formData.get("user_id") as string;
-    const action = formData.get("action") as string; // block | unblock
+    const action = formData.get("action") as string; 
     const reason = formData.get("reason") as string | null;
 
     if (!userId || !action) {

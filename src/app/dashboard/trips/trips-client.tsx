@@ -41,7 +41,7 @@ export default function TripsClient({
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 items-center">
-      {/* Total count label */}
+      
       <div
         className="px-3 py-2 rounded-xl text-[12px] font-semibold whitespace-nowrap"
         style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
@@ -50,7 +50,7 @@ export default function TripsClient({
       </div>
 
       <div className="flex gap-3 flex-1 justify-end flex-wrap">
-        {/* Status Filter */}
+        
         <div className="relative">
           <SlidersHorizontal size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
           <select
@@ -71,7 +71,7 @@ export default function TripsClient({
           <ChevronLeft size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
         </div>
 
-        {/* Vehicle Filter */}
+        
         <div className="relative">
           <select
             value={currentVehicle}
@@ -87,7 +87,7 @@ export default function TripsClient({
         </div>
       </div>
 
-      {/* Pagination */}
+      
       {totalPages > 1 && (
         <div className="flex items-center gap-1">
           <button

@@ -50,7 +50,7 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
       </div>
 
       <div className="p-5 space-y-4">
-        {/* Status selector */}
+        
         <div>
           <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">تغيير الحالة</label>
           <div className="flex gap-2 flex-wrap">
@@ -80,7 +80,7 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           </div>
         </div>
 
-        {/* Reply textarea */}
+        
         <div>
           <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">نص الرد</label>
           <textarea

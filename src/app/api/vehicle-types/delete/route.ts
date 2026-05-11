@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
 
-    // Check if this type is used in any trips
+    
     const { data: tripsUsingType } = await supabase
       .from("trips")
       .select("id", { count: "exact" })

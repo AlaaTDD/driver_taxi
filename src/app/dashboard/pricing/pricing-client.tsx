@@ -174,7 +174,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -207,7 +207,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         </div>
       </div>
 
-      {/* Grid */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {configs.map((config) => {
           const IconComponent = getIconComponent(config.icon);
@@ -225,7 +225,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
               }}
             >
-              {/* Status Bar */}
+              
               <div
                 className="absolute top-0 left-0 right-0 h-[2px]"
                 style={{
@@ -237,7 +237,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               />
 
               <div className="p-5">
-                {/* Header */}
+                
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div
@@ -286,7 +286,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   </div>
                 </div>
 
-                {/* Pricing Info */}
+                
                 <div className="space-y-2">
                   <div
                     className="flex items-center justify-between p-3 rounded-xl"
@@ -308,7 +308,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   </div>
                 </div>
 
-                {/* Status Badge */}
+                
                 <div className="mt-4 flex items-center gap-2">
                   <span
                     className="px-2 py-1 rounded-lg text-[10px] font-bold"
@@ -327,7 +327,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         })}
       </div>
 
-      {/* Empty State */}
+      
       {configs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
@@ -341,7 +341,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         </div>
       )}
 
-      {/* Modal */}
+      
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -355,7 +355,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
             }}
           >
-            {/* Header */}
+            
             <div
               className="flex items-center justify-between px-6 py-4"
               style={{ borderBottom: "1px solid var(--divider)" }}
@@ -373,9 +373,9 @@ export default function PricingClient({ configs }: PricingClientProps) {
               </button>
             </div>
 
-            {/* Form */}
+            
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Name (internal) */}
+              
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   الاسم التقني (بالإنجليزية)
@@ -398,7 +398,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 <p className="text-[10px] text-text-disabled mt-1">يُستخدم في الكود، لا مسافات</p>
               </div>
 
-              {/* Display Name */}
+              
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   الاسم المعروض (بالعربية)
@@ -418,7 +418,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 />
               </div>
 
-              {/* Icon Selection */}
+              
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   الأيقونة
@@ -448,7 +448,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
               </div>
 
-              {/* Color Selection */}
+              
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   اللون
@@ -475,7 +475,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
               </div>
 
-              {/* Pricing */}
+              
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
@@ -519,7 +519,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
               </div>
 
-              {/* Sort Order */}
+              
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   الترتيب
@@ -538,7 +538,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 />
               </div>
 
-              {/* Submit */}
+              
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"

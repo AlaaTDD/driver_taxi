@@ -12,7 +12,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  // Fetch driver profile and user data
+  
   const { data: driver } = await supabase
     .from("drivers_profile")
     .select(`
@@ -28,13 +28,13 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
 
   if (!driver) return notFound();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const user = driver.users as any;
 
   return (
     <DashboardShell>
     <div className="space-y-6">
-      {/* Header & Back button */}
+      
       <div className="flex flex-col gap-4">
         <Link href="/dashboard/drivers" className="inline-flex items-center gap-2 text-text-disabled hover:text-text-primary transition-colors text-sm font-medium w-fit">
           <ArrowRight size={16} />
@@ -103,7 +103,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Personal Details */}
+        
         <div className="rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
             <User size={18} className="text-violet-400" />
@@ -133,7 +133,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        {/* Vehicle Details */}
+        
         <div className="rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
             <Car size={18} className="text-cyan-400" />
@@ -163,7 +163,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        {/* Stats */}
+        
         <div className="md:col-span-2 rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
             <Star size={18} className="text-amber-400" />
@@ -193,7 +193,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        {/* Documents */}
+        
         <div className="md:col-span-2 rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
             <FileText size={18} className="text-emerald-400" />

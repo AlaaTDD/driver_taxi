@@ -31,7 +31,7 @@ export default async function TripOffersPage({
   const { data: offers, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  // Fetch related user names for drivers
+  
   const driverIds = [...new Set((offers || []).map((o) => o.driver_id).filter(Boolean))];
   const tripIds = [...new Set((offers || []).map((o) => o.trip_id).filter(Boolean))];
 
@@ -52,7 +52,7 @@ export default async function TripOffersPage({
   const tripMap = new Map((trips || []).map((t) => [t.id, t]));
   const tripUserMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
-  // Status stats
+  
   const { data: statusStats } = await supabase
     .from("trip_offers")
     .select("status");
@@ -76,7 +76,7 @@ export default async function TripOffersPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("tripOffers.title")}</h1>
@@ -84,7 +84,7 @@ export default async function TripOffersPage({
           </div>
         </div>
 
-      {/* ===== STAT CARDS ===== */}
+      
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {statCards.map((s) => (
           <Link
@@ -102,7 +102,7 @@ export default async function TripOffersPage({
         ))}
       </div>
 
-      {/* ===== TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -183,14 +183,30 @@ export default async function TripOffersPage({
                       {offer.responded_at ? formatDate(offer.responded_at) : <span className="text-text-disabled">—</span>}
                     </td>
                     <td className="py-3.5 px-4">
-                      <Link
-                        href={`/dashboard/trips/${offer.trip_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-                        style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
-                      >
-                        <Eye size={12} />
-                        الرحلة
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/dashboard/trips/${offer.trip_id}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
+                          style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
+                        >
+                          <Eye size={12} />
+                          الرحلة
+                        </Link>
+                        {offer.status === "pending" && (
+                          <form action="/api/trip-offers/cancel" method="POST">
+                            <input type="hidden" name="offer_id" value={offer.id} />
+                            <button
+                              type="submit"
+                              id={`cancel-offer-${offer.id}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
+                              style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
+                            >
+                              <X size={12} />
+                              إلغاء
+                            </button>
+                          </form>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -215,7 +231,7 @@ export default async function TripOffersPage({
           </table>
         </div>
 
-        {/* Pagination */}
+        
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
             {page > 1 && (

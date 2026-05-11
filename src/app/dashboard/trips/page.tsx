@@ -54,14 +54,14 @@ export default async function TripsPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("trips.title")}</h1>
             <p className="text-sm text-text-secondary mt-1">{t("trips.subtitle")}</p>
           </div>
 
-          {/* Total info */}
+          
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 border border-primary/20 text-primary">
               <MapPin size={11} />
@@ -76,7 +76,7 @@ export default async function TripsPage({
           </div>
         </div>
 
-      {/* ===== FILTERS ===== */}
+      
       <TripsClient
         currentPage={page}
         totalPages={totalPages}
@@ -85,7 +85,7 @@ export default async function TripsPage({
         totalCount={count || 0}
       />
 
-      {/* ===== TRIPS TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -94,7 +94,7 @@ export default async function TripsPage({
           boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
-        {/* Table Header bar */}
+        
         <div
           className="flex items-center justify-between px-6 py-4"
           style={{ borderBottom: "1px solid var(--divider)" }}

@@ -14,7 +14,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  // 1. Fetch Trip Data
+  
   const { data: trip, error } = await supabase
     .from("trips")
     .select(`
@@ -31,25 +31,25 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   if (error) console.error("Trip detail fetch error:", error);
   if (!trip) notFound();
 
-  // 2. Fetch Complaints associated with this trip
+  
   const { data: complaints } = await supabase
     .from("complaints")
     .select("id, subject, message, status, priority, created_at, admin_reply")
     .eq("trip_id", id)
     .order("created_at", { ascending: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const user = trip.user as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const driver = trip.driver as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const driverProfile = driver?.drivers_profile as any;
 
   return (
     <DashboardShell>
     <div className="space-y-6 max-w-5xl mx-auto">
       
-      {/* ===== HEADER ===== */}
+      
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="space-y-1.5">
           <Link href="/dashboard/trips"
@@ -90,10 +90,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         </div>
       </div>
 
-      {/* ===== LOCATIONS & FINANCIALS ===== */}
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Route Details */}
+        
         <div className="lg:col-span-2 rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">
             <Navigation size={16} className="text-blue-400" />
@@ -128,7 +128,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           )}
         </div>
 
-        {/* Financial Details */}
+        
         <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">
             <DollarSign size={16} className="text-emerald-400" />
@@ -154,10 +154,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         </div>
       </div>
 
-      {/* ===== USER & DRIVER INFO ===== */}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* User Card */}
+        
         <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2">
@@ -186,7 +186,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           )}
         </div>
 
-        {/* Driver Card */}
+        
         <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2">
@@ -225,7 +225,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
       </div>
 
-      {/* ===== COMPLAINTS SECTION ===== */}
+      
       {complaints && complaints.length > 0 && (
         <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(239,68,68,0.15)", boxShadow: "0 4px 20px rgba(239,68,68,0.05)" }}>
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">

@@ -5,37 +5,47 @@ import UsersClient from "./users-client";
 import { getTranslations } from "next-intl/server";
 import { Users, ShieldBan, Shield, Crown } from "lucide-react";
 
+/* ─── stat colours ────────────────────────────────────────── */
+const STAT_COLORS = {
+  users:      { accent: "#3B82F6", glow: "rgba(59,130,246,0.18)",  border: "rgba(59,130,246,0.2)"  },
+  blocked:    { accent: "#EF4444", glow: "rgba(239,68,68,0.18)",   border: "rgba(239,68,68,0.2)"   },
+  supervisor: { accent: "#8B5CF6", glow: "rgba(139,92,246,0.18)",  border: "rgba(139,92,246,0.2)"  },
+  admin:      { accent: "#F59E0B", glow: "rgba(245,158,11,0.18)",  border: "rgba(245,158,11,0.2)"  },
+};
+
 export default async function UsersPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; q?: string; role?: string; status?: string }>;
 }) {
-  const params = await searchParams;
-  const page = Number(params.page) || 1;
-  const pageSize = 15;
-  const searchQuery = params.q || "";
-  const filterRole = params.role || "";
+  const params    = await searchParams;
+  const page      = Number(params.page) || 1;
+  const pageSize  = 15;
+  const searchQuery  = params.q      || "";
+  const filterRole   = params.role   || "";
   const filterStatus = params.status || "";
 
-  const t = await getTranslations();
-  const supabase = createAdminClient();
+  const t         = await getTranslations();
+  const supabase  = createAdminClient();
   const authClient = await createClient();
   const { data: { user: currentUser } } = await authClient.auth.getUser();
 
-  // Build query
+  /* ── main paginated query ── */
   let query = supabase
     .from("users")
-    .select("id, name, email, phone, role, is_admin, is_active, is_blocked, blocked_reason, blocked_at, rating, total_trips, avatar_url, created_at", { count: "exact" });
+    .select(
+      "id, name, email, phone, role, is_admin, is_active, is_blocked, blocked_reason, blocked_at, rating, total_trips, avatar_url, created_at",
+      { count: "exact" }
+    );
 
-  // Search: name, phone, national_id (via drivers_profile join is hard in supabase client, search name+phone only here)
   if (searchQuery) {
-    query = query.or(`name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+    query = query.or(
+      `name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
+    );
   }
-
-  if (filterRole) query = query.eq("role", filterRole);
-
-  if (filterStatus === "active") query = query.eq("is_active", true).eq("is_blocked", false);
-  else if (filterStatus === "blocked") query = query.eq("is_blocked", true);
+  if (filterRole)   query = query.eq("role", filterRole);
+  if (filterStatus === "active")   query = query.eq("is_active", true).eq("is_blocked", false);
+  else if (filterStatus === "blocked")  query = query.eq("is_blocked", true);
   else if (filterStatus === "inactive") query = query.eq("is_active", false);
 
   query = query
@@ -45,7 +55,7 @@ export default async function UsersPage({
   const { data: users, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  // Stats
+  /* ── stats counters ── */
   const [totalRes, blockedRes, adminsRes, supervisorRes] = await Promise.all([
     supabase.from("users").select("id", { count: "exact", head: true }),
     supabase.from("users").select("id", { count: "exact", head: true }).eq("is_blocked", true),
@@ -54,40 +64,151 @@ export default async function UsersPage({
   ]);
 
   const stats = [
-    { label: t("dashboard.stats.totalUsers"), value: totalRes.count || 0, icon: <Users size={18} />, color: "#3B82F6" },
-    { label: t("common.blocked"), value: blockedRes.count || 0, icon: <ShieldBan size={18} />, color: "#EF4444" },
-    { label: t("users.roles.supervisor"), value: supervisorRes.count || 0, icon: <Shield size={18} />, color: "#8B5CF6" },
-    { label: t("users.roles.admin"), value: adminsRes.count || 0, icon: <Crown size={18} />, color: "#F59E0B" },
+    {
+      key: "users" as const,
+      label: t("dashboard.stats.totalUsers"),
+      value: totalRes.count || 0,
+      icon: <Users size={16} />,
+      subLabel: "إجمالي المسجّلين",
+    },
+    {
+      key: "blocked" as const,
+      label: t("common.blocked"),
+      value: blockedRes.count || 0,
+      icon: <ShieldBan size={16} />,
+      subLabel: "حساب محظور",
+    },
+    {
+      key: "supervisor" as const,
+      label: t("users.roles.supervisor"),
+      value: supervisorRes.count || 0,
+      icon: <Shield size={16} />,
+      subLabel: "مشرف نشط",
+    },
+    {
+      key: "admin" as const,
+      label: t("users.roles.admin"),
+      value: adminsRes.count || 0,
+      icon: <Crown size={16} />,
+      subLabel: "صلاحية كاملة",
+    },
   ];
 
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("users.title")}</h1>
-          <p className="text-sm text-text-secondary mt-1">{t("users.subtitle")}</p>
-        </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, i) => (
-            <div key={i} className="group relative rounded-xl overflow-hidden p-4 bg-surface border border-divider hover:border-divider-strong hover:-translate-y-0.5 transition-all duration-300 shadow-sm">
-              <div className="absolute top-0 left-0 right-0 h-[2px]"
-                style={{ background: `linear-gradient(to left, transparent, ${stat.color}, transparent)`, opacity: 0.6 }} />
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}25`, color: stat.color }}>
-                  {stat.icon}
-                </div>
-                <span className="text-2xl font-black num" style={{ color: stat.color }}>{stat.value}</span>
-              </div>
-              <p className="text-text-tertiary text-xs mt-2 font-medium">{stat.label}</p>
+        {/* ── Page header ──────────────────────────────────── */}
+        <div className="flex items-start justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            {/* icon badge */}
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: "linear-gradient(135deg,rgba(59,130,246,0.25),rgba(59,130,246,0.08))",
+                border: "1px solid rgba(59,130,246,0.2)",
+              }}
+            >
+              <Users size={18} style={{ color: "#93C5FD" }} />
             </div>
-          ))}
+            <div>
+              <h1 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+                {t("users.title")}
+              </h1>
+              <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                {t("users.subtitle")}
+              </p>
+            </div>
+          </div>
+
+          {/* breadcrumb / meta */}
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold self-start"
+            style={{
+              background: "var(--surface-glass)",
+              border: "1px solid var(--divider)",
+              color: "var(--text-tertiary)",
+            }}
+          >
+            <span>لوحة التحكم</span>
+            <span style={{ color: "var(--text-disabled)" }}>/</span>
+            <span style={{ color: "var(--text-secondary)" }}>المستخدمون</span>
+          </div>
         </div>
 
-        {/* Client */}
+        {/* ── Stats grid ───────────────────────────────────── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat) => {
+            const c = STAT_COLORS[stat.key];
+            return (
+              <div
+                key={stat.key}
+                className="group relative rounded-2xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                style={{
+                  background: `linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)`,
+                  border: `1px solid ${c.border}`,
+                  boxShadow: `0 2px 10px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04)`,
+                }}
+              >
+                {/* top glow line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px] transition-opacity duration-300 group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(to left, transparent, ${c.accent}, transparent)`,
+                    opacity: 0.7,
+                  }}
+                />
+
+                {/* corner glow */}
+                <div
+                  className="absolute top-0 left-0 w-16 h-16 rounded-br-full opacity-20 pointer-events-none"
+                  style={{ background: c.accent, filter: "blur(18px)" }}
+                />
+
+                {/* icon + value */}
+                <div className="relative flex items-start justify-between mb-3">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                    style={{
+                      background: c.glow,
+                      border: `1px solid ${c.border}`,
+                      color: c.accent,
+                    }}
+                  >
+                    {stat.icon}
+                  </div>
+                  <span
+                    className="text-[28px] leading-none font-black num tabular-nums"
+                    style={{ color: c.accent }}
+                  >
+                    {stat.value}
+                  </span>
+                </div>
+
+                {/* labels */}
+                <div>
+                  <p className="text-[12px] font-bold" style={{ color: "var(--text-primary)" }}>
+                    {stat.label}
+                  </p>
+                  <p className="text-[10px] mt-0.5" style={{ color: "var(--text-disabled)" }}>
+                    {stat.subLabel}
+                  </p>
+                </div>
+
+                {/* subtle progress bar (just decorative) */}
+                {stat.value > 0 && (
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                    style={{
+                      background: `linear-gradient(to left, transparent, ${c.accent}40, transparent)`,
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Users table / client component ───────────────── */}
         <UsersClient
           users={(users || []).map((u) => ({
             id: u.id,

@@ -8,13 +8,13 @@ export default async function DriverLocationsPage() {
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  // Fetch driver locations with driver profiles
+  
   const { data: locations } = await supabase
     .from("driver_locations")
     .select("id, driver_id, lat, lng, heading, geohash, created_at, updated_at")
     .order("updated_at", { ascending: false });
 
-  // Fetch driver names
+  
   const driverIds = [...new Set((locations || []).map((l) => l.driver_id).filter(Boolean))];
   const { data: drivers } = driverIds.length
     ? await supabase.from("users").select("id, name, phone").in("id", driverIds)
@@ -27,7 +27,7 @@ export default async function DriverLocationsPage() {
   const driverMap = new Map((drivers || []).map((d) => [d.id, d]));
   const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-  // Fetch user_presence for online status
+  
   const { data: presenceData } = await supabase
     .from("user_presence")
     .select("user_id, lat, lng, last_seen");
@@ -39,7 +39,7 @@ export default async function DriverLocationsPage() {
     const p = presenceMap.get(userId);
     if (!p) return false;
     const diff = now.getTime() - new Date(p.last_seen).getTime();
-    return diff < 5 * 60 * 1000; // 5 minutes
+    return diff < 5 * 60 * 1000; 
   };
 
   const onlineCount = (locations || []).filter((l) => isOnline(l.driver_id)).length;
@@ -48,13 +48,13 @@ export default async function DriverLocationsPage() {
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("driverLocations.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("driverLocations.subtitle")}</p>
         </div>
 
-      {/* ===== STATS ===== */}
+      
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "إجمالي المواقع", value: totalCount, color: "#60A5FA", icon: MapPin },
@@ -76,7 +76,7 @@ export default async function DriverLocationsPage() {
         ))}
       </div>
 
-      {/* ===== DRIVER LOCATIONS TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -170,7 +170,7 @@ export default async function DriverLocationsPage() {
         </div>
       </div>
 
-      {/* ===== USER PRESENCE TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{

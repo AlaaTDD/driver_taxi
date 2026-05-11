@@ -61,7 +61,7 @@ export default async function NotificationsPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("notifications.title")}</h1>
@@ -91,14 +91,14 @@ export default async function NotificationsPage({
         </div>
       </div>
 
-      {/* ===== FILTERS ===== */}
+      
       <NotificationsClient
         currentPage={page}
         totalPages={totalPages}
         currentType={typeFilter}
       />
 
-      {/* ===== NOTIFICATIONS LIST ===== */}
+      
       <div className="space-y-3">
         {(notifications || []).map((notif) => {
           const user = notif.users as unknown as { name: string } | null;
@@ -120,7 +120,7 @@ export default async function NotificationsPage({
                   : "0 1px 6px rgba(0,0,0,0.2)",
               }}
             >
-              {/* Unread left bar */}
+              
               {isUnread && (
                 <div
                   className="absolute right-0 top-0 bottom-0 w-[3px] rounded-l-full"
@@ -131,7 +131,7 @@ export default async function NotificationsPage({
                 />
               )}
 
-              {/* Hover glow */}
+              
               <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{ boxShadow: "0 0 30px rgba(59,130,246,0.04) inset" }}
@@ -139,7 +139,7 @@ export default async function NotificationsPage({
 
               <div className="relative p-5">
                 <div className="flex items-start gap-4">
-                  {/* Notification icon */}
+                  
                   <div
                     className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5"
                     style={{
@@ -153,7 +153,7 @@ export default async function NotificationsPage({
                     />
                   </div>
 
-                  {/* Content */}
+                  
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       <Badge variant={typeBadgeVariants[notif.type] || "default"} dot>
@@ -180,7 +180,7 @@ export default async function NotificationsPage({
                       {notif.message}
                     </p>
 
-                    {/* Meta */}
+                    
                     <div className="flex items-center gap-4 mt-3">
                       <div className="flex items-center gap-1.5">
                         <User size={11} className="text-text-disabled" />
@@ -204,7 +204,7 @@ export default async function NotificationsPage({
           );
         })}
 
-        {/* Empty State */}
+        
         {(!notifications || notifications.length === 0) && (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div

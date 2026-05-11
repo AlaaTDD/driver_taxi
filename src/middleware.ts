@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminRoute = pathname.startsWith("/dashboard");
 
-  // Check if user is admin (only for dashboard routes)
+  
   let isAdmin = false;
   if (user && isAdminRoute) {
     const { data: userProfile } = await supabase
@@ -44,22 +44,22 @@ export async function middleware(request: NextRequest) {
     isAdmin = userProfile?.is_admin === true;
   }
 
-  // Redirect logged-in users away from login
+  
   if (user && pathname === "/login") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Redirect unauthenticated users to login
+  
   if (!user && pathname !== "/login" && pathname !== "/") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect non-admin users away from dashboard
+  
   if (user && isAdminRoute && !isAdmin) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect root to dashboard
+  
   if (pathname === "/") {
     return NextResponse.redirect(
       new URL(user ? "/dashboard" : "/login", request.url)

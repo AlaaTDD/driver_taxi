@@ -30,7 +30,7 @@ export default async function UserCouponsPage({
   const { data: userCoupons, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  // Fetch related data
+  
   const userIds = [...new Set((userCoupons || []).map((uc) => uc.user_id).filter(Boolean))];
   const couponIds = [...new Set((userCoupons || []).map((uc) => uc.coupon_id).filter(Boolean))];
 
@@ -40,26 +40,26 @@ export default async function UserCouponsPage({
   const userMap = new Map((users || []).map((u) => [u.id, u]));
   const couponMap = new Map((coupons || []).map((c) => [c.id, c]));
 
-  // Coupon usage stats from coupon_usages table
+  
   const { data: usages } = await supabase.from("coupon_usages").select("id, trip_id, user_coupon_id, discount_amount, created_at");
 
-  // Stats
+  
   const totalAssigned = count || 0;
   const totalUsed = (userCoupons || []).filter((uc) => uc.is_used).length;
   const totalUnused = (userCoupons || []).filter((uc) => !uc.is_used).length;
-  // totalUsages not used in current UI
+  
   const totalDiscount = (usages || []).reduce((s, u) => s + (Number(u.discount_amount) || 0), 0);
 
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("userCoupons.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("userCoupons.subtitle")}</p>
         </div>
 
-      {/* ===== STATS ===== */}
+      
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "كوبونات معينة", value: totalAssigned, color: "#60A5FA", icon: Gift },
@@ -83,7 +83,7 @@ export default async function UserCouponsPage({
         ))}
       </div>
 
-      {/* ===== FILTER TABS ===== */}
+      
       <div className="flex items-center gap-2">
         {[
           { label: "الكل", value: "", count: totalAssigned },
@@ -105,7 +105,7 @@ export default async function UserCouponsPage({
         ))}
       </div>
 
-      {/* ===== TABLE ===== */}
+      
       <div
         className="rounded-2xl overflow-hidden"
         style={{
@@ -200,7 +200,7 @@ export default async function UserCouponsPage({
           </table>
         </div>
 
-        {/* Pagination */}
+        
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
             {page > 1 && (

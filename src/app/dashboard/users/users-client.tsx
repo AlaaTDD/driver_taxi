@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search, ShieldBan, Shield, UserCheck, UserX,
   ChevronLeft, ChevronRight, SlidersHorizontal, X,
-  Lock, Unlock, Crown, AlertTriangle
+  Lock, Unlock, Crown, AlertTriangle, Filter,
+  MoreVertical, CheckCircle2
 } from "lucide-react";
 
 interface User {
@@ -35,12 +36,105 @@ interface UsersClientProps {
   currentUserId: string;
 }
 
-const selectStyle: React.CSSProperties = {
+/* ─── tiny helpers ───────────────────────────────────────── */
+const glassCard: React.CSSProperties = {
   background: "var(--surface-glass)",
   border: "1px solid var(--divider)",
   color: "var(--text-primary)",
 };
 
+const avatarGrad = (user: User) =>
+  user.is_blocked
+    ? { bg: "rgba(239,68,68,0.15)", color: "#F87171", border: "rgba(239,68,68,0.25)" }
+    : user.is_admin
+    ? { bg: "linear-gradient(135deg,rgba(245,158,11,0.28),rgba(245,158,11,0.08))", color: "#FCD34D", border: "rgba(245,158,11,0.25)" }
+    : user.role === "supervisor"
+    ? { bg: "linear-gradient(135deg,rgba(139,92,246,0.28),rgba(139,92,246,0.08))", color: "#C4B5FD", border: "rgba(139,92,246,0.25)" }
+    : user.role === "driver"
+    ? { bg: "linear-gradient(135deg,rgba(16,185,129,0.22),rgba(16,185,129,0.06))", color: "#34D399", border: "rgba(16,185,129,0.2)" }
+    : { bg: "linear-gradient(135deg,rgba(59,130,246,0.22),rgba(59,130,246,0.06))", color: "#93C5FD", border: "rgba(59,130,246,0.2)" };
+
+const roleLabel = (user: User) =>
+  user.is_admin ? { label: "أدمن", bg: "rgba(245,158,11,0.12)", color: "#FCD34D", border: "rgba(245,158,11,0.22)" }
+  : user.role === "driver" ? { label: "سائق", bg: "rgba(16,185,129,0.12)", color: "#34D399", border: "rgba(16,185,129,0.22)" }
+  : user.role === "supervisor" ? { label: "مشرف", bg: "rgba(139,92,246,0.12)", color: "#C4B5FD", border: "rgba(139,92,246,0.22)" }
+  : { label: "مستخدم", bg: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "rgba(59,130,246,0.22)" };
+
+/* ─── ActionMenu (three-dot dropdown) ───────────────────── */
+function ActionMenu({
+  user,
+  onBlock,
+  onRole,
+}: {
+  user: User;
+  onBlock: () => void;
+  onRole: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        style={{
+          background: open ? "var(--surface-glass)" : "transparent",
+          border: open ? "1px solid var(--divider)" : "1px solid transparent",
+          color: "var(--text-tertiary)",
+        }}
+      >
+        <MoreVertical size={15} />
+      </button>
+
+      {open && (
+        <div
+          className="absolute left-0 top-10 z-30 w-44 rounded-xl overflow-hidden"
+          style={{
+            background: "var(--surface-elevated)",
+            border: "1px solid var(--divider)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.45)",
+            animation: "fadeSlideDown 0.15s ease",
+          }}
+        >
+          <button
+            onClick={() => { setOpen(false); onBlock(); }}
+            id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
+            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
+            style={{
+              background: "transparent",
+              color: user.is_blocked ? "#34D399" : "#F87171",
+              borderBottom: "1px solid var(--divider)",
+            }}
+          >
+            {user.is_blocked ? <Unlock size={13} /> : <Lock size={13} />}
+            {user.is_blocked ? "رفع الحظر" : "حظر المستخدم"}
+          </button>
+
+          {user.role !== "driver" && (
+            <button
+              onClick={() => { setOpen(false); onRole(); }}
+              id={`set-role-${user.id}`}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
+              style={{ background: "transparent", color: "#C4B5FD" }}
+            >
+              <Shield size={13} />
+              {user.role === "supervisor" ? "إلغاء مشرف" : "تعيين مشرف"}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── main component ─────────────────────────────────────── */
 export default function UsersClient({
   users, totalCount, currentPage, totalPages,
   searchQuery, filterRole, filterStatus, currentUserId,
@@ -54,6 +148,8 @@ export default function UsersClient({
   const [blockReason, setBlockReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
+  const hasFilters = filterRole || filterStatus || searchQuery;
+
   const updateParams = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([k, v]) => {
@@ -63,9 +159,11 @@ export default function UsersClient({
     startTransition(() => router.push(`/dashboard/users?${params.toString()}`));
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateParams({ q: search });
+  const handleSearch = (e: React.FormEvent) => { e.preventDefault(); updateParams({ q: search }); };
+
+  const clearAll = () => {
+    setSearch("");
+    startTransition(() => router.push("/dashboard/users"));
   };
 
   const handleBlock = async () => {
@@ -77,8 +175,7 @@ export default function UsersClient({
       fd.set("action", blockModal.action);
       if (blockModal.action === "block" && blockReason) fd.set("reason", blockReason);
       await fetch("/api/users/block", { method: "POST", body: fd });
-      setBlockModal(null);
-      setBlockReason("");
+      setBlockModal(null); setBlockReason("");
       router.refresh();
     } finally { setActionLoading(false); }
   };
@@ -102,197 +199,320 @@ export default function UsersClient({
     router.push(`/dashboard/users?${params.toString()}`);
   };
 
+  /* pagination window */
+  const pageWindow = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const w: (number | "…")[] = [1];
+    if (currentPage > 3) w.push("…");
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) w.push(i);
+    if (currentPage < totalPages - 2) w.push("…");
+    w.push(totalPages);
+    return w;
+  };
+
   return (
     <>
-      {/* ===== CONTROLS ===== */}
-      <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex items-center flex-1 min-w-[220px] max-w-sm">
+      <style>{`
+        @keyframes fadeSlideDown {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes rowIn {
+          from { opacity: 0; transform: translateX(8px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+        .row-animate { animation: rowIn 0.25s ease both; }
+        .hover-lift { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+        .hover-lift:hover { transform: translateY(-1px); }
+        .btn-action { transition: transform 0.15s ease, filter 0.15s ease; }
+        .btn-action:hover { transform: scale(1.04); filter: brightness(1.12); }
+        .btn-action:active { transform: scale(0.96); }
+        .focus-ring:focus-within { outline: 2px solid rgba(59,130,246,0.4); outline-offset: 0; border-radius: 14px; }
+      `}</style>
+
+      {/* ── Search + Filters bar ─────────────────────────── */}
+      <div
+        className="flex flex-col sm:flex-row gap-3 flex-wrap items-center p-3 rounded-2xl"
+        style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
+      >
+        {/* search */}
+        <form onSubmit={handleSearch} className="flex items-center flex-1 min-w-[240px] max-w-md gap-2 focus-ring">
           <div className="relative w-full">
-            <Search size={13} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
+            <Search size={13} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-disabled)" }} />
             <input
+              id="users-search-input"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="بحث بالاسم أو التليفون أو الرقم القومي..."
-              className="w-full pr-9 pl-10 py-2.5 rounded-xl text-[13px] outline-none"
-              style={selectStyle}
-              id="users-search-input"
+              placeholder="بحث بالاسم أو التليفون أو البريد..."
+              className="w-full pr-9 pl-9 py-2.5 rounded-xl text-[13px] outline-none transition-all"
+              style={{ background: "var(--surface)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}
             />
             {search && (
               <button type="button" onClick={() => { setSearch(""); updateParams({ q: "" }); }}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled hover:text-text-primary">
+                className="absolute left-3 top-1/2 -translate-y-1/2 transition-all hover:scale-110 active:scale-90"
+                style={{ color: "var(--text-disabled)" }}>
                 <X size={12} />
               </button>
             )}
           </div>
-          <button type="submit" id="users-search-btn"
-            className="mr-2 px-3 py-2.5 rounded-xl text-[12px] font-bold text-white flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}>
+          <button
+            type="submit"
+            id="users-search-btn"
+            className="px-4 py-2.5 rounded-xl text-[12px] font-bold text-white flex-shrink-0 btn-action"
+            style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}
+          >
             بحث
           </button>
         </form>
 
-        <div className="flex gap-2 flex-wrap">
-          {/* Role filter */}
+        {/* divider */}
+        <div className="hidden sm:block w-px h-8" style={{ background: "var(--divider)" }} />
+
+        {/* filters */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+            <Filter size={11} />
+            <span className="font-semibold">تصفية</span>
+          </div>
+
+          {/* role */}
           <div className="relative">
-            <SlidersHorizontal size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
-            <select value={filterRole} onChange={(e) => updateParams({ role: e.target.value })}
-              className="appearance-none pr-8 pl-6 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer"
-              style={selectStyle} id="users-role-filter">
+            <SlidersHorizontal size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-disabled)" }} />
+            <select
+              id="users-role-filter"
+              value={filterRole}
+              onChange={(e) => updateParams({ role: e.target.value })}
+              className="appearance-none pr-7 pl-5 py-2 rounded-xl text-[12px] font-semibold outline-none cursor-pointer transition-all hover:brightness-110"
+              style={{
+                background: filterRole ? "rgba(139,92,246,0.12)" : "var(--surface)",
+                border: filterRole ? "1px solid rgba(139,92,246,0.3)" : "1px solid var(--divider)",
+                color: filterRole ? "#C4B5FD" : "var(--text-secondary)",
+              }}
+            >
               <option value="">كل الأدوار</option>
               <option value="user">مستخدم</option>
               <option value="driver">سائق</option>
               <option value="supervisor">مشرف</option>
             </select>
-            <ChevronLeft size={11} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
+            <ChevronLeft size={10} className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-disabled)" }} />
           </div>
 
-          {/* Status filter */}
+          {/* status */}
           <div className="relative">
-            <select value={filterStatus} onChange={(e) => updateParams({ status: e.target.value })}
-              className="appearance-none px-3 py-2.5 rounded-xl text-[12px] outline-none cursor-pointer"
-              style={selectStyle} id="users-status-filter">
+            <select
+              id="users-status-filter"
+              value={filterStatus}
+              onChange={(e) => updateParams({ status: e.target.value })}
+              className="appearance-none px-3 py-2 rounded-xl text-[12px] font-semibold outline-none cursor-pointer transition-all hover:brightness-110"
+              style={{
+                background: filterStatus === "blocked" ? "rgba(239,68,68,0.12)" : filterStatus === "active" ? "rgba(16,185,129,0.12)" : "var(--surface)",
+                border: filterStatus === "blocked" ? "1px solid rgba(239,68,68,0.3)" : filterStatus === "active" ? "1px solid rgba(16,185,129,0.3)" : "1px solid var(--divider)",
+                color: filterStatus === "blocked" ? "#F87171" : filterStatus === "active" ? "#34D399" : "var(--text-secondary)",
+              }}
+            >
               <option value="">كل الحالات</option>
               <option value="active">نشط</option>
               <option value="blocked">محظور</option>
               <option value="inactive">غير نشط</option>
             </select>
           </div>
+
+          {hasFilters && (
+            <button
+              onClick={clearAll}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold btn-action"
+              style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
+            >
+              <X size={10} /> مسح الكل
+            </button>
+          )}
+        </div>
+
+        {/* results + loading indicator */}
+        <div className="sm:mr-auto flex items-center gap-2">
+          {isPending ? (
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              جاري البحث...
+            </span>
+          ) : (
+            <span className="text-[11px] font-semibold px-2 py-1 rounded-lg"
+              style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.15)" }}>
+              {totalCount} مستخدم
+            </span>
+          )}
         </div>
       </div>
 
-      {/* ===== TABLE ===== */}
-      {isPending && (
-        <div className="text-center py-3 text-text-tertiary text-[12px]">جاري البحث...</div>
-      )}
-
-      <div className="rounded-2xl overflow-hidden" style={{
-        background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-        border: "1px solid rgba(255,255,255,0.05)",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-      }}>
+      {/* ── Table ───────────────────────────────────────────── */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(160deg, var(--surface-elevated) 0%, var(--surface) 100%)",
+          border: "1px solid rgba(255,255,255,0.04)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+        }}
+      >
+        {/* Desktop table */}
         <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full border-collapse">
             <thead>
               <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["المستخدم", "التليفون", "الدور", "الرحلات", "الحالة", "إجراءات"].map(h => (
-                  <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
+                {[
+                  { label: "المستخدم", w: "w-[30%]" },
+                  { label: "التليفون", w: "w-[14%]" },
+                  { label: "الدور", w: "w-[11%]" },
+                  { label: "الرحلات", w: "w-[10%]" },
+                  { label: "الحالة", w: "w-[13%]" },
+                  { label: "إجراءات", w: "w-[10%]" },
+                ].map((h) => (
+                  <th key={h.label} className={`${h.w} text-right py-3 px-5 text-[10px] font-black uppercase tracking-widest whitespace-nowrap`}
+                    style={{ color: "var(--text-tertiary)" }}>
+                    {h.label}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
-                  {/* User info */}
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0"
-                        style={{
-                          background: user.is_blocked
-                            ? "rgba(239,68,68,0.15)"
-                            : user.is_admin
-                            ? "linear-gradient(135deg,rgba(245,158,11,0.3),rgba(245,158,11,0.1))"
-                            : user.role === "supervisor"
-                            ? "linear-gradient(135deg,rgba(139,92,246,0.3),rgba(139,92,246,0.1))"
-                            : "linear-gradient(135deg,rgba(59,130,246,0.25),rgba(59,130,246,0.1))",
-                          border: "1px solid rgba(255,255,255,0.05)",
-                          color: user.is_blocked ? "#F87171" : user.is_admin ? "#FCD34D" : user.role === "supervisor" ? "#C4B5FD" : "#93C5FD",
-                        }}>
-                        {user.name?.charAt(0)?.toUpperCase() || "U"}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-text-primary font-bold text-[13px]">{user.name}</span>
-                          {user.is_admin && <Crown size={11} className="text-amber-400" />}
-                          {user.role === "supervisor" && <Shield size={11} className="text-purple-400" />}
+              {users.map((user, i) => {
+                const av = avatarGrad(user);
+                const rl = roleLabel(user);
+                const canAct = user.id !== currentUserId && !user.is_admin;
+                return (
+                  <tr
+                    key={user.id}
+                    className="row-animate group/row hover-lift"
+                    style={{
+                      borderBottom: "1px solid rgba(26,45,71,0.45)",
+                      animationDelay: `${i * 28}ms`,
+                    }}
+                  >
+                    {/* Avatar + name */}
+                    <td className="py-3.5 px-5">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0 transition-transform group-hover/row:scale-105"
+                          style={{ background: av.bg, color: av.color, border: `1px solid ${av.border}` }}
+                        >
+                          {user.name?.charAt(0)?.toUpperCase() || "U"}
+                          {user.is_blocked && (
+                            <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
+                              style={{ background: "var(--surface-elevated)", border: "1.5px solid var(--divider)" }}>
+                              <Lock size={7} style={{ color: "#F87171" }} />
+                            </span>
+                          )}
                         </div>
-                        <p className="text-text-disabled text-[11px]">{user.email}</p>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-text-primary font-bold text-[13px] truncate">{user.name}</span>
+                            {user.is_admin && <Crown size={10} style={{ color: "#FCD34D", flexShrink: 0 }} />}
+                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "#C4B5FD", flexShrink: 0 }} />}
+                          </div>
+                          <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-disabled)" }}>{user.email}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Phone */}
-                  <td className="py-3 px-4 text-text-secondary text-[12px] num">{user.phone}</td>
+                    {/* Phone */}
+                    <td className="py-3.5 px-5">
+                      <span className="text-[12px] font-mono tracking-wide" style={{ color: "var(--text-secondary)" }}>{user.phone}</span>
+                    </td>
 
-                  {/* Role */}
-                  <td className="py-3 px-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold`}
-                      style={{
-                        background: user.is_admin ? "rgba(245,158,11,0.12)" : user.role === "driver" ? "rgba(16,185,129,0.12)" : user.role === "supervisor" ? "rgba(139,92,246,0.12)" : "rgba(59,130,246,0.12)",
-                        color: user.is_admin ? "#FCD34D" : user.role === "driver" ? "#34D399" : user.role === "supervisor" ? "#C4B5FD" : "#93C5FD",
-                        border: `1px solid ${user.is_admin ? "rgba(245,158,11,0.2)" : user.role === "driver" ? "rgba(16,185,129,0.2)" : user.role === "supervisor" ? "rgba(139,92,246,0.2)" : "rgba(59,130,246,0.2)"}`,
-                      }}>
-                      {user.is_admin ? "أدمن" : user.role === "driver" ? "سائق" : user.role === "supervisor" ? "مشرف" : "مستخدم"}
-                    </span>
-                  </td>
-
-                  {/* Trips */}
-                  <td className="py-3 px-4 text-text-secondary text-[13px] num font-bold">{user.total_trips ?? 0}</td>
-
-                  {/* Status */}
-                  <td className="py-3 px-4">
-                    {user.is_blocked ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                        style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-                        <Lock size={10} /> محظور
+                    {/* Role badge */}
+                    <td className="py-3.5 px-5">
+                      <span
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap"
+                        style={{ background: rl.bg, color: rl.color, border: `1px solid ${rl.border}` }}
+                      >
+                        {rl.label}
                       </span>
-                    ) : user.is_active ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                        style={{ background: "rgba(16,185,129,0.12)", color: "#34D399", border: "1px solid rgba(16,185,129,0.2)" }}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-success" /> نشط
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                        style={{ background: "rgba(100,116,139,0.15)", color: "#94A3B8", border: "1px solid rgba(100,116,139,0.2)" }}>
-                        غير نشط
-                      </span>
-                    )}
-                  </td>
+                    </td>
 
-                  {/* Actions */}
-                  <td className="py-3 px-4">
-                    {user.id !== currentUserId && !user.is_admin && (
-                      <div className="flex items-center gap-2 transition-opacity">
-                        {/* Block/Unblock */}
-                        <button
-                          onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                          id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:scale-105"
-                          style={{
-                            background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-                            color: user.is_blocked ? "#34D399" : "#F87171",
-                            border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)"}`,
-                          }}>
-                          {user.is_blocked ? <><Unlock size={10} />رفع الحظر</> : <><Lock size={10} />حظر</>}
-                        </button>
+                    {/* Trips */}
+                    <td className="py-3.5 px-5">
+                      <div className="flex flex-col">
+                        <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
+                        <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>رحلة</span>
+                      </div>
+                    </td>
 
-                        {/* Role (only for non-drivers) */}
-                        {user.role !== "driver" && (
+                    {/* Status */}
+                    <td className="py-3.5 px-5">
+                      {user.is_blocked ? (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                            style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                            <Lock size={9} /> محظور
+                          </span>
+                          {user.blocked_reason && (
+                            <span className="text-[10px] px-1 truncate max-w-[110px]" style={{ color: "var(--text-disabled)" }} title={user.blocked_reason}>
+                              {user.blocked_reason}
+                            </span>
+                          )}
+                        </div>
+                      ) : user.is_active ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                          style={{ background: "rgba(16,185,129,0.12)", color: "#34D399", border: "1px solid rgba(16,185,129,0.2)" }}>
+                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
+                          نشط
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                          style={{ background: "rgba(100,116,139,0.14)", color: "#94A3B8", border: "1px solid rgba(100,116,139,0.2)" }}>
+                          غير نشط
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-3.5 px-5">
+                      {canAct && (
+                        <div className="flex items-center gap-1.5">
+                          {/* quick block toggle */}
                           <button
-                            onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                            id={`set-role-${user.id}`}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:scale-105"
+                            onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
+                            id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action"
                             style={{
-                              background: "rgba(139,92,246,0.1)",
-                              color: "#C4B5FD",
-                              border: "1px solid rgba(139,92,246,0.2)",
-                            }}>
-                            <Shield size={10} />
-                            {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
+                              background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
+                              color: user.is_blocked ? "#34D399" : "#F87171",
+                              border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.22)" : "rgba(239,68,68,0.22)"}`,
+                            }}
+                          >
+                            {user.is_blocked ? <><Unlock size={10} /> رفع</> : <><Lock size={10} /> حظر</>}
                           </button>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
+
+                          {/* three-dot for role */}
+                          <ActionMenu
+                            user={user}
+                            onBlock={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
+                            onRole={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
+                          />
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
 
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center text-text-disabled">
-                    <UserX size={32} className="mx-auto mb-3 opacity-30" />
-                    <p className="font-semibold">لا توجد نتائج</p>
+                  <td colSpan={6} className="py-20 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                        style={{ background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.15)" }}>
+                        <UserX size={26} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-[14px]" style={{ color: "var(--text-secondary)" }}>لا توجد نتائج</p>
+                        <p className="text-[12px] mt-0.5" style={{ color: "var(--text-disabled)" }}>جرب تعديل معايير البحث</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -300,151 +520,262 @@ export default function UsersClient({
           </table>
         </div>
 
-        {/* Mobile Cards */}
+        {/* Mobile cards */}
         <div className="lg:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
-          {users.map((user) => (
-            <div key={user.id} className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[14px] font-black"
-                    style={{
-                      background: user.is_admin ? "rgba(245,158,11,0.2)" : "rgba(59,130,246,0.15)",
-                      color: user.is_admin ? "#FCD34D" : "#93C5FD",
-                    }}>
-                    {user.name?.charAt(0)?.toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-text-primary text-[14px]">{user.name}</span>
-                      {user.is_admin && <Crown size={12} className="text-amber-400" />}
+          {users.map((user, i) => {
+            const av = avatarGrad(user);
+            const rl = roleLabel(user);
+            const canAct = user.id !== currentUserId && !user.is_admin;
+            return (
+              <div
+                key={user.id}
+                className="p-4 space-y-3 row-animate"
+                style={{ animationDelay: `${i * 30}ms` }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center text-[14px] font-black flex-shrink-0"
+                      style={{ background: av.bg, color: av.color, border: `1px solid ${av.border}` }}
+                    >
+                      {user.name?.charAt(0)?.toUpperCase()}
                     </div>
-                    <p className="text-text-disabled text-[11px]">{user.phone}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-[14px] truncate" style={{ color: "var(--text-primary)" }}>{user.name}</span>
+                        {user.is_admin && <Crown size={11} style={{ color: "#FCD34D", flexShrink: 0 }} />}
+                      </div>
+                      <p className="text-[11px] font-mono" style={{ color: "var(--text-disabled)" }}>{user.phone}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                      style={{ background: rl.bg, color: rl.color, border: `1px solid ${rl.border}` }}>
+                      {rl.label}
+                    </span>
+                    {user.is_blocked && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                        style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        محظور
+                      </span>
+                    )}
                   </div>
                 </div>
-                {user.is_blocked && (
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-lg"
-                    style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-                    محظور
-                  </span>
+
+                {/* stats row */}
+                <div className="flex items-center gap-4 py-2 px-3 rounded-xl"
+                  style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
+                    <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>رحلة</span>
+                  </div>
+                  <div className="w-px h-6" style={{ background: "var(--divider)" }} />
+                  <div>
+                    {user.is_blocked ? (
+                      <span className="text-[11px] font-bold" style={{ color: "#F87171" }}>محظور</span>
+                    ) : user.is_active ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold" style={{ color: "#34D399" }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
+                        نشط
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-bold" style={{ color: "#94A3B8" }}>غير نشط</span>
+                    )}
+                  </div>
+                </div>
+
+                {canAct && (
+                  <div className="flex gap-2 pt-0.5">
+                    <button
+                      onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
+                      className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
+                      style={{
+                        background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
+                        color: user.is_blocked ? "#34D399" : "#F87171",
+                        border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
+                      }}
+                    >
+                      {user.is_blocked ? <><Unlock size={12} /> رفع الحظر</> : <><Lock size={12} /> حظر</>}
+                    </button>
+                    {user.role !== "driver" && (
+                      <button
+                        onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
+                        className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
+                        style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.25)" }}
+                      >
+                        <Shield size={12} />
+                        {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
-              {user.id !== currentUserId && !user.is_admin && (
-                <div className="flex gap-2 pt-1">
-                  <button onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                    className="flex-1 py-2 rounded-xl text-[12px] font-bold"
-                    style={{
-                      background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-                      color: user.is_blocked ? "#34D399" : "#F87171",
-                      border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
-                    }}>
-                    {user.is_blocked ? "رفع الحظر" : "حظر"}
-                  </button>
-                  {user.role !== "driver" && (
-                    <button onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                      className="flex-1 py-2 rounded-xl text-[12px] font-bold"
-                      style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.25)" }}>
-                      {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
+
           {users.length === 0 && (
-            <div className="py-16 text-center text-text-disabled">
-              <UserX size={32} className="mx-auto mb-3 opacity-30" />
-              <p>لا توجد نتائج</p>
+            <div className="py-20 text-center flex flex-col items-center gap-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.15)" }}>
+                <UserX size={22} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
+              </div>
+              <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>لا توجد نتائج</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* ===== PAGINATION ===== */}
+      {/* ── Pagination ─────────────────────────────────────── */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          <button onClick={() => goPage(currentPage - 1)} disabled={currentPage <= 1}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-30"
-            style={selectStyle}>
+        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => goPage(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30"
+            style={glassCard}
+          >
             <ChevronRight size={14} />
           </button>
-          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map((p) => (
-            <button key={p} onClick={() => goPage(p)}
-              className="w-9 h-9 rounded-xl text-[13px] font-bold"
-              style={p === currentPage
-                ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
-                : { ...selectStyle, color: "var(--text-secondary)" }}>
-              {p}
-            </button>
-          ))}
-          <button onClick={() => goPage(currentPage + 1)} disabled={currentPage >= totalPages}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-30"
-            style={selectStyle}>
+
+          {pageWindow().map((p, i) =>
+            p === "…" ? (
+              <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-[12px]"
+                style={{ color: "var(--text-disabled)" }}>…</span>
+            ) : (
+              <button
+                key={p}
+                onClick={() => goPage(p as number)}
+                className="w-9 h-9 rounded-xl text-[13px] font-bold btn-action"
+                style={p === currentPage
+                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "#fff", boxShadow: "0 4px 14px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                  : { ...glassCard, color: "var(--text-secondary)" }}
+              >
+                {p}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() => goPage(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30"
+            style={glassCard}
+          >
             <ChevronLeft size={14} />
           </button>
         </div>
       )}
 
-      {/* ===== BLOCK MODAL ===== */}
+      {/* ══ Block / Unblock Modal ══════════════════════════════ */}
       {blockModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}>
-          <div className="relative w-full max-w-sm rounded-2xl overflow-hidden"
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(10px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setBlockModal(null); setBlockReason(""); } }}
+        >
+          <div
+            className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-              border: `1px solid ${blockModal.action === "block" ? "rgba(239,68,68,0.25)" : "rgba(16,185,129,0.25)"}`,
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
-            }}>
+              background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
+              border: `1px solid ${blockModal.action === "block" ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)"}`,
+              boxShadow: "0 32px 64px rgba(0,0,0,0.65)",
+              animation: "fadeSlideDown 0.2s ease",
+            }}
+          >
+            {/* top gradient line */}
             <div className="absolute top-0 left-0 right-0 h-[2px]"
               style={{ background: `linear-gradient(to left, transparent, ${blockModal.action === "block" ? "#EF4444" : "#10B981"}, transparent)` }} />
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                  style={{ background: blockModal.action === "block" ? "rgba(239,68,68,0.15)" : "rgba(16,185,129,0.15)" }}>
-                  {blockModal.action === "block" ? <ShieldBan size={20} className="text-error" /> : <UserCheck size={20} className="text-success" />}
+
+            {/* drag handle (mobile) */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />
+            </div>
+
+            <div className="p-6 pt-4 sm:pt-6">
+              {/* header */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center"
+                    style={{ background: blockModal.action === "block" ? "rgba(239,68,68,0.14)" : "rgba(16,185,129,0.14)" }}
+                  >
+                    {blockModal.action === "block"
+                      ? <ShieldBan size={20} style={{ color: "#F87171" }} />
+                      : <UserCheck size={20} style={{ color: "#34D399" }} />
+                    }
+                  </div>
+                  <div>
+                    <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
+                      {blockModal.action === "block" ? "حظر المستخدم" : "رفع الحظر"}
+                    </h3>
+                    <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{blockModal.user.name}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-text-primary text-[15px]">
-                    {blockModal.action === "block" ? "حظر المستخدم" : "رفع الحظر"}
-                  </h3>
-                  <p className="text-text-tertiary text-[12px]">{blockModal.user.name}</p>
-                </div>
+                <button
+                  onClick={() => { setBlockModal(null); setBlockReason(""); }}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center btn-action"
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }}
+                >
+                  <X size={13} />
+                </button>
               </div>
 
               {blockModal.action === "block" && (
                 <div className="mb-4">
-                  <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">سبب الحظر (اختياري)</label>
-                  <textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)}
+                  <label className="block text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>
+                    سبب الحظر (اختياري)
+                  </label>
+                  <textarea
+                    value={blockReason}
+                    onChange={(e) => setBlockReason(e.target.value)}
                     placeholder="اكتب سبب الحظر..."
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none"
-                    style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }} />
+                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none transition-all"
+                    style={{
+                      background: "var(--surface)",
+                      border: "1px solid var(--divider)",
+                      color: "var(--text-primary)",
+                    }}
+                  />
                 </div>
               )}
 
               {blockModal.action === "unblock" && (
-                <div className="flex items-center gap-2 p-3 rounded-xl mb-4"
-                  style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}>
-                  <AlertTriangle size={14} className="text-success flex-shrink-0" />
-                  <p className="text-[12px] text-text-secondary">سيتم استعادة وصول المستخدم للتطبيق فوراً</p>
+                <div
+                  className="flex items-start gap-2.5 p-3.5 rounded-xl mb-4"
+                  style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.15)" }}
+                >
+                  <CheckCircle2 size={15} style={{ color: "#34D399", flexShrink: 0, marginTop: 1 }} />
+                  <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
+                    سيتم استعادة وصول المستخدم للتطبيق فوراً بعد رفع الحظر.
+                  </p>
                 </div>
               )}
 
-              <div className="flex gap-3">
-                <button onClick={() => { setBlockModal(null); setBlockReason(""); }}
-                  className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
+              <div className="flex gap-2.5">
+                <button
+                  onClick={() => { setBlockModal(null); setBlockReason(""); }}
+                  className="flex-1 py-3 rounded-xl text-[13px] font-bold btn-action"
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+                >
                   إلغاء
                 </button>
-                <button onClick={handleBlock} disabled={actionLoading}
+                <button
+                  onClick={handleBlock}
+                  disabled={actionLoading}
                   id="confirm-block-action"
-                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
                   style={{
                     background: blockModal.action === "block"
                       ? "linear-gradient(135deg, #EF4444, #DC2626)"
                       : "linear-gradient(135deg, #10B981, #059669)",
-                    boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
-                  }}>
-                  {actionLoading ? "جاري..." : blockModal.action === "block" ? "تأكيد الحظر" : "رفع الحظر"}
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                  }}
+                >
+                  {actionLoading
+                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> جاري...</span>
+                    : blockModal.action === "block" ? "تأكيد الحظر" : "رفع الحظر"
+                  }
                 </button>
               </div>
             </div>
@@ -452,56 +783,86 @@ export default function UsersClient({
         </div>
       )}
 
-      {/* ===== ROLE MODAL ===== */}
+      {/* ══ Role Modal ════════════════════════════════════════ */}
       {roleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}>
-          <div className="relative w-full max-w-sm rounded-2xl overflow-hidden"
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(10px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setRoleModal(null); }}
+        >
+          <div
+            className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-              border: "1px solid rgba(139,92,246,0.25)",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
-            }}>
+              background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
+              border: "1px solid rgba(139,92,246,0.22)",
+              boxShadow: "0 32px 64px rgba(0,0,0,0.65)",
+              animation: "fadeSlideDown 0.2s ease",
+            }}
+          >
             <div className="absolute top-0 left-0 right-0 h-[2px]"
               style={{ background: "linear-gradient(to left, transparent, #8B5CF6, transparent)" }} />
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(139,92,246,0.15)" }}>
-                  <Shield size={20} className="text-purple-400" />
+
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />
+            </div>
+
+            <div className="p-6 pt-4 sm:pt-6">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+                    style={{ background: "rgba(139,92,246,0.14)" }}>
+                    <Shield size={20} style={{ color: "#C4B5FD" }} />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
+                      {roleModal.role === "supervisor" ? "تعيين مشرف" : "إلغاء صلاحية المشرف"}
+                    </h3>
+                    <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{roleModal.user.name}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-text-primary text-[15px]">
-                    {roleModal.role === "supervisor" ? "تعيين مشرف" : "إلغاء صلاحية المشرف"}
-                  </h3>
-                  <p className="text-text-tertiary text-[12px]">{roleModal.user.name}</p>
-                </div>
+                <button
+                  onClick={() => setRoleModal(null)}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center btn-action"
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }}
+                >
+                  <X size={13} />
+                </button>
               </div>
 
-              <div className="flex items-center gap-2 p-3 rounded-xl mb-5"
-                style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.15)" }}>
-                <AlertTriangle size={14} className="text-amber-400 flex-shrink-0" />
-                <p className="text-[12px] text-text-secondary">
+              <div
+                className="flex items-start gap-2.5 p-3.5 rounded-xl mb-5"
+                style={{ background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.15)" }}
+              >
+                <AlertTriangle size={14} style={{ color: "#FCD34D", flexShrink: 0, marginTop: 1 }} />
+                <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
                   {roleModal.role === "supervisor"
                     ? "سيتمكن المشرف من عرض الشكاوي والرد عليها وطلب مراجعة السائقين."
                     : "سيفقد المستخدم صلاحيات الإشراف فوراً."}
                 </p>
               </div>
 
-              <div className="flex gap-3">
-                <button onClick={() => setRoleModal(null)}
-                  className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
+              <div className="flex gap-2.5">
+                <button
+                  onClick={() => setRoleModal(null)}
+                  className="flex-1 py-3 rounded-xl text-[13px] font-bold btn-action"
+                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
+                >
                   إلغاء
                 </button>
-                <button onClick={handleSetRole} disabled={actionLoading}
+                <button
+                  onClick={handleSetRole}
+                  disabled={actionLoading}
                   id="confirm-role-action"
-                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
                   style={{
                     background: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
-                    boxShadow: "0 4px 14px rgba(139,92,246,0.35)",
-                  }}>
-                  {actionLoading ? "جاري..." : "تأكيد"}
+                    boxShadow: "0 4px 16px rgba(139,92,246,0.35)",
+                  }}
+                >
+                  {actionLoading
+                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> جاري...</span>
+                    : "تأكيد"
+                  }
                 </button>
               </div>
             </div>

@@ -68,7 +68,7 @@ function ChartCard({
         boxShadow: "var(--shadow-md)",
       }}
     >
-      {/* Top accent line */}
+      
       <div
         className="absolute top-0 left-0 right-0 h-[2px]"
         style={{
@@ -178,7 +178,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
             <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
           )}
         </div>
-        {/* Custom Legend - prevents overlap */}
+        
         {data.length > 0 && (
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2 pb-1">
             {data.map((entry, index) => (
@@ -266,7 +266,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
           <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
         )}
       </div>
-      {/* Revenue breakdown */}
+      
       {data.length > 0 && (
         <div className="mt-3 grid grid-cols-2 gap-3">
           {data.map((d, i) => (

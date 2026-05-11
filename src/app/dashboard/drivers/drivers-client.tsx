@@ -38,7 +38,7 @@ export default function DriversClient({ tab, currentPage, totalPages, searchQuer
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Search */}
+      
       <div className="relative flex items-center">
         <Search size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
         <input
@@ -64,7 +64,7 @@ export default function DriversClient({ tab, currentPage, totalPages, searchQuer
         بحث
       </button>
 
-      {/* Pagination */}
+      
       {totalPages > 1 && (
         <div className="flex items-center gap-1 mr-auto">
           <button onClick={() => goPage(currentPage - 1)} disabled={currentPage <= 1}

@@ -26,9 +26,9 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
 
   if (!complaint) notFound();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const user = (complaint as any).users;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const admin = (complaint as any).admin;
 
   const categoryLabel: Record<string, string> = { general: "عام", driver: "سائق", trip: "رحلة", payment: "دفع", app: "تطبيق", other: "أخرى" };
@@ -37,14 +37,14 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
   return (
     <DashboardShell>
     <div className="space-y-6 max-w-3xl mx-auto">
-      {/* Back */}
+      
       <Link href="/dashboard/complaints"
         className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-sm transition-colors">
         <ArrowRight size={14} />
         {t("complaints.backToList")}
       </Link>
 
-      {/* Header */}
+      
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-black text-text-primary">{complaint.title}</h1>
@@ -61,7 +61,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         </div>
       </div>
 
-      {/* User Info */}
+      
       <div className="rounded-2xl p-5" style={{
         background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
         border: "1px solid rgba(255,255,255,0.05)",
@@ -79,7 +79,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         </div>
       </div>
 
-      {/* Complaint Message */}
+      
       <div className="rounded-2xl p-5" style={{
         background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
         border: "1px solid rgba(255,255,255,0.05)",
@@ -91,7 +91,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         <p className="text-text-secondary leading-relaxed">{complaint.description}</p>
       </div>
 
-      {/* Existing Reply */}
+      
       {complaint.admin_reply && (
         <div className="rounded-2xl p-5" style={{
           background: "rgba(16,185,129,0.06)",
@@ -108,7 +108,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         </div>
       )}
 
-      {/* Reply Form */}
+      
       {complaint.status !== "closed" && (
         <ComplaintDetailClient complaintId={complaint.id} currentStatus={complaint.status} />
       )}

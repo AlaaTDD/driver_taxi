@@ -36,7 +36,7 @@ export function StatCard({
         boxShadow: "var(--shadow-md)",
       }}
     >
-      {/* Top accent line */}
+      
       <div
         className="absolute top-0 left-0 right-0 h-[2px]"
         style={{
@@ -47,7 +47,7 @@ export function StatCard({
 
 
       <div className="relative p-5 z-10">
-        {/* Header: title + icon */}
+        
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-text-tertiary text-[11px] font-semibold uppercase tracking-widest mb-0.5">{title}</p>
@@ -68,12 +68,12 @@ export function StatCard({
           </div>
         </div>
 
-        {/* Value */}
+        
         <div className="text-3xl font-black tracking-tight text-text-primary transition-all duration-300 num">
           {value}
         </div>
 
-        {/* Trend / Extra Info */}
+        
         {trend && (
           <div className="flex items-center gap-2 mt-2">
             <div

@@ -40,7 +40,7 @@ export default async function ComplaintsPage({
 
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  // Stats
+  
   const [openRes, inProgressRes, resolvedRes, urgentRes] = await Promise.all([
     supabase.from("complaints").select("id", { count: "exact", head: true }).eq("status", "open"),
     supabase.from("complaints").select("id", { count: "exact", head: true }).eq("status", "in_progress"),
@@ -82,13 +82,13 @@ export default async function ComplaintsPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Header */}
+        
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("complaints.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("complaints.subtitle")}</p>
         </div>
 
-      {/* ===== STATS ===== */}
+      
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
           <div key={i} className="group relative rounded-xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1"
@@ -111,14 +111,14 @@ export default async function ComplaintsPage({
         ))}
       </div>
 
-      {/* ===== TABLE ===== */}
+      
       <div className="rounded-2xl overflow-hidden"
         style={{
           background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
           border: "1px solid rgba(255,255,255,0.05)",
           boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
         }}>
-        {/* Filters */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4"
           style={{ borderBottom: "1px solid var(--divider)" }}>
           <div className="flex items-center gap-2.5 flex-1">
@@ -136,7 +136,7 @@ export default async function ComplaintsPage({
           />
         </div>
 
-        {/* Desktop */}
+        
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -148,7 +148,7 @@ export default async function ComplaintsPage({
             </thead>
             <tbody>
               {(complaints || []).map((complaint) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                
                 const user = (complaint as any).users;
                 return (
                   <tr key={complaint.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
@@ -195,10 +195,10 @@ export default async function ComplaintsPage({
           </table>
         </div>
 
-        {/* Mobile Cards */}
+        
         <div className="md:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
           {(complaints || []).map((complaint) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            
             const user = (complaint as any).users;
             return (
               <div key={complaint.id} className="p-4 space-y-3">

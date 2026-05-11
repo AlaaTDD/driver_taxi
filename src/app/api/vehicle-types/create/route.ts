@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });
     }
 
-    // Validate name format
+    
     if (!/^[a-z][a-z0-9_]*$/.test(name)) {
       return NextResponse.json(
         { error: "الاسم التقني يجب أن يبدأ بحرف صغير ويحتوي على حروف وأرقام وشرطات سفلية فقط" },
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
 
-    // Check if name already exists
+    
     const { data: existing } = await supabase
       .from("vehicle_types")
       .select("id")

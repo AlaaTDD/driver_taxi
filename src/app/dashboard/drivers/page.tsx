@@ -23,7 +23,7 @@ export default async function DriversPage({
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  // Stats counts
+  
   const [pendingRes, approvedRes, blockedRes, revisionRes] = await Promise.all([
     supabase.from("drivers_profile").select("id", { count: "exact", head: true }).eq("is_verified", false),
     supabase.from("drivers_profile").select("id", { count: "exact", head: true }).eq("is_verified", true),
@@ -31,7 +31,7 @@ export default async function DriversPage({
     supabase.from("driver_revision_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
   ]);
 
-  // Fetch drivers based on tab
+  
   let driversQuery = supabase
     .from("drivers_profile")
     .select(`
@@ -59,7 +59,7 @@ export default async function DriversPage({
     .order("users(created_at)", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  // For revision tab, fetch revision requests separately
+  
   let revisionDrivers: unknown[] = [];
   if (tab === "revision") {
     const { data } = await supabase
@@ -87,13 +87,13 @@ export default async function DriversPage({
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Page Header */}
+        
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("drivers.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("drivers.subtitle")}</p>
         </div>
 
-      {/* ===== TABS ===== */}
+      
       <div className="flex gap-2 flex-wrap">
         {tabs.map((t) => (
           <a
@@ -128,7 +128,7 @@ export default async function DriversPage({
         ))}
       </div>
 
-      {/* ===== DRIVERS TABLE ===== */}
+      
       {tab !== "revision" ? (
         <div className="rounded-2xl overflow-hidden"
           style={{
@@ -137,7 +137,7 @@ export default async function DriversPage({
             boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
           }}>
 
-          {/* Header */}
+          
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4"
             style={{ borderBottom: "1px solid var(--divider)" }}>
             <div className="flex items-center gap-2.5 flex-1">
@@ -149,7 +149,7 @@ export default async function DriversPage({
             <DriversClient tab={tab} currentPage={page} totalPages={totalPages} searchQuery={searchQuery} />
           </div>
 
-          {/* Desktop Table */}
+          
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -161,11 +161,11 @@ export default async function DriversPage({
               </thead>
               <tbody>
                 {(driversRaw || []).map((driver) => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  
                   const user = (driver as any).users;
                   return (
                     <tr key={driver.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
-                      {/* Driver info */}
+                      
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black shrink-0"
@@ -183,7 +183,7 @@ export default async function DriversPage({
                         </div>
                       </td>
 
-                      {/* Vehicle */}
+                      
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
                           <Car size={11} className="text-text-disabled shrink-0" />
@@ -194,7 +194,7 @@ export default async function DriversPage({
                         <p className="text-text-disabled text-[11px] mt-0.5 num">{driver.vehicle_plate}</p>
                       </td>
 
-                      {/* Documents */}
+                      
                       <td className="py-3 px-4">
                         <div className="flex gap-1.5 flex-wrap">
                           {[
@@ -212,10 +212,10 @@ export default async function DriversPage({
                         </div>
                       </td>
 
-                      {/* Trips */}
+                      
                       <td className="py-3 px-4 text-text-secondary font-bold text-[13px] num">{user?.total_trips ?? 0}</td>
 
-                      {/* Rating */}
+                      
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1">
                           <Star size={11} className="text-amber-400" />
@@ -223,14 +223,14 @@ export default async function DriversPage({
                         </div>
                       </td>
 
-                      {/* Status */}
+                      
                       <td className="py-3 px-4">
                         <Badge variant={driver.is_verified ? "success" : "warning"} dot>
                           {driver.is_verified ? "معتمد" : "بانتظار"}
                         </Badge>
                       </td>
 
-                      {/* Actions */}
+                      
                       <td className="py-3 px-4">
                         <div className="flex gap-2 items-center transition-opacity">
                           {!driver.is_verified && (
@@ -277,10 +277,10 @@ export default async function DriversPage({
             </table>
           </div>
 
-          {/* Mobile Cards */}
+          
           <div className="md:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
             {(driversRaw || []).map((driver) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              
               const user = (driver as any).users;
               return (
                 <div key={driver.id} className="p-4 space-y-3">
@@ -348,7 +348,7 @@ export default async function DriversPage({
           </div>
         </div>
       ) : (
-        /* REVISION TAB */
+        
         <div className="rounded-2xl overflow-hidden" style={{
           background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
           border: "1px solid rgba(255,255,255,0.05)",
@@ -359,7 +359,7 @@ export default async function DriversPage({
           </div>
           <div className="divide-y" style={{ borderColor: "var(--divider)" }}>
             {revisionDrivers.map((rev: unknown) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              
               const r = rev as any;
               const user = r.users;
               const dp = r.drivers_profile;
@@ -422,7 +422,7 @@ export default async function DriversPage({
   );
 }
 
-// Mini component for revision request button
+
 function DriversRevisionButton({ driverId, driverName, mobile }: { driverId: string; driverName: string; mobile?: boolean }) {
   return (
     <a

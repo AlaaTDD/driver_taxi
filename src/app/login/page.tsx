@@ -43,7 +43,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-background">
-      {/* Ambient blobs - theme aware via opacity */}
+      
       <div className="absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
         style={{ background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", animation: "float 12s ease-in-out infinite" }} />
       <div className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
@@ -51,15 +51,15 @@ export default function LoginPage() {
       <div className="absolute top-1/2 left-1/4 w-[400px] h-[400px] rounded-full pointer-events-none -translate-y-1/2 opacity-60 dark:opacity-100"
         style={{ background: "radial-gradient(circle, rgba(6,182,212,0.04) 0%, transparent 70%)", animation: "float 14s ease-in-out 2s infinite" }} />
 
-      {/* Top bar */}
+      
       <div className="absolute top-4 right-4 left-4 flex justify-between items-center z-20">
         <ThemeToggle />
         <LanguageSwitcher />
       </div>
 
-      {/* Main Card */}
+      
       <div className="relative w-full max-w-[420px] mx-4 z-10">
-        {/* Logo */}
+        
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <div className="absolute inset-0 rounded-2xl scale-125 blur-xl bg-primary/20 dark:bg-primary/40 animate-pulse-glow" />
@@ -75,10 +75,10 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Card */}
+        
         <div className="bg-surface border border-divider rounded-2xl p-6 sm:p-8 shadow-lg">
           <form onSubmit={handleLogin} className="space-y-5" id="login-form">
-            {/* Email */}
+            
             <div>
               <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider">
                 {t("login.emailPlaceholder")}
@@ -94,7 +94,7 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
+            
             <div>
               <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider">
                 {t("login.passwordPlaceholder")}
@@ -120,7 +120,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Error */}
+            
             {error && (
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-error/5 border border-error/20 text-error">
                 <div className="w-2 h-2 rounded-full bg-error animate-pulse" />
@@ -128,7 +128,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Submit */}
+            
             <button
               type="submit"
               id="login-submit"
@@ -154,14 +154,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Security note */}
+          
           <div className="flex items-center justify-center gap-1.5 mt-4">
             <Shield size={11} className="text-text-tertiary" />
             <span className="text-[11px] text-text-tertiary">{isRTL ? "بيانات مشفرة وآمنة" : "Encrypted & Secure"}</span>
           </div>
         </div>
 
-        {/* Footer */}
+        
         <p className="text-center text-text-disabled text-[11px] mt-6 tracking-wider">
           {isRTL ? `نظام إدارة تاكسي © ${new Date().getFullYear()}` : `Taxi Admin System © ${new Date().getFullYear()}`}
         </p>

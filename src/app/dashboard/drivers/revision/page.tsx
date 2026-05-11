@@ -5,7 +5,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Send } from "lucide-react";
 
-// Inner component that uses search params
+
 function DriverRevisionForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -57,7 +57,7 @@ function DriverRevisionForm() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      {/* Back */}
+      
       <Link
         href="/dashboard/drivers"
         className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-[13px] transition-colors"
@@ -66,7 +66,7 @@ function DriverRevisionForm() {
         العودة للسائقين
       </Link>
 
-      {/* Header */}
+      
       <div>
         <h1 className="page-title">طلب مراجعة</h1>
         <p className="page-subtitle">
@@ -79,7 +79,7 @@ function DriverRevisionForm() {
           <p className="text-text-tertiary">لم يتم تحديد سائق. يرجى الاختيار من قائمة السائقين.</p>
         </div>
       ) : (
-        /* Form */
+        
         <form
           onSubmit={handleSubmit}
           className="rounded-2xl overflow-hidden"
@@ -104,7 +104,7 @@ function DriverRevisionForm() {
           </div>
 
           <div className="p-6 space-y-5">
-            {/* Fields */}
+            
             <div>
               <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-3">
                 الحقول المطلوبة
@@ -133,7 +133,7 @@ function DriverRevisionForm() {
               </div>
             </div>
 
-            {/* Message */}
+            
             <div>
               <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                 رسالة للسائق
@@ -156,7 +156,7 @@ function DriverRevisionForm() {
               </div>
             </div>
 
-            {/* Submit */}
+            
             <button
               type="submit"
               disabled={loading || fields.length === 0 || !message.trim()}
@@ -194,7 +194,7 @@ function DriverRevisionForm() {
   );
 }
 
-// Loading fallback
+
 function Loading() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -205,7 +205,7 @@ function Loading() {
   );
 }
 
-// Main page with Suspense
+
 export default function DriverRevisionPage() {
   return (
     <Suspense fallback={<Loading />}>

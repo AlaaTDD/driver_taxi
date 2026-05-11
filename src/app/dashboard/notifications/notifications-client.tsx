@@ -73,9 +73,9 @@ export default function NotificationsClient({
 
   return (
     <>
-      {/* Controls Row */}
+      
       <div className="flex flex-col sm:flex-row gap-3 items-center">
-        {/* Type Filter */}
+        
         <div className="relative">
           <SlidersHorizontal size={13} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
           <select
@@ -92,7 +92,7 @@ export default function NotificationsClient({
           <ChevronLeft size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
         </div>
 
-        {/* Send Broadcast Button */}
+        
         <button
           id="send-notification-btn"
           onClick={() => setShowSendModal(true)}
@@ -108,7 +108,7 @@ export default function NotificationsClient({
           إرسال إشعار جماعي
         </button>
 
-        {/* Pagination */}
+        
         {totalPages > 1 && (
           <div className="flex items-center gap-1">
             <button
@@ -145,7 +145,7 @@ export default function NotificationsClient({
         )}
       </div>
 
-      {/* Send Modal */}
+      
       {showSendModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -159,12 +159,12 @@ export default function NotificationsClient({
               boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
             }}
           >
-            {/* Top accent */}
+            
             <div className="absolute top-0 left-0 right-0 h-[2px]"
               style={{ background: "linear-gradient(to left, transparent, #3B82F6, transparent)" }} />
 
             <div className="p-6">
-              {/* Header */}
+              
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-[16px] font-black text-text-primary">إرسال إشعار جماعي</h3>
@@ -179,9 +179,9 @@ export default function NotificationsClient({
                 </button>
               </div>
 
-              {/* Form */}
+              
               <div className="space-y-4">
-                {/* Type */}
+                
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">نوع الإشعار</label>
                   <select
@@ -197,7 +197,7 @@ export default function NotificationsClient({
                   </select>
                 </div>
 
-                {/* Title */}
+                
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">عنوان الإشعار</label>
                   <input
@@ -211,7 +211,7 @@ export default function NotificationsClient({
                   />
                 </div>
 
-                {/* Message */}
+                
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">نص الرسالة</label>
                   <textarea
@@ -227,7 +227,7 @@ export default function NotificationsClient({
                 </div>
               </div>
 
-              {/* Actions */}
+              
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowSendModal(false)}

@@ -313,6 +313,40 @@
     "heading": "الاتجاه",
     "lastUpdate": "آخر تحديث"
   },
+  "wallets": {
+    "title": "المحافظ المالية",
+    "subtitle": "إدارة محافظ السائقين والمستخدمين والمعاملات المالية",
+    "driverWallets": "محافظ السائقين",
+    "userWallets": "محافظ المستخدمين",
+    "transactions": "المعاملات المالية",
+    "balance": "الرصيد",
+    "totalEarned": "إجمالي الأرباح",
+    "totalWithdrawn": "إجمالي المسحوب",
+    "pendingWithdrawal": "معلق السحب",
+    "commission": "العمولة",
+    "totalSpent": "إجمالي المصروف",
+    "totalToppedUp": "إجمالي الشحن",
+    "adjustBalance": "تعديل الرصيد"
+  },
+  "withdrawals": {
+    "title": "طلبات السحب",
+    "subtitle": "إدارة طلبات سحب أرباح السائقين",
+    "approve": "قبول",
+    "reject": "رفض",
+    "pending": "معلق",
+    "approved": "مقبول",
+    "processing": "قيد المعالجة",
+    "completed": "مكتمل",
+    "rejected": "مرفوض",
+    "amount": "المبلغ",
+    "method": "طريقة الدفع",
+    "methods": {
+      "bank_transfer": "تحويل بنكي",
+      "vodafone_cash": "فودافون كاش",
+      "instapay": "انستاباي",
+      "orange_money": "اورانج كاش"
+    }
+  },
   "errors": {
     "generic": "حدث خطأ غير متوقع",
     "notFound": "الصفحة غير موجودة",

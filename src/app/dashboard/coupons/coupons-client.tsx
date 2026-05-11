@@ -81,15 +81,15 @@ export default function CouponsClient() {
               boxShadow: "0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
           >
-            {/* Top accent */}
+            
             <div className="absolute top-0 left-0 right-0 h-[2px]"
               style={{ background: "linear-gradient(to left, transparent, #F59E0B, transparent)" }} />
 
-            {/* Backdrop close */}
+            
             <div className="fixed inset-0 -z-10" onClick={() => setIsOpen(false)} />
 
             <div className="p-6">
-              {/* Header */}
+              
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -111,7 +111,7 @@ export default function CouponsClient() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4" id="create-coupon-form">
-                {/* Code */}
+                
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">كود الكوبون</label>
                   <input
@@ -126,7 +126,7 @@ export default function CouponsClient() {
                   />
                 </div>
 
-                {/* Type + Value (2 cols) */}
+                
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">نوع الخصم</label>
@@ -156,7 +156,7 @@ export default function CouponsClient() {
                   </div>
                 </div>
 
-                {/* Min price + Max uses (2 cols) */}
+                
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">حد أدنى (ج.م)</label>
@@ -180,7 +180,7 @@ export default function CouponsClient() {
                   </div>
                 </div>
 
-                {/* Expiry */}
+                
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">تاريخ الانتهاء (اختياري)</label>
                   <input
@@ -192,7 +192,7 @@ export default function CouponsClient() {
                   />
                 </div>
 
-                {/* Actions */}
+                
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"

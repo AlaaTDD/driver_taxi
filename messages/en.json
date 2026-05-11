@@ -313,6 +313,40 @@
     "heading": "Heading",
     "lastUpdate": "Last Update"
   },
+  "wallets": {
+    "title": "Financial Wallets",
+    "subtitle": "Manage driver and user wallets and financial transactions",
+    "driverWallets": "Driver Wallets",
+    "userWallets": "User Wallets",
+    "transactions": "Financial Transactions",
+    "balance": "Balance",
+    "totalEarned": "Total Earned",
+    "totalWithdrawn": "Total Withdrawn",
+    "pendingWithdrawal": "Pending Withdrawal",
+    "commission": "Commission",
+    "totalSpent": "Total Spent",
+    "totalToppedUp": "Total Topped Up",
+    "adjustBalance": "Adjust Balance"
+  },
+  "withdrawals": {
+    "title": "Withdrawal Requests",
+    "subtitle": "Manage driver earnings withdrawal requests",
+    "approve": "Approve",
+    "reject": "Reject",
+    "pending": "Pending",
+    "approved": "Approved",
+    "processing": "Processing",
+    "completed": "Completed",
+    "rejected": "Rejected",
+    "amount": "Amount",
+    "method": "Payment Method",
+    "methods": {
+      "bank_transfer": "Bank Transfer",
+      "vodafone_cash": "Vodafone Cash",
+      "instapay": "InstaPay",
+      "orange_money": "Orange Cash"
+    }
+  },
   "errors": {
     "generic": "An unexpected error occurred",
     "notFound": "Page not found",
