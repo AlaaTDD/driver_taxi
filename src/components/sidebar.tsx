@@ -426,11 +426,51 @@ function SidebarContent({
       <div className={cn("relative z-10 flex-shrink-0 pb-4", collapsed ? "px-2" : "px-3")}>
         <div className={cn("mb-3 h-px sidebar-divider", collapsed ? "mx-0" : "mx-1")} />
 
-        {/* ── System Toggles ── */}
-        <div className={cn("flex items-center gap-2 mb-3", collapsed ? "flex-col" : "justify-center")}>
-          <ThemeToggle />
-          <LanguageSwitcher />
-        </div>
+        {collapsed ? (
+          /* ━━ COLLAPSED: vertical stack of icon buttons ━━━━━━━━━━━━━━━ */
+          <div className="flex flex-col items-center gap-1.5 mb-2">
+            <div
+              onMouseEnter={(e) => {
+                const r = e.currentTarget.getBoundingClientRect();
+                setTooltip({ label: "تغيير المظهر", y: r.top + r.height / 2 });
+              }}
+              onMouseLeave={() => setTooltip(null)}
+            >
+              <ThemeToggle collapsed />
+            </div>
+            <div
+              onMouseEnter={(e) => {
+                const r = e.currentTarget.getBoundingClientRect();
+                setTooltip({ label: "تغيير اللغة", y: r.top + r.height / 2 });
+              }}
+              onMouseLeave={() => setTooltip(null)}
+            >
+              <LanguageSwitcher collapsed />
+            </div>
+          </div>
+        ) : (
+          /* ━━ EXPANDED: settings card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+          <div
+            className="rounded-xl overflow-hidden mb-3"
+            style={{
+              background: "var(--sb-icon-bg)",
+              border: "1px solid var(--sb-nav-hover-border)",
+            }}
+          >
+            {/* theme toggle row */}
+            <div className="p-1.5">
+              <ThemeToggle collapsed={false} />
+            </div>
+
+            {/* divider */}
+            <div className="mx-2 h-px" style={{ background: "var(--sb-nav-hover-border)" }} />
+
+            {/* bottom row: language */}
+            <div className="p-1.5">
+              <LanguageSwitcher collapsed={false} />
+            </div>
+          </div>
+        )}
 
         {/* collapse toggle */}
         <button
