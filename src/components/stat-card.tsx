@@ -33,16 +33,15 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative rounded-2xl overflow-hidden transition-all duration-300 cursor-default",
-        "hover:-translate-y-1 hover:shadow-xl",
+        "dash-stat group relative overflow-hidden transition-all duration-300 cursor-default",
+        "hover:-translate-y-0.5",
         className
       )}
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--divider)",
-        boxShadow: "var(--shadow-sm)",
-      }}
     >
+      <div
+        className="absolute inset-x-5 top-0 h-[2px] rounded-full opacity-80"
+        style={{ background: `linear-gradient(to left, transparent, ${accentColor}, transparent)` }}
+      />
       <div className="relative p-5 z-10">
         {/* Top row: title + icon */}
         <div className="flex items-start justify-between gap-3">
@@ -52,6 +51,11 @@ export function StatCard({
             <div className="text-[28px] font-black tracking-tight text-text-primary leading-none num">
               {value}
             </div>
+            {subtitle && (
+              <p className="mt-2 truncate text-[11px] font-semibold text-text-tertiary">
+                {subtitle}
+              </p>
+            )}
 
             {/* Trend percentage */}
             {trendPercent && (
@@ -84,7 +88,7 @@ export function StatCard({
                   strokeLinecap="round"
                   fill="none"
                   opacity="0.9"
-                  style={{ filter: `drop-shadow(0 2px 4px ${sparkColor}40)` }}
+                  style={{ filter: "drop-shadow(0 2px 6px rgba(var(--primary-rgb),0.25))" }}
                 />
                 <path
                   d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4 L120 32 L0 32 Z"
@@ -109,8 +113,9 @@ export function StatCard({
               iconColor
             )}
             style={{
-              background: accentColor,
-              boxShadow: `0 4px 14px ${accentColor}44`,
+              background: "var(--accent-surface)",
+              border: "1px solid var(--accent-border)",
+              color: accentColor,
             }}
           >
             {icon}

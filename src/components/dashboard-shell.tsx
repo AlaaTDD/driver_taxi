@@ -1,41 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { ThemeToggle } from "./theme-toggle";
-import { LanguageSwitcher } from "./language-switcher";
 import Sidebar from "./sidebar";
-
+import { UnifiedTopBar } from "./unified-topbar";
+import { SidebarProvider } from "./sidebar-context";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <div className="min-h-dvh flex bg-background">
-      <Sidebar />
+    <SidebarProvider>
+      <div className="dashboard-shell h-dvh flex flex-col bg-background overflow-hidden">
+        {/* Full-width dashboard chrome: brand, navigation rail, and page controls */}
+        <UnifiedTopBar />
 
-      <main className="flex-1 w-full overflow-x-hidden relative">
-        {/* Mobile Header */}
-        <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-surface border-b border-divider z-40 flex items-center justify-between px-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold text-xs">
-              T
+        <div className="dashboard-body flex flex-1 min-h-0 overflow-hidden">
+          <Sidebar />
+
+          <main className="dashboard-main flex-1 min-w-0 overflow-y-auto">
+            <div className="p-4 sm:p-5 lg:p-6 max-w-[1400px] mx-auto">
+              {children}
             </div>
-            <span className="font-bold text-text-primary text-sm">Taxi Admin</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <ThemeToggle />
-            <LanguageSwitcher />
-            {/* The mobile menu toggle is now handled inside Sidebar component */}
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <div className="pt-14 lg:pt-0">
-          <div className="p-4 sm:p-5 lg:p-6 max-w-[1400px] mx-auto">
-            {children}
-          </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }

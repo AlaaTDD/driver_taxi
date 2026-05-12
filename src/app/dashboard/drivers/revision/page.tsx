@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Send } from "lucide-react";
+import { DashboardShell } from "@/components/dashboard-shell";
 
 
 function DriverRevisionForm() {
@@ -201,8 +202,10 @@ function Loading() {
 
 export default function DriverRevisionPage() {
   return (
-    <Suspense fallback={<Loading />}>
-      <DriverRevisionForm />
-    </Suspense>
+    <DashboardShell>
+      <Suspense fallback={<Loading />}>
+        <DriverRevisionForm />
+      </Suspense>
+    </DashboardShell>
   );
 }

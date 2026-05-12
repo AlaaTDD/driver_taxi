@@ -7,10 +7,10 @@ import { Users, ShieldBan, Shield, Crown } from "lucide-react";
 
 /* ─── stat colours ────────────────────────────────────────── */
 const STAT_COLORS = {
-  users:      { accent: "#3B82F6", glow: "rgba(59,130,246,0.18)",  border: "rgba(59,130,246,0.2)"  },
-  blocked:    { accent: "#EF4444", glow: "rgba(239,68,68,0.18)",   border: "rgba(239,68,68,0.2)"   },
-  supervisor: { accent: "#8B5CF6", glow: "rgba(139,92,246,0.18)",  border: "rgba(139,92,246,0.2)"  },
-  admin:      { accent: "#F59E0B", glow: "rgba(245,158,11,0.18)",  border: "rgba(245,158,11,0.2)"  },
+  users:      { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
+  blocked:    { accent: "var(--error)", glow: "rgba(var(--error-rgb),0.14)", border: "rgba(var(--error-rgb),0.2)" },
+  supervisor: { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
+  admin:      { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
 };
 
 export default async function UsersPage({
@@ -105,11 +105,11 @@ export default async function UsersPage({
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{
-                background: "linear-gradient(135deg,rgba(59,130,246,0.25),rgba(59,130,246,0.08))",
-                border: "1px solid rgba(59,130,246,0.2)",
+                background: "var(--accent-surface)",
+                border: "1px solid var(--accent-border)",
               }}
             >
-              <Users size={18} style={{ color: "#93C5FD" }} />
+              <Users size={18} style={{ color: "var(--primary)" }} />
             </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
@@ -157,12 +157,6 @@ export default async function UsersPage({
                   }}
                 />
 
-                {/* corner glow */}
-                <div
-                  className="absolute top-0 left-0 w-16 h-16 rounded-br-full opacity-20 pointer-events-none"
-                  style={{ background: c.accent, filter: "blur(18px)" }}
-                />
-
                 {/* icon + value */}
                 <div className="relative flex items-start justify-between mb-3">
                   <div
@@ -193,14 +187,6 @@ export default async function UsersPage({
                   </p>
                 </div>
 
-                {/* subtle progress bar (just decorative) */}
-                {stat.value > 0 && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px]"
-                    style={{
-                      background: `linear-gradient(to left, transparent, ${c.accent}40, transparent)`,
-                    }}
-                  />
-                )}
               </div>
             );
           })}

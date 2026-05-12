@@ -68,7 +68,7 @@ export default async function TripsPage({
               {count || 0} {t("trips.title")}
             </div>
             {!statusFilter && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-success/5 border border-success/20 text-success">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 border border-primary/20 text-primary">
                 <Gauge size={11} />
                 {formatCurrency(totalRevenue)}
               </div>
@@ -93,8 +93,8 @@ export default async function TripsPage({
             <div
               className="w-[3px] h-5 rounded-full"
               style={{
-                background: "linear-gradient(to bottom, #10B981, #059669)",
-                boxShadow: "0 0 8px rgba(16,185,129,0.5)",
+                background: "linear-gradient(to bottom, var(--primary), transparent)",
+                boxShadow: "0 0 8px rgba(var(--primary-rgb),0.35)",
               }}
             />
             <div>
@@ -106,8 +106,7 @@ export default async function TripsPage({
           </div>
 
           {(statusFilter || vehicleFilter) && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-amber-400"
-              style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
+            <div className="status-pill status-pill-warning">
               {t("common.activeFilter")}
             </div>
           )}
@@ -137,7 +136,7 @@ export default async function TripsPage({
                     <span className="flex items-center gap-2">
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ background: "#10B981", boxShadow: "0 0 4px rgba(16,185,129,0.6)" }}
+                        style={{ background: "var(--primary)", boxShadow: "0 0 4px rgba(var(--primary-rgb),0.6)" }}
                       />
                       <span className="truncate">{trip.pickup_address}</span>
                     </span>
@@ -148,16 +147,16 @@ export default async function TripsPage({
                   <td className="py-3.5 px-4 text-text-tertiary text-[13px] num whitespace-nowrap">
                     {Number(trip.distance_km).toFixed(1)} {t("common.km")}
                   </td>
-                  <td className="py-3.5 px-4 text-[13px] font-black num text-emerald-400 whitespace-nowrap">
+                  <td className="py-3.5 px-4 text-[13px] font-black num text-primary whitespace-nowrap">
                     {formatCurrency(Number(trip.price))}
                   </td>
                   <td className="py-3.5 px-4">
                     <span
                       className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap"
                       style={{
-                        background: trip.vehicle_type === "car" ? "rgba(59,130,246,0.1)" : "rgba(16,185,129,0.1)",
-                        color: trip.vehicle_type === "car" ? "#60A5FA" : "#34D399",
-                        border: `1px solid ${trip.vehicle_type === "car" ? "rgba(59,130,246,0.2)" : "rgba(16,185,129,0.2)"}`,
+                        background: "var(--accent-surface)",
+                        color: "var(--primary)",
+                        border: "1px solid var(--accent-border)",
                       }}
                     >
                       {trip.vehicle_type === "car" ? "🚗" : "🏍"}
@@ -205,8 +204,7 @@ export default async function TripsPage({
                   <td className="py-3.5 px-4">
                     <Link
                       href={`/dashboard/trips/${trip.id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-                      style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
+                      className="table-action"
                     >
                       <Eye size={12} /> {t("common.view")}
                     </Link>

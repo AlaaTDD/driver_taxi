@@ -26,15 +26,24 @@ interface RevenueData {
   revenue: number;
 }
 
-const PIE_COLORS = [
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#8B5CF6",
-  "#06B6D4",
-  "#EF4444",
-  "#EC4899",
-  "#6366F1",
+const STATUS_COLOR_MAP: Record<string, string> = {
+  completed: "var(--success)",
+  accepted: "var(--primary)",
+  driver_arriving: "var(--primary)",
+  in_progress: "var(--primary)",
+  searching: "var(--warning)",
+  pending: "var(--warning)",
+  cancelled: "var(--error)",
+  rejected: "var(--error)",
+  expired: "var(--text-disabled)",
+};
+
+const PIE_FALLBACK = [
+  "var(--primary)",
+  "var(--success)",
+  "var(--warning)",
+  "var(--error)",
+  "var(--primary-light)",
 ];
 
 const TOOLTIP_STYLE = {
@@ -47,6 +56,9 @@ const TOOLTIP_STYLE = {
   fontSize: "13px",
   padding: "10px 14px",
 };
+
+const statusTone = (status: string, index: number) =>
+  STATUS_COLOR_MAP[status] || PIE_FALLBACK[index % PIE_FALLBACK.length];
 
 function useChartSize() {
   const ref = useRef<HTMLDivElement>(null);
@@ -99,7 +111,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
                   {data.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                      fill={statusTone(data[index]?.status || "", index)}
                     />
                   ))}
                 </Pie>
@@ -133,7 +145,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
               <span
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{
-                  background: PIE_COLORS[index % PIE_COLORS.length],
+                  background: statusTone(entry.status, index),
                 }}
               />
               <div className="flex-1 min-w-0">
@@ -189,8 +201,8 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
             <BarChart data={data} width={width} height={208} barCategoryGap="40%">
               <defs>
                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.95} />
-                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.75} />
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="var(--primary-dark)" stopOpacity={0.78} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -218,7 +230,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
               />
               <Tooltip
                 contentStyle={TOOLTIP_STYLE}
-                cursor={{ fill: "rgba(59,130,246,0.06)", radius: 8 }}
+                cursor={{ fill: "rgba(var(--primary-rgb),0.08)", radius: 8 }}
                 formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), t("dashboard.charts.revenueLabel")]}
               />
               <Bar

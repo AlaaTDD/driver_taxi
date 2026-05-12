@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -12,8 +12,7 @@ import {
   Navigation, Wallet, Banknote, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "./theme-toggle";
-import { LanguageSwitcher } from "./language-switcher";
+import { useSidebar, SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./sidebar-context";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES & DATA
@@ -34,8 +33,7 @@ type NavGroup = {
   items:  NavItem[];
 };
 
-/* ────── تم توحيد الألوان كلها على أزرق الكوبالت (#1b4ec0 = 27,78,192) ────── */
-const PRIMARY_RGB = "27,78,192";
+const PRIMARY_RGB = "var(--primary-rgb)";
 
 const getNavGroups = (t: any): NavGroup[] => [
   {
@@ -93,8 +91,8 @@ const getNavGroups = (t: any): NavGroup[] => [
   },
 ];
 
-const EXPANDED_W  = 260;
-const COLLAPSED_W = 64;
+const EXPANDED_W  = SIDEBAR_EXPANDED_W;
+const COLLAPSED_W = SIDEBAR_COLLAPSED_W;
 
 /* ─────────────────────────────────────────────────────────────────────────────
    FLOATING TOOLTIP
@@ -304,7 +302,7 @@ function SidebarContent({
   const nextDelay = () => { const d = idx * 0.027; idx++; return d; };
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden sidebar-root">
+    <div className="relative flex flex-col h-full overflow-hidden sidebar-root dashboard-sidebar-root">
 
       {/* ── noise texture (dark only) ────────────────────────────────────── */}
       <div
@@ -318,63 +316,9 @@ function SidebarContent({
       {/* ── top ambient glow ─────────────────────────────────────────────── */}
       <div className="pointer-events-none absolute top-0 inset-x-0 h-36 z-0 sidebar-top-glow" />
 
-      {/* ── BRAND ───────────────────────────────────────────────────────── */}
-      <div
-        className={cn(
-          "relative z-10 flex flex-shrink-0 items-center transition-all duration-300",
-          collapsed ? "justify-center px-2 py-5" : "gap-3.5 px-5 pt-6 pb-5"
-        )}
-      >
-        <div className="relative flex-shrink-0">
-          <div
-            className="relative flex items-center justify-center rounded-xl border sidebar-logo"
-            style={{
-              width:  collapsed ? 38 : 42,
-              height: collapsed ? 38 : 42,
-            }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ width: collapsed ? 18 : 20, height: collapsed ? 18 : 20 }}
-            >
-              <path d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" fill="rgba(255,255,255,0.95)" />
-              <path d="M5.5 14l2-5h9l2 5" stroke="rgba(255,255,255,0.95)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(255,255,255,0.15)" />
-              <rect x="9" y="6" width="6" height="3" rx="1" fill="#FBBF24" />
-              <rect x="10.5" y="6.7" width="3" height="1.5" rx="0.5" fill="#F59E0B" opacity="0.6" />
-              <circle cx="7" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
-              <circle cx="17" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
-              <rect x="19" y="14.5" width="1.5" height="1" rx="0.5" fill="#FBBF24" opacity="0.8" />
-              <rect x="3.5" y="14.5" width="1.5" height="1" rx="0.5" fill="#FCA5A5" opacity="0.7" />
-            </svg>
-          </div>
-        </div>
-
-        <div
-          className="flex flex-col gap-0.5 overflow-hidden"
-          style={{
-            width: collapsed ? 0 : "auto",
-            opacity: collapsed ? 0 : 1,
-            transition: "opacity 200ms ease, width 280ms cubic-bezier(0.16,1,0.3,1)",
-          }}
-        >
-          <span className="sidebar-brand-name text-[16px] font-black leading-none tracking-tight whitespace-nowrap select-none">
-            Taxi
-          </span>
-          <span className="sidebar-brand-sub text-[9.5px] font-bold tracking-[0.15em] whitespace-nowrap select-none">
-            {t("common.dashboard")}
-          </span>
-        </div>
-      </div>
-
-      <div className={cn("relative z-10 flex-shrink-0", collapsed ? "mx-2" : "mx-4")}>
-        <div className="sidebar-divider h-px" />
-      </div>
-
       <nav
         className={cn(
-          "relative z-10 flex-1 overflow-y-auto py-3 hide-scrollbar",
+          "relative z-10 flex-1 overflow-y-auto pt-3 pb-3 hide-scrollbar",
           collapsed ? "px-2 space-y-0.5" : "px-3 space-y-0.5"
         )}
         style={{
@@ -423,34 +367,6 @@ function SidebarContent({
 
       <div className={cn("relative z-10 flex-shrink-0 pb-4", collapsed ? "px-2" : "px-3")}>
         <div className={cn("mb-3 h-px sidebar-divider", collapsed ? "mx-0" : "mx-1")} />
-
-        {collapsed ? (
-          <div className="flex flex-col items-center gap-1.5 mb-2">
-            <div
-              onMouseEnter={(e) => {
-                const r = e.currentTarget.getBoundingClientRect();
-                setTooltip({ label: t("sidebar.theme") || "تغيير المظهر", y: r.top + r.height / 2 });
-              }}
-              onMouseLeave={() => setTooltip(null)}
-            >
-              <ThemeToggle collapsed />
-            </div>
-            <div
-              onMouseEnter={(e) => {
-                const r = e.currentTarget.getBoundingClientRect();
-                setTooltip({ label: t("sidebar.language") || "تغيير اللغة", y: r.top + r.height / 2 });
-              }}
-              onMouseLeave={() => setTooltip(null)}
-            >
-              <LanguageSwitcher collapsed />
-            </div>
-          </div>
-        ) : (
-          <div className="mb-3 space-y-0.5">
-            <ThemeToggle collapsed={false} />
-            <LanguageSwitcher collapsed={false} />
-          </div>
-        )}
 
         <form action="/api/auth/logout" method="POST">
           <button
@@ -534,24 +450,7 @@ function SidebarContent({
 
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed,  setCollapsed]  = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => {
-      try {
-        const stored = localStorage.getItem("sidebar-collapsed");
-        if (stored !== null) setCollapsed(stored === "true");
-      } catch { /* SSR / private mode */ }
-    }, 0);
-  }, []);
-
-  const toggleCollapse = useCallback(() => {
-    setCollapsed((v) => {
-      const next = !v;
-      try { localStorage.setItem("sidebar-collapsed", String(next)); } catch { /* noop */ }
-      return next;
-    });
-  }, []);
+  const { collapsed, toggle: toggleCollapse } = useSidebar();
 
   return (
     <>
@@ -589,13 +488,13 @@ export default function Sidebar() {
       </aside>
 
       <aside
-        className="hidden lg:flex flex-col sticky top-0 h-screen sidebar-panel border-l"
+        className="hidden lg:flex flex-col h-full sidebar-panel dashboard-sidebar-panel border-l"
         style={{
           width:      collapsed ? COLLAPSED_W : EXPANDED_W,
           minWidth:   collapsed ? COLLAPSED_W : EXPANDED_W,
           transition: "width 280ms cubic-bezier(0.16,1,0.3,1), min-width 280ms cubic-bezier(0.16,1,0.3,1)",
           overflow:   "visible",
-          boxShadow:  "inset -1px 0 0 var(--sidebar-border), 8px 0 32px rgba(0,0,0,0.12)",
+          boxShadow:  "var(--sidebar-chrome-shadow)",
         }}
       >
         <SidebarContent

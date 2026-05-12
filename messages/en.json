@@ -622,26 +622,6 @@
       "fixed": "Fixed Amount"
     }
   },
-
-  "pricing": {
-    "title": "Pricing & Rates",
-    "subtitle": "Manage vehicle pricing and fare configurations"
-  },
-  "tripOffers": {
-    "title": "Trip Offers",
-    "subtitle": "Manage driver trip offers"
-  },
-  "driverLocations": {
-    "title": "Driver Locations",
-    "subtitle": "Track driver locations in real time",
-    "totalLocations": "Total Locations",
-    "onlineNow": "Online Now",
-    "offline": "Offline",
-    "onlineUsers": "Online Users",
-    "coordinates": "Coordinates",
-    "heading": "Heading",
-    "lastUpdate": "Last Update"
-  },
   "wallets": {
     "title": "Financial Wallets",
     "subtitle": "Manage driver and user wallets and financial transactions",

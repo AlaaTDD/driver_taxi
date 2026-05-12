@@ -30,11 +30,7 @@ export function KpiCard({
 
   return (
     <div
-      className="group relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg overflow-hidden"
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--divider)",
-      }}
+      className="dash-stat group relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
     >
       {/* Right side in UI (First in DOM for RTL): The Ring */}
       <div className="relative flex-shrink-0 w-14 h-14 flex items-center justify-center">
@@ -61,7 +57,7 @@ export function KpiCard({
               strokeDasharray: circumference,
               strokeDashoffset: strokeDashoffset,
               transition: "stroke-dashoffset 1s ease-out",
-              filter: `drop-shadow(0 0 4px ${color}80)`,
+              filter: "drop-shadow(0 0 4px rgba(var(--primary-rgb),0.34))",
             }}
           />
         </svg>
@@ -89,7 +85,8 @@ export function KpiCard({
         <div
           className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
           style={{
-            background: `${color}15`,
+            background: "var(--accent-surface)",
+            border: "1px solid var(--accent-border)",
             color: color,
           }}
         >

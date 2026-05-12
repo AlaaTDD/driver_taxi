@@ -78,10 +78,10 @@ export default async function DriversPage({
   const totalPages = Math.ceil(((tab === "revision" ? revisionRes.count : driversCount) || 0) / pageSize);
 
   const tabs = [
-    { key: "pending", label: t("drivers.tabs.pending"), count: pendingRes.count || 0, icon: <Clock size={14} />, color: "#F59E0B" },
-    { key: "approved", label: t("drivers.tabs.approved"), count: approvedRes.count || 0, icon: <CheckCircle size={14} />, color: "#10B981" },
-    { key: "blocked", label: t("drivers.tabs.blocked"), count: blockedRes.count || 0, icon: <ShieldBan size={14} />, color: "#EF4444" },
-    { key: "revision", label: t("drivers.tabs.revision"), count: revisionRes.count || 0, icon: <AlertCircle size={14} />, color: "#8B5CF6" },
+    { key: "pending", label: t("drivers.tabs.pending"), count: pendingRes.count || 0, icon: <Clock size={14} /> },
+    { key: "approved", label: t("drivers.tabs.approved"), count: approvedRes.count || 0, icon: <CheckCircle size={14} /> },
+    { key: "blocked", label: t("drivers.tabs.blocked"), count: blockedRes.count || 0, icon: <ShieldBan size={14} /> },
+    { key: "revision", label: t("drivers.tabs.revision"), count: revisionRes.count || 0, icon: <AlertCircle size={14} /> },
   ];
 
   return (
@@ -102,12 +102,12 @@ export default async function DriversPage({
             id={`drivers-tab-${t.key}`}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
             style={tab === t.key ? {
-              background: `linear-gradient(135deg, ${t.color}25, ${t.color}12)`,
-              border: `1px solid ${t.color}35`,
-              color: t.color,
-              boxShadow: `0 4px 12px ${t.color}15`,
+              background: "var(--accent-surface)",
+              border: "1px solid var(--accent-border)",
+              color: "var(--primary)",
+              boxShadow: "0 4px 12px rgba(var(--primary-rgb),0.14)",
             } : {
-              background: "var(--surface-glass)",
+              background: "var(--surface-elevated)",
               border: "1px solid var(--divider)",
               color: "var(--text-tertiary)",
             }}
@@ -117,7 +117,7 @@ export default async function DriversPage({
             {t.count > 0 && (
               <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
                 style={{
-                  background: tab === t.key ? t.color : "var(--surface-glass)",
+                  background: tab === t.key ? "var(--primary)" : "var(--surface-elevated)",
                   color: tab === t.key ? "white" : "var(--text-tertiary)",
                   border: tab === t.key ? "none" : "1px solid var(--divider)",
                 }}>
@@ -136,7 +136,7 @@ export default async function DriversPage({
           <div className="dash-section-header justify-between">
             <div className="flex items-center gap-2.5 flex-1">
               <div className="w-[3px] h-5 rounded-full"
-                style={{ background: `linear-gradient(to bottom, ${tabs.find(t => t.key === tab)?.color || "#3B82F6"}, transparent)`, boxShadow: `0 0 8px ${tabs.find(t => t.key === tab)?.color || "#3B82F6"}50` }} />
+                style={{ background: "linear-gradient(to bottom, var(--primary), transparent)", boxShadow: "0 0 8px rgba(var(--primary-rgb),0.35)" }} />
               <h3 className="text-[13px] font-bold text-text-primary">{tabs.find(t => t.key === tab)?.label}</h3>
               <span className="text-text-disabled text-[11px]">({driversCount || 0})</span>
             </div>
@@ -164,8 +164,8 @@ export default async function DriversPage({
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black shrink-0"
                             style={{
-                              background: driver.is_verified ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.12)",
-                              color: driver.is_verified ? "#34D399" : "#FCD34D",
+                              background: driver.is_verified ? "var(--success-surface)" : "var(--warning-surface)",
+                              color: driver.is_verified ? "var(--success)" : "var(--warning)",
                               border: "1px solid var(--divider)",
                             }}>
                             {user?.name?.charAt(0)?.toUpperCase() || "D"}
@@ -199,7 +199,7 @@ export default async function DriversPage({
                           ].map((doc) => (
                             <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
                               className="px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all hover:opacity-80"
-                              style={{ background: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
                               {doc.label}
                             </a>
                           ))}
@@ -212,8 +212,8 @@ export default async function DriversPage({
                       
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1">
-                          <Star size={11} className="text-amber-400" />
-                          <span className="font-bold text-[13px] num" style={{ color: "#FCD34D" }}>{user?.rating ?? "—"}</span>
+                          <Star size={11} style={{ color: "var(--warning)" }} />
+                          <span className="font-bold text-[13px] num" style={{ color: "var(--warning)" }}>{user?.rating ?? "—"}</span>
                         </div>
                       </td>
 
@@ -232,7 +232,7 @@ export default async function DriversPage({
                               <input type="hidden" name="driver_id" value={driver.id} />
                               <button type="submit" id={`verify-driver-${driver.id}`}
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white"
-                                style={{ background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 8px rgba(16,185,129,0.3)" }}>
+                                style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))", boxShadow: "0 3px 8px rgba(var(--primary-rgb),0.3)" }}>
                                 {t("drivers.verify")}
                               </button>
                             </form>
@@ -242,14 +242,14 @@ export default async function DriversPage({
                               <input type="hidden" name="driver_id" value={driver.id} />
                               <button type="submit" id={`revoke-driver-${driver.id}`}
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
-                                style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                                style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>
                                 {t("common.cancel")}
                               </button>
                             </form>
                           )}
                           <Link href={`/dashboard/drivers/${driver.id}`}
                             className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-opacity hover:opacity-80"
-                            style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                            style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
                             {t("common.details")}
                           </Link>
                           <DriversRevisionButton driverId={driver.id} driverName={user?.name} label={t("drivers.requestRevision")} />
@@ -281,7 +281,7 @@ export default async function DriversPage({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black"
-                        style={{ background: driver.is_verified ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.12)", color: driver.is_verified ? "#34D399" : "#FCD34D" }}>
+                        style={{ background: driver.is_verified ? "var(--success-surface)" : "var(--warning-surface)", color: driver.is_verified ? "var(--success)" : "var(--warning)" }}>
                         {user?.name?.charAt(0)?.toUpperCase()}
                       </div>
                       <div>
@@ -305,7 +305,7 @@ export default async function DriversPage({
                     ].map((doc) => (
                       <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
                         className="px-2 py-1 rounded-lg text-[10px] font-bold"
-                        style={{ background: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                        style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
                         {doc.label}
                       </a>
                     ))}
@@ -315,14 +315,14 @@ export default async function DriversPage({
                       <form action="/api/drivers/verify" method="POST" className="flex-1">
                         <input type="hidden" name="driver_id" value={driver.id} />
                         <button className="w-full py-2 rounded-xl text-[12px] font-bold text-white"
-                          style={{ background: "linear-gradient(135deg,#10B981,#059669)" }}>اعتماد</button>
+                          style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))" }}>اعتماد</button>
                       </form>
                     )}
                     {driver.is_verified && (
                       <form action="/api/drivers/revoke" method="POST" className="flex-1">
                         <input type="hidden" name="driver_id" value={driver.id} />
                         <button className="w-full py-2 rounded-xl text-[12px] font-bold"
-                          style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>إلغاء الاعتماد</button>
+                          style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>إلغاء الاعتماد</button>
                       </form>
                     )}
                     <div className="flex-1">
@@ -331,7 +331,7 @@ export default async function DriversPage({
                     <div className="flex-1">
                       <Link href={`/dashboard/drivers/${driver.id}`}
                         className="flex items-center justify-center w-full py-2 rounded-xl text-[12px] font-bold transition-opacity hover:opacity-80"
-                        style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                        style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
                         التفاصيل
                       </Link>
                     </div>
@@ -366,12 +366,12 @@ export default async function DriversPage({
                     <span className="text-[11px] text-text-disabled">{formatDate(r.created_at)}</span>
                   </div>
 
-                  <div className="p-3 rounded-xl" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                    <p className="text-[12px] font-bold text-purple-300 mb-1">{t("drivers.requestedFields")}:</p>
+                  <div className="p-3 rounded-xl" style={{ background: "var(--accent-surface)", border: "1px solid var(--accent-border)" }}>
+                    <p className="text-[12px] font-bold text-primary mb-1">{t("drivers.requestedFields")}:</p>
                     <div className="flex gap-1.5 flex-wrap">
                       {(r.fields_requested || []).map((f: string) => (
                         <span key={f} className="px-2 py-0.5 rounded-lg text-[10px] font-bold"
-                          style={{ background: "rgba(139,92,246,0.15)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.2)" }}>
+                          style={{ background: "var(--accent-surface-strong)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
                           {f}
                         </span>
                       ))}
@@ -383,14 +383,14 @@ export default async function DriversPage({
                     <form action="/api/drivers/verify" method="POST">
                       <input type="hidden" name="driver_id" value={user?.id} />
                       <button type="submit" className="px-4 py-2 rounded-xl text-[12px] font-bold text-white"
-                        style={{ background: "linear-gradient(135deg,#10B981,#059669)" }}>
+                        style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))" }}>
                         قبول وتأكيد
                       </button>
                     </form>
                     <form action="/api/drivers/revoke" method="POST">
                       <input type="hidden" name="driver_id" value={user?.id} />
                       <button type="submit" className="px-4 py-2 rounded-xl text-[12px] font-bold"
-                        style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>
                         رفض
                       </button>
                     </form>
@@ -419,7 +419,7 @@ function DriversRevisionButton({ driverId, driverName, label, mobile }: { driver
       href={`/dashboard/drivers/revision?driver_id=${driverId}&name=${encodeURIComponent(driverName)}`}
       id={`request-revision-${driverId}`}
       className={`flex items-center justify-center gap-1 rounded-lg text-[11px] font-bold transition-all hover:opacity-80 ${mobile ? "w-full py-2" : "px-3 py-1.5"}`}
-      style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.2)" }}
+      style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
     >
       <AlertCircle size={10} />
       {label}

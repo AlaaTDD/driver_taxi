@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { Sun, Moon } from "lucide-react";
 import { useSyncExternalStore, useCallback, useRef, useEffect, useState } from "react";
 
@@ -8,11 +9,11 @@ function getServerSnapshot() { return false; }
 function getSnapshot() { return true; }
 function subscribe() { return () => {}; }
 
-/* ───── تم توحيد اللون على أزرق الكوبالت الأساسي ───── */
-const PRIMARY_RGB = "27,78,192";
+const PRIMARY_RGB = "var(--primary-rgb)";
 
 export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const t = useTranslations("common");
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const pillRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
@@ -24,7 +25,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
     if (!pillRef.current || collapsed) return;
     const btns = pillRef.current.querySelectorAll<HTMLButtonElement>("[data-theme-btn]");
     const activeBtn = btns[activeIdx];
-    if (!activeBtn) return;
+    if (!pillRef.current || !activeBtn) return;
     const parentRect = pillRef.current.getBoundingClientRect();
     const btnRect = activeBtn.getBoundingClientRect();
     setIndicatorStyle({
@@ -47,6 +48,8 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
     return (
       <button
         onClick={toggleTheme}
+        aria-label={t("theme")}
+        title={t("theme")}
         className="group relative w-[40px] h-[40px] rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90"
         style={{
           background: `rgba(${PRIMARY_RGB}, 0.08)`,
@@ -73,7 +76,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <div className="flex items-center gap-2 w-full" style={{ padding: "4px 6px" }}>
       <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "var(--sb-footer-text)" }}>
-        الوضع
+        {t("theme")}
       </span>
       <div
         ref={pillRef}
@@ -98,6 +101,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
         <button
           data-theme-btn
           onClick={() => setTheme("light")}
+          aria-label={t("light")}
           className="relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200"
           style={{
             color: !isDark ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",
@@ -116,6 +120,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
         <button
           data-theme-btn
           onClick={() => setTheme("dark")}
+          aria-label={t("dark")}
           className="relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200"
           style={{
             color: isDark ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",

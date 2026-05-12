@@ -3,7 +3,7 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { StatCard } from "@/components/stat-card";
 import { TripsStatusChart, RevenueChart } from "@/components/charts";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { DataTable } from "@/components/data-table";
 import {
@@ -18,36 +18,30 @@ import {
   Activity,
   BarChart2,
   ArrowUpRight,
-  Bell,
-  Calendar,
-  ChevronDown,
   UserCheck,
 } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 
+const DASHBOARD_COLORS = {
+  primary: "var(--primary)",
+  info: "var(--primary)",
+  success: "var(--success)",
+  warning: "var(--warning)",
+};
+
 export default async function DashboardPage() {
   const t = await getTranslations();
-  const locale = await getLocale();
   const supabase = createAdminClient();
 
-  const [dashboardRes, recentTripsRes, tripsForChartRes, notifRes] = await Promise.all([
+  const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
     supabase.from("admin_dashboard").select("*").single(),
     supabase.from("admin_recent_trips").select("*").limit(10),
     supabase.from("trips").select("id, status, price, vehicle_type"),
-    supabase.from("notifications").select("*", { count: "exact", head: true }).eq("is_read", false),
   ]);
 
   const dashboard = dashboardRes.data;
   const recentTrips = recentTripsRes.data || [];
   const trips = tripsForChartRes.data || [];
-  const unreadCount = notifRes.count || 0;
-
-  const today = new Date().toLocaleDateString("ar-EG", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 
   const totalUsers = Number(dashboard?.total_users ?? 0);
   const totalDrivers = Number(dashboard?.total_drivers ?? 0);
@@ -89,63 +83,32 @@ export default async function DashboardPage() {
   const completionRate = totalTrips > 0 ? Math.round((completedTrips / totalTrips) * 100) : 0;
   const cancelledTrips = trips.filter((t) => t.status === "cancelled").length;
   const acceptanceRate = totalTrips > 0 ? Math.round(((totalTrips - cancelledTrips) / totalTrips) * 100) : 0;
-
-  const isRTL = locale === "ar";
+  const recentCompletedTrips = recentTrips.filter((trip) => trip.status === "completed").length;
+  const recentActiveTrips = recentTrips.filter((trip) => !["completed", "cancelled"].includes(trip.status)).length;
 
   return (
     <DashboardShell>
       <div className="space-y-6">
 
-        {/* ─── PAGE HEADER ─── matching design exactly ─────────── */}
-        <div className="flex items-start justify-between gap-4">
-          {/* Right: title + subtitle */}
+        {/* ─── PAGE HEADER ──────────────────────────────────────── */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
             <h1 className="text-[28px] font-black tracking-tight text-text-primary leading-tight">
               {t("dashboard.overview")}
             </h1>
-            <p className="text-[14px] text-text-tertiary">
-              {t("dashboard.welcome")} 👋
+            <p className="text-[14px] text-text-tertiary leading-relaxed">
+              {t("dashboard.welcome")}
             </p>
           </div>
-
-          {/* Left: date + bell */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Date chip */}
-            <div
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-[12px] text-text-secondary font-medium cursor-pointer hover:border-primary/30 transition-all"
-              style={{
-                background: "var(--surface-elevated)",
-                border: "1px solid var(--divider)",
-              }}
-            >
-              <Calendar size={14} className="text-text-tertiary" />
-              <span>{today}</span>
-              <ChevronDown size={12} className="text-text-disabled" />
-            </div>
-
-            {/* Notification bell */}
-            <Link
-              href="/dashboard/notifications"
-              id="topbar-notifications"
-              className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 group hover:border-primary/40 hover:bg-primary/10"
-              style={{
-                background: "var(--surface-elevated)",
-                border: "1px solid var(--divider)",
-              }}
-            >
-              <Bell size={17} className="text-text-secondary group-hover:text-primary transition-colors" />
-              {unreadCount > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-white text-[9px] font-bold rounded-full px-1"
-                  style={{
-                    background: "var(--error)",
-                    border: "2px solid var(--surface)",
-                  }}
-                >
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary">
+              <Activity size={13} />
+              {totalTrips} {t("dashboard.charts.tripsLabel")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
+              <CheckCircle size={13} />
+              {completionRate}%
+            </span>
           </div>
         </div>
 
@@ -157,8 +120,8 @@ export default async function DashboardPage() {
             value={totalUsers}
             icon={<Users size={24} strokeWidth={2.5} />}
             iconColor="text-white"
-            accentColor="#7C3AED"
-            sparkColor="#7C3AED"
+            accentColor={DASHBOARD_COLORS.primary}
+            sparkColor={DASHBOARD_COLORS.primary}
             subtitle={t("dashboard.stats.activeUsers")}
           />
           {/* Card 2: إجمالي السائقين */}
@@ -167,7 +130,7 @@ export default async function DashboardPage() {
             value={totalDrivers}
             icon={<Car size={24} strokeWidth={2.5} />}
             iconColor="text-white"
-            accentColor="#3B82F6"
+            accentColor={DASHBOARD_COLORS.info}
             subtitle={`${availableDrivers} ${t("dashboard.stats.availableDriversSubtitle")}`}
           />
           {/* Card 3: رحلات نشطة */}
@@ -176,8 +139,8 @@ export default async function DashboardPage() {
             value={activeTrips}
             icon={<MapPin size={24} strokeWidth={2.5} />}
             iconColor="text-white"
-            accentColor="#10B981"
-            sparkColor="#10B981"
+            accentColor={DASHBOARD_COLORS.success}
+            sparkColor={DASHBOARD_COLORS.success}
             subtitle={activeTrips === 0 ? t("dashboard.stats.noActiveTrips") : undefined}
           />
           {/* Card 4 (leftmost in RTL): إجمالي الإيرادات */}
@@ -186,8 +149,8 @@ export default async function DashboardPage() {
             value={formatCurrency(totalRevenue)}
             icon={<DollarSign size={24} strokeWidth={2.5} />}
             iconColor="text-white"
-            accentColor="#3B82F6"
-            sparkColor="#3B82F6"
+            accentColor={DASHBOARD_COLORS.primary}
+            sparkColor={DASHBOARD_COLORS.primary}
             trendPercent="12.5%"
             trendUp={true}
           />
@@ -209,7 +172,7 @@ export default async function DashboardPage() {
               value={availableDrivers}
               suffix={`${t("dashboard.kpis.outOf")} ${totalDrivers}`}
               icon={<UserCheck size={18} strokeWidth={2.5} />}
-              color="#10B981"
+              color={DASHBOARD_COLORS.success}
               progress={totalDrivers > 0 ? (availableDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.onlineNow")}
             />
@@ -219,7 +182,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.pendingDrivers")}
               value={pendingDrivers}
               icon={<Clock size={18} strokeWidth={2.5} />}
-              color="#3B82F6"
+              color={DASHBOARD_COLORS.warning}
               progress={totalDrivers > 0 ? (pendingDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.awaitingReview")}
             />
@@ -229,7 +192,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.completionRate")}
               value={`${completionRate}%`}
               icon={<AlertTriangle size={18} strokeWidth={2.5} />}
-              color="#10B981"
+              color={DASHBOARD_COLORS.success}
               progress={completionRate}
               sublabel={t("dashboard.kpis.ofTotalTrips")}
             />
@@ -239,7 +202,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.acceptanceRate")}
               value={`${acceptanceRate}%`}
               icon={<TrendingUp size={18} strokeWidth={2.5} />}
-              color="#8B5CF6"
+              color={DASHBOARD_COLORS.primary}
               progress={acceptanceRate}
               sublabel={t("dashboard.kpis.ofTotalRequests")}
             />
@@ -257,24 +220,34 @@ export default async function DashboardPage() {
         </div>
 
         {/* ─── RECENT TRIPS TABLE ──────────────────────────────────── */}
-        <div className="dash-table-card">
-          <div className="dash-section-header justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-                <MapPin size={14} className="text-primary" />
+        <div className="dash-table-card recent-trips-card">
+          <div className="dash-section-header justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                <MapPin size={17} />
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-text-primary leading-none">{t("dashboard.recentTrips")}</h3>
-                <p className="text-[11px] text-text-tertiary mt-0.5">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
+              <div className="min-w-0">
+                <h3 className="text-[15px] font-black text-text-primary leading-none">{t("dashboard.recentTrips")}</h3>
+                <p className="mt-1 truncate text-[12px] text-text-tertiary">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
               </div>
             </div>
-            <Link
-              href="/dashboard/trips"
-              className="group flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-all font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/5"
-            >
-              {t("common.view")}
-              <ArrowUpRight size={13} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </Link>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-success/20 bg-success/10 px-2.5 py-1.5 text-[11px] font-black text-success">
+                <CheckCircle size={12} />
+                {recentCompletedTrips}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/10 px-2.5 py-1.5 text-[11px] font-black text-primary">
+                <Activity size={12} />
+                {recentActiveTrips}
+              </span>
+              <Link
+                href="/dashboard/trips"
+                className="group flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-black text-primary transition-all hover:border-primary/30 hover:bg-primary/15"
+              >
+                {t("common.view")}
+                <ArrowUpRight size={13} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Link>
+            </div>
           </div>
 
           <DataTable
@@ -290,38 +263,48 @@ export default async function DashboardPage() {
               recentTrips.map((trip, idx) => (
                 <tr
                   key={trip.id}
-                  className="group dash-table-row"
+                  className="group dash-table-row recent-trips-row"
                 >
-                  <td className="py-3.5 px-5 text-text-primary max-w-[180px] truncate text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <td className="py-4 px-5 text-text-primary min-w-[230px] max-w-[280px]">
+                    <span className="flex items-center gap-3">
+                      <span className="recent-trip-marker flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-black num">
+                        {idx + 1}
                       </span>
-                      <span className="truncate font-medium">{trip.pickup_address}</span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-black">{trip.pickup_address || "-"}</span>
+                        <span className="mt-0.5 block text-[11px] font-semibold text-text-tertiary">{t("trips.from")}</span>
+                      </span>
                     </span>
                   </td>
-                  <td className="py-3.5 px-5 text-text-secondary max-w-[180px] truncate text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-surface-elevated shrink-0 border border-divider">
-                        <span className="w-1 h-1 rounded-full bg-text-tertiary" />
+                  <td className="py-4 px-5 text-text-secondary min-w-[230px] max-w-[280px]">
+                    <span className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-divider bg-surface-elevated text-text-tertiary">
+                        <MapPin size={14} />
                       </span>
-                      <span className="truncate">{trip.destination_address}</span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold text-text-secondary">{trip.destination_address || "-"}</span>
+                        <span className="mt-0.5 block text-[11px] font-semibold text-text-tertiary">{t("trips.to")}</span>
+                      </span>
                     </span>
                   </td>
-                  <td className="py-3.5 px-5">
+                  <td className="py-4 px-5">
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide ${getStatusColor(trip.status)}`}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black tracking-wide ${getStatusColor(trip.status)}`}
                     >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
                       {getStatusLabel(trip.status)}
                     </span>
                   </td>
-                  <td className="py-3.5 px-5">
-                    <span className="inline-flex items-center gap-1 text-sm font-black num text-primary">
+                  <td className="py-4 px-5">
+                    <span className="inline-flex items-center rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-sm font-black num text-primary">
                       {formatCurrency(Number(trip.price))}
                     </span>
                   </td>
-                  <td className="py-3.5 px-5 text-text-tertiary text-xs font-medium">
-                    {formatDate(trip.created_at)}
+                  <td className="py-4 px-5 text-text-tertiary text-xs font-bold whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock size={13} className="text-text-disabled" />
+                      {formatDate(trip.created_at)}
+                    </span>
                   </td>
                 </tr>
               ))

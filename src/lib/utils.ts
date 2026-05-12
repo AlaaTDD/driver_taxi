@@ -21,17 +21,17 @@ export function formatDate(date: string): string {
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    searching: "bg-warning/20 text-warning",
-    accepted: "bg-primary/20 text-primary",
-    driver_arriving: "bg-cyan-400/20 text-cyan-400",
-    in_progress: "bg-purple-400/20 text-purple-400",
-    completed: "bg-success/20 text-success",
-    cancelled: "bg-error/20 text-error",
-    pending: "bg-warning/20 text-warning",
-    rejected: "bg-error/20 text-error",
-    expired: "bg-text-disabled/30 text-text-secondary",
+    searching: "status-pill-warning border",
+    accepted: "status-pill-primary border",
+    driver_arriving: "status-pill-primary border",
+    in_progress: "status-pill-primary border",
+    completed: "status-pill-success border",
+    cancelled: "status-pill-error border",
+    pending: "status-pill-warning border",
+    rejected: "status-pill-error border",
+    expired: "status-pill-muted border",
   };
-  return colors[status] || "bg-text-disabled/30 text-text-secondary";
+  return colors[status] || "status-pill-muted border";
 }
 
 export function getStatusLabel(status: string): string {

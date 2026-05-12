@@ -4,8 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Globe } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 
-/* ───── تم توحيد اللون على أزرق الكوبالت الأساسي ───── */
-const PRIMARY_RGB = "27,78,192";
+const PRIMARY_RGB = "var(--primary-rgb)";
 
 export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean }) {
   const locale = useLocale();
@@ -30,7 +29,9 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
     
     // Slight delay to ensure DOM is fully rendered before measuring
     requestAnimationFrame(() => {
-      const parentRect = pillRef.current!.getBoundingClientRect();
+      const activeBtn = btns[activeIdx];
+      if (!pillRef.current || !activeBtn) return;
+      const parentRect = pillRef.current.getBoundingClientRect();
       const btnRect = activeBtn.getBoundingClientRect();
       
       // Calculate position relative to parent (RTL-aware)
@@ -50,6 +51,8 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
     return (
       <button
         onClick={() => setLanguage(isAr ? "en" : "ar")}
+        aria-label={t("language")}
+        title={t("language")}
         className="group relative w-[40px] h-[40px] rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90"
         style={{
           background: `rgba(${PRIMARY_RGB}, 0.08)`,
@@ -101,6 +104,7 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
         <button
           data-lang-btn
           onClick={() => setLanguage("ar")}
+          aria-label="العربية"
           className="relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold"
           style={{
             color: isAr ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",
@@ -114,6 +118,7 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
         <button
           data-lang-btn
           onClick={() => setLanguage("en")}
+          aria-label="English"
           className="relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold tracking-wider"
           style={{
             color: !isAr ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",

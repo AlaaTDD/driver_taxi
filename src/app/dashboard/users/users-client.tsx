@@ -44,22 +44,28 @@ const glassCard: React.CSSProperties = {
   color: "var(--text-primary)",
 };
 
+const userColor = {
+  primary: "var(--primary)",
+  primaryBg: "rgba(var(--primary-rgb),0.12)",
+  primaryBgStrong: "rgba(var(--primary-rgb),0.18)",
+  primaryBorder: "rgba(var(--primary-rgb),0.22)",
+  primaryStrongBorder: "rgba(var(--primary-rgb),0.24)",
+  error: "var(--error)",
+  errorBg: "rgba(var(--error-rgb),0.12)",
+  errorBgStrong: "rgba(var(--error-rgb),0.18)",
+  errorBorder: "rgba(var(--error-rgb),0.24)",
+};
+
 const avatarGrad = (user: User) =>
   user.is_blocked
-    ? { bg: "rgba(239,68,68,0.15)", color: "#F87171", border: "rgba(239,68,68,0.25)" }
-    : user.is_admin
-    ? { bg: "linear-gradient(135deg,rgba(245,158,11,0.28),rgba(245,158,11,0.08))", color: "#FCD34D", border: "rgba(245,158,11,0.25)" }
-    : user.role === "supervisor"
-    ? { bg: "linear-gradient(135deg,rgba(139,92,246,0.28),rgba(139,92,246,0.08))", color: "#C4B5FD", border: "rgba(139,92,246,0.25)" }
-    : user.role === "driver"
-    ? { bg: "linear-gradient(135deg,rgba(16,185,129,0.22),rgba(16,185,129,0.06))", color: "#34D399", border: "rgba(16,185,129,0.2)" }
-    : { bg: "linear-gradient(135deg,rgba(59,130,246,0.22),rgba(59,130,246,0.06))", color: "#93C5FD", border: "rgba(59,130,246,0.2)" };
+    ? { bg: userColor.errorBgStrong, color: userColor.error, border: userColor.errorBorder }
+    : { bg: userColor.primaryBgStrong, color: userColor.primary, border: userColor.primaryBorder };
 
 const roleLabel = (user: User, t: any) =>
-  user.is_admin ? { label: t("users.roles.admin"), bg: "rgba(245,158,11,0.12)", color: "#FCD34D", border: "rgba(245,158,11,0.22)" }
-  : user.role === "driver" ? { label: t("users.roles.driver"), bg: "rgba(16,185,129,0.12)", color: "#34D399", border: "rgba(16,185,129,0.22)" }
-  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), bg: "rgba(139,92,246,0.12)", color: "#C4B5FD", border: "rgba(139,92,246,0.22)" }
-  : { label: t("users.roles.user"), bg: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "rgba(59,130,246,0.22)" };
+  user.is_admin ? { label: t("users.roles.admin"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
+  : user.role === "driver" ? { label: t("users.roles.driver"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
+  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
+  : { label: t("users.roles.user"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryBorder };
 
 /* ─── ActionMenu (three-dot dropdown) ───────────────────── */
 function ActionMenu({
@@ -100,7 +106,7 @@ function ActionMenu({
           style={{
             background: "var(--surface-elevated)",
             border: "1px solid var(--divider)",
-            boxShadow: "0 16px 40px rgba(0,0,0,0.45)",
+            boxShadow: "var(--shadow-lg)",
             animation: "fadeSlideDown 0.15s ease",
           }}
         >
@@ -110,7 +116,7 @@ function ActionMenu({
             className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
             style={{
               background: "transparent",
-              color: user.is_blocked ? "#34D399" : "#F87171",
+              color: user.is_blocked ? "var(--primary)" : "var(--error)",
               borderBottom: "1px solid var(--divider)",
             }}
           >
@@ -123,7 +129,7 @@ function ActionMenu({
               onClick={() => { setOpen(false); onRole(); }}
               id={`set-role-${user.id}`}
               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
-              style={{ background: "transparent", color: "#C4B5FD" }}
+              style={{ background: "transparent", color: "var(--primary)" }}
             >
               <Shield size={13} />
               {user.role === "supervisor" ? "إلغاء مشرف" : "تعيين مشرف"}
@@ -233,13 +239,13 @@ export default function UsersClient({
         .btn-action { transition: transform 0.15s ease, filter 0.15s ease; }
         .btn-action:hover { transform: scale(1.04); filter: brightness(1.12); }
         .btn-action:active { transform: scale(0.96); }
-        .focus-ring:focus-within { outline: 2px solid rgba(59,130,246,0.4); outline-offset: 0; border-radius: 14px; }
+        .focus-ring:focus-within { outline: 2px solid var(--accent-border); outline-offset: 0; border-radius: 14px; }
       `}</style>
 
       {/* ── Search + Filters bar ─────────────────────────── */}
       <div
         className="flex flex-col sm:flex-row gap-3 flex-wrap items-center p-3 rounded-2xl"
-        style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
+        style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)", boxShadow: "var(--shadow-sm)" }}
       >
         {/* search */}
         <form onSubmit={handleSearch} className="flex items-center flex-1 min-w-[240px] max-w-md gap-2 focus-ring">
@@ -266,7 +272,7 @@ export default function UsersClient({
             type="submit"
             id="users-search-btn"
             className="px-4 py-2.5 rounded-xl text-[12px] font-bold text-white flex-shrink-0 btn-action"
-            style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}
+            style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", boxShadow: "0 8px 20px rgba(var(--primary-rgb),0.24)" }}
           >
             {t("common.search")}
           </button>
@@ -291,9 +297,9 @@ export default function UsersClient({
               onChange={(e) => updateParams({ role: e.target.value })}
               className="appearance-none pr-7 pl-5 py-2 rounded-xl text-[12px] font-semibold outline-none cursor-pointer transition-all hover:brightness-110"
               style={{
-                background: filterRole ? "rgba(139,92,246,0.12)" : "var(--surface)",
-                border: filterRole ? "1px solid rgba(139,92,246,0.3)" : "1px solid var(--divider)",
-                color: filterRole ? "#C4B5FD" : "var(--text-secondary)",
+                background: filterRole ? "var(--accent-surface)" : "var(--surface)",
+                border: filterRole ? "1px solid var(--accent-border)" : "1px solid var(--divider)",
+                color: filterRole ? "var(--primary)" : "var(--text-secondary)",
               }}
             >
               <option value="">{t("common.all")}</option>
@@ -312,9 +318,9 @@ export default function UsersClient({
               onChange={(e) => updateParams({ status: e.target.value })}
               className="appearance-none px-3 py-2 rounded-xl text-[12px] font-semibold outline-none cursor-pointer transition-all hover:brightness-110"
               style={{
-                background: filterStatus === "blocked" ? "rgba(239,68,68,0.12)" : filterStatus === "active" ? "rgba(16,185,129,0.12)" : "var(--surface)",
-                border: filterStatus === "blocked" ? "1px solid rgba(239,68,68,0.3)" : filterStatus === "active" ? "1px solid rgba(16,185,129,0.3)" : "1px solid var(--divider)",
-                color: filterStatus === "blocked" ? "#F87171" : filterStatus === "active" ? "#34D399" : "var(--text-secondary)",
+                background: filterStatus === "blocked" ? "var(--error-surface)" : filterStatus === "active" ? "var(--accent-surface)" : "var(--surface)",
+                border: filterStatus === "blocked" ? "1px solid var(--error-border)" : filterStatus === "active" ? "1px solid var(--accent-border)" : "1px solid var(--divider)",
+                color: filterStatus === "blocked" ? "var(--error)" : filterStatus === "active" ? "var(--primary)" : "var(--text-secondary)",
               }}
             >
               <option value="">{t("common.all")}</option>
@@ -328,7 +334,7 @@ export default function UsersClient({
             <button
               onClick={clearAll}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold btn-action"
-              style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
+              style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}
             >
               <X size={10} /> مسح الكل
             </button>
@@ -344,7 +350,7 @@ export default function UsersClient({
             </span>
           ) : (
             <span className="text-[11px] font-semibold px-2 py-1 rounded-lg"
-              style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.15)" }}>
+              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
               {totalCount} {t("common.users")}
             </span>
           )}
@@ -397,15 +403,15 @@ export default function UsersClient({
                           {user.is_blocked && (
                             <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
                               style={{ background: "var(--surface-elevated)", border: "1.5px solid var(--divider)" }}>
-                              <Lock size={7} style={{ color: "#F87171" }} />
+                              <Lock size={7} style={{ color: "var(--error)" }} />
                             </span>
                           )}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-text-primary font-bold text-[13px] truncate">{user.name}</span>
-                            {user.is_admin && <Crown size={10} style={{ color: "#FCD34D", flexShrink: 0 }} />}
-                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "#C4B5FD", flexShrink: 0 }} />}
+                            {user.is_admin && <Crown size={10} style={{ color: "var(--primary)", flexShrink: 0 }} />}
+                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "var(--primary)", flexShrink: 0 }} />}
                           </div>
                           <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-disabled)" }}>{user.email}</p>
                         </div>
@@ -440,7 +446,7 @@ export default function UsersClient({
                       {user.is_blocked ? (
                         <div className="flex flex-col gap-0.5">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                            style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                            style={{ background: "rgba(var(--error-rgb),0.12)", color: "var(--error)", border: "1px solid rgba(var(--error-rgb),0.2)" }}>
                             <Lock size={9} /> {t("common.blocked")}
                           </span>
                           {user.blocked_reason && (
@@ -451,13 +457,13 @@ export default function UsersClient({
                         </div>
                       ) : user.is_active ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                          style={{ background: "rgba(16,185,129,0.12)", color: "#34D399", border: "1px solid rgba(16,185,129,0.2)" }}>
-                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
+                          style={{ background: "rgba(var(--primary-rgb),0.12)", color: "var(--primary)", border: "1px solid rgba(var(--primary-rgb),0.2)" }}>
+                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
                           {t("common.active")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                          style={{ background: "rgba(100,116,139,0.14)", color: "#94A3B8", border: "1px solid rgba(100,116,139,0.2)" }}>
+                          style={{ background: "var(--neutral-surface)", color: "var(--text-tertiary)", border: "1px solid var(--neutral-border)" }}>
                           {t("common.inactive")}
                         </span>
                       )}
@@ -473,9 +479,9 @@ export default function UsersClient({
                             id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
                             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action"
                             style={{
-                              background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-                              color: user.is_blocked ? "#34D399" : "#F87171",
-                              border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.22)" : "rgba(239,68,68,0.22)"}`,
+                              background: user.is_blocked ? "rgba(var(--primary-rgb),0.1)" : "rgba(var(--error-rgb),0.1)",
+                              color: user.is_blocked ? "var(--primary)" : "var(--error)",
+                              border: `1px solid ${user.is_blocked ? "rgba(var(--primary-rgb),0.22)" : "rgba(var(--error-rgb),0.22)"}`,
                             }}
                           >
                             {user.is_blocked ? <><Unlock size={10} /> رفع</> : <><Lock size={10} /> حظر</>}
@@ -499,7 +505,7 @@ export default function UsersClient({
                   <td colSpan={6} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                        style={{ background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.15)" }}>
+                        style={{ background: "var(--neutral-surface)", border: "1px solid var(--neutral-border)" }}>
                         <UserX size={26} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
                       </div>
                       <div>
@@ -537,7 +543,7 @@ export default function UsersClient({
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-[14px] truncate" style={{ color: "var(--text-primary)" }}>{user.name}</span>
-                        {user.is_admin && <Crown size={11} style={{ color: "#FCD34D", flexShrink: 0 }} />}
+                        {user.is_admin && <Crown size={11} style={{ color: "var(--primary)", flexShrink: 0 }} />}
                       </div>
                       <p className="text-[11px] font-mono" style={{ color: "var(--text-disabled)" }}>{user.phone}</p>
                     </div>
@@ -549,7 +555,7 @@ export default function UsersClient({
                     </span>
                     {user.is_blocked && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                        style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        style={{ background: "rgba(var(--error-rgb),0.12)", color: "var(--error)", border: "1px solid rgba(var(--error-rgb),0.2)" }}>
                         {t("common.blocked")}
                       </span>
                     )}
@@ -566,14 +572,14 @@ export default function UsersClient({
                   <div className="w-px h-6" style={{ background: "var(--divider)" }} />
                   <div>
                     {user.is_blocked ? (
-                      <span className="text-[11px] font-bold" style={{ color: "#F87171" }}>{t("common.blocked")}</span>
+                      <span className="text-[11px] font-bold" style={{ color: "var(--error)" }}>{t("common.blocked")}</span>
                     ) : user.is_active ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold" style={{ color: "#34D399" }}>
-                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
+                      <span className="flex items-center gap-1 text-[11px] font-bold" style={{ color: "var(--primary)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
                         {t("common.active")}
                       </span>
                     ) : (
-                      <span className="text-[11px] font-bold" style={{ color: "#94A3B8" }}>{t("common.inactive")}</span>
+                      <span className="text-[11px] font-bold" style={{ color: "var(--text-tertiary)" }}>{t("common.inactive")}</span>
                     )}
                   </div>
                 </div>
@@ -584,9 +590,9 @@ export default function UsersClient({
                       onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
                       className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
                       style={{
-                        background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-                        color: user.is_blocked ? "#34D399" : "#F87171",
-                        border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
+                        background: user.is_blocked ? "rgba(var(--primary-rgb),0.1)" : "rgba(var(--error-rgb),0.1)",
+                        color: user.is_blocked ? "var(--primary)" : "var(--error)",
+                        border: `1px solid ${user.is_blocked ? "rgba(var(--primary-rgb),0.24)" : "rgba(var(--error-rgb),0.24)"}`,
                       }}
                     >
                       {user.is_blocked ? <><Unlock size={12} /> رفع الحظر</> : <><Lock size={12} /> حظر</>}
@@ -595,7 +601,7 @@ export default function UsersClient({
                       <button
                         onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
                         className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
-                        style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.25)" }}
+                        style={{ background: "rgba(var(--primary-rgb),0.1)", color: "var(--primary)", border: "1px solid rgba(var(--primary-rgb),0.24)" }}
                       >
                         <Shield size={12} />
                         {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
@@ -610,7 +616,7 @@ export default function UsersClient({
           {users.length === 0 && (
             <div className="py-20 text-center flex flex-col items-center gap-3">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.15)" }}>
+                style={{ background: "var(--neutral-surface)", border: "1px solid var(--neutral-border)" }}>
                 <UserX size={22} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
               </div>
               <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
@@ -641,7 +647,7 @@ export default function UsersClient({
                 onClick={() => goPage(p as number)}
                 className="w-9 h-9 rounded-xl text-[13px] font-bold btn-action"
                 style={p === currentPage
-                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "#fff", boxShadow: "0 4px 14px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "#fff", boxShadow: "0 8px 20px rgba(var(--primary-rgb),0.26)", border: "1px solid var(--accent-border)" }
                   : { ...glassCard, color: "var(--text-secondary)" }}
               >
                 {p}
@@ -664,21 +670,21 @@ export default function UsersClient({
       {blockModal && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-          style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(10px)" }}
+          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) { setBlockModal(null); setBlockReason(""); } }}
         >
           <div
             className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
             style={{
               background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
-              border: `1px solid ${blockModal.action === "block" ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)"}`,
-              boxShadow: "0 32px 64px rgba(0,0,0,0.65)",
+              border: `1px solid ${blockModal.action === "block" ? "var(--error-border)" : "var(--accent-border)"}`,
+              boxShadow: "var(--shadow-xl)",
               animation: "fadeSlideDown 0.2s ease",
             }}
           >
             {/* top gradient line */}
             <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(to left, transparent, ${blockModal.action === "block" ? "#EF4444" : "#10B981"}, transparent)` }} />
+              style={{ background: `linear-gradient(to left, transparent, ${blockModal.action === "block" ? "var(--error)" : "var(--primary)"}, transparent)` }} />
 
             {/* drag handle (mobile) */}
             <div className="flex justify-center pt-3 pb-1 sm:hidden">
@@ -691,11 +697,11 @@ export default function UsersClient({
                 <div className="flex items-center gap-3">
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center"
-                    style={{ background: blockModal.action === "block" ? "rgba(239,68,68,0.14)" : "rgba(16,185,129,0.14)" }}
+                    style={{ background: blockModal.action === "block" ? "rgba(var(--error-rgb),0.14)" : "rgba(var(--primary-rgb),0.14)" }}
                   >
                     {blockModal.action === "block"
-                      ? <ShieldBan size={20} style={{ color: "#F87171" }} />
-                      : <UserCheck size={20} style={{ color: "#34D399" }} />
+                      ? <ShieldBan size={20} style={{ color: "var(--error)" }} />
+                      : <UserCheck size={20} style={{ color: "var(--primary)" }} />
                     }
                   </div>
                   <div>
@@ -737,9 +743,9 @@ export default function UsersClient({
               {blockModal.action === "unblock" && (
                 <div
                   className="flex items-start gap-2.5 p-3.5 rounded-xl mb-4"
-                  style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.15)" }}
+                  style={{ background: "rgba(var(--primary-rgb),0.08)", border: "1px solid rgba(var(--primary-rgb),0.16)" }}
                 >
-                  <CheckCircle2 size={15} style={{ color: "#34D399", flexShrink: 0, marginTop: 1 }} />
+                  <CheckCircle2 size={15} style={{ color: "var(--primary)", flexShrink: 0, marginTop: 1 }} />
                   <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
                     سيتم استعادة وصول المستخدم للتطبيق فوراً بعد رفع الحظر.
                   </p>
@@ -761,9 +767,9 @@ export default function UsersClient({
                   className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
                   style={{
                     background: blockModal.action === "block"
-                      ? "linear-gradient(135deg, #EF4444, #DC2626)"
-                      : "linear-gradient(135deg, #10B981, #059669)",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                      ? "linear-gradient(135deg, var(--error), var(--error))"
+                      : "linear-gradient(135deg, var(--primary), var(--primary))",
+                    boxShadow: "var(--shadow-md)",
                   }}
                 >
                   {actionLoading
@@ -781,20 +787,20 @@ export default function UsersClient({
       {roleModal && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-          style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(10px)" }}
+          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setRoleModal(null); }}
         >
           <div
             className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
             style={{
               background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
-              border: "1px solid rgba(139,92,246,0.22)",
-              boxShadow: "0 32px 64px rgba(0,0,0,0.65)",
+              border: "1px solid var(--accent-border)",
+              boxShadow: "var(--shadow-xl)",
               animation: "fadeSlideDown 0.2s ease",
             }}
           >
             <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: "linear-gradient(to left, transparent, #8B5CF6, transparent)" }} />
+              style={{ background: "linear-gradient(to left, transparent, var(--primary), transparent)" }} />
 
             <div className="flex justify-center pt-3 pb-1 sm:hidden">
               <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />
@@ -804,8 +810,8 @@ export default function UsersClient({
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                    style={{ background: "rgba(139,92,246,0.14)" }}>
-                    <Shield size={20} style={{ color: "#C4B5FD" }} />
+                    style={{ background: "rgba(var(--primary-rgb),0.14)" }}>
+                    <Shield size={20} style={{ color: "var(--primary)" }} />
                   </div>
                   <div>
                     <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
@@ -825,9 +831,9 @@ export default function UsersClient({
 
               <div
                 className="flex items-start gap-2.5 p-3.5 rounded-xl mb-5"
-                style={{ background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.15)" }}
+                style={{ background: "rgba(var(--primary-rgb),0.08)", border: "1px solid rgba(var(--primary-rgb),0.16)" }}
               >
-                <AlertTriangle size={14} style={{ color: "#FCD34D", flexShrink: 0, marginTop: 1 }} />
+                <AlertTriangle size={14} style={{ color: "var(--primary)", flexShrink: 0, marginTop: 1 }} />
                 <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
                   {roleModal.role === "supervisor"
                     ? t("users.roleSupervisorWarning")
@@ -849,8 +855,8 @@ export default function UsersClient({
                   id="confirm-role-action"
                   className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
                   style={{
-                    background: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
-                    boxShadow: "0 4px 16px rgba(139,92,246,0.35)",
+                    background: "linear-gradient(135deg, var(--primary), var(--primary))",
+                    boxShadow: "var(--shadow-md)",
                   }}
                 >
                   {actionLoading
