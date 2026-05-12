@@ -62,10 +62,10 @@ export default async function UserCouponsPage({
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "كوبونات معينة", value: totalAssigned, color: "#60A5FA", icon: Gift },
-          { label: "مستخدمة", value: totalUsed, color: "#34D399", icon: CheckCircle },
-          { label: "غير مستخدمة", value: totalUnused, color: "#FBBF24", icon: Clock },
-          { label: "إجمالي الخصومات", value: formatCurrency(totalDiscount), color: "#F472B6", icon: Ticket },
+          { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "#60A5FA", icon: Gift },
+          { label: t("userCoupons.stats.used"), value: totalUsed, color: "#34D399", icon: CheckCircle },
+          { label: t("userCoupons.stats.unused"), value: totalUnused, color: "#FBBF24", icon: Clock },
+          { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "#F472B6", icon: Ticket },
         ].map((s) => (
           <div
             key={s.label}
@@ -86,9 +86,9 @@ export default async function UserCouponsPage({
       
       <div className="flex items-center gap-2">
         {[
-          { label: "الكل", value: "", count: totalAssigned },
-          { label: "مستخدمة", value: "used", count: totalUsed },
-          { label: "غير مستخدمة", value: "unused", count: totalUnused },
+          { label: t("userCoupons.filters.all"), value: "", count: totalAssigned },
+          { label: t("userCoupons.filters.used"), value: "used", count: totalUsed },
+          { label: t("userCoupons.filters.unused"), value: "unused", count: totalUnused },
         ].map((f) => (
           <Link
             key={f.value}
@@ -106,26 +106,19 @@ export default async function UserCouponsPage({
       </div>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+      <div className="dash-table-card">
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #F59E0B, #D97706)", boxShadow: "0 0 8px rgba(245,158,11,0.5)" }} />
-            <h3 className="text-[13px] font-bold text-text-primary">كوبونات المستخدمين</h3>
+            <h3 className="text-[13px] font-bold text-text-primary">{t("userCoupons.title")}</h3>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["المستخدم", "الهاتف", "كود الكوبون", "نوع الخصم", "القيمة", "الحالة", "تاريخ التعيين", "تاريخ الاستخدام"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("userCoupons.table.user"), t("userCoupons.table.phone"), t("userCoupons.table.code"), t("userCoupons.table.discountType"), t("userCoupons.table.value"), t("userCoupons.table.status"), t("userCoupons.table.assignedAt"), t("userCoupons.table.usedAt")].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -135,7 +128,7 @@ export default async function UserCouponsPage({
                 const user = userMap.get(uc.user_id);
                 const coupon = couponMap.get(uc.coupon_id);
                 return (
-                  <tr key={uc.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                  <tr key={uc.id} className="group/row dash-table-row">
                     <td className="py-3.5 px-4">
                       <span className="inline-flex items-center gap-1.5 text-[12px] text-text-primary font-medium">
                         <User size={12} className="text-violet-400" />
@@ -153,7 +146,7 @@ export default async function UserCouponsPage({
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-[12px] text-text-secondary">
-                      {coupon?.discount_type === "percentage" ? "نسبة مئوية" : coupon?.discount_type === "fixed" ? "مبلغ ثابت" : "—"}
+                      {coupon?.discount_type === "percentage" ? t("userCoupons.discountType.percentage") : coupon?.discount_type === "fixed" ? t("userCoupons.discountType.fixed") : "—"}
                     </td>
                     <td className="py-3.5 px-4 text-[13px] font-bold num text-emerald-400">
                       {coupon ? (
@@ -171,7 +164,7 @@ export default async function UserCouponsPage({
                           border: `1px solid ${uc.is_used ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.25)"}`,
                         }}
                       >
-                        {uc.is_used ? <><CheckCircle size={10} /> مستخدم</> : <><Clock size={10} /> غير مستخدم</>}
+                        {uc.is_used ? <><CheckCircle size={10} /> {t("userCoupons.status.used")}</> : <><Clock size={10} /> {t("userCoupons.status.unused")}</>}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-text-tertiary text-[11px] font-medium whitespace-nowrap">
@@ -191,7 +184,7 @@ export default async function UserCouponsPage({
                       <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                         <Ticket size={24} className="opacity-40" />
                       </div>
-                      <p className="text-text-secondary font-semibold">لا توجد كوبونات معينة</p>
+                      <p className="text-text-secondary font-semibold">{t("userCoupons.noCoupons")}</p>
                     </div>
                   </td>
                 </tr>

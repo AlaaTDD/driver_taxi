@@ -130,16 +130,10 @@ export default async function DriversPage({
 
       
       {tab !== "revision" ? (
-        <div className="rounded-2xl overflow-hidden"
-          style={{
-            background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-            border: "1px solid rgba(255,255,255,0.05)",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-          }}>
+        <div className="dash-table-card">
 
           
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4"
-            style={{ borderBottom: "1px solid var(--divider)" }}>
+          <div className="dash-section-header justify-between">
             <div className="flex items-center gap-2.5 flex-1">
               <div className="w-[3px] h-5 rounded-full"
                 style={{ background: `linear-gradient(to bottom, ${tabs.find(t => t.key === tab)?.color || "#3B82F6"}, transparent)`, boxShadow: `0 0 8px ${tabs.find(t => t.key === tab)?.color || "#3B82F6"}50` }} />
@@ -153,8 +147,8 @@ export default async function DriversPage({
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                  {["السائق", "المركبة", "الوثائق", "الرحلات", "التقييم", "الحالة", "إجراءات"].map(h => (
+                <tr className="dash-table-head">
+                  {[t("common.driver"), t("common.vehicle"), t("drivers.documents"), t("common.trips"), t("drivers.rating"), t("common.status"), t("common.actions")].map(h => (
                     <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -164,7 +158,7 @@ export default async function DriversPage({
                   
                   const user = (driver as any).users;
                   return (
-                    <tr key={driver.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                    <tr key={driver.id} className="group/row dash-table-row">
                       
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
@@ -172,7 +166,7 @@ export default async function DriversPage({
                             style={{
                               background: driver.is_verified ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.12)",
                               color: driver.is_verified ? "#34D399" : "#FCD34D",
-                              border: "1px solid rgba(255,255,255,0.05)",
+                              border: "1px solid var(--divider)",
                             }}>
                             {user?.name?.charAt(0)?.toUpperCase() || "D"}
                           </div>
@@ -198,10 +192,10 @@ export default async function DriversPage({
                       <td className="py-3 px-4">
                         <div className="flex gap-1.5 flex-wrap">
                           {[
-                            { label: "هوية", url: driver.national_id_image_url },
-                            { label: "رخصة", url: driver.license_image_url },
-                            { label: "سجل", url: driver.criminal_record_url },
-                            { label: "مركبة", url: driver.vehicle_image_url },
+                            { label: t("drivers.docs.id"), url: driver.national_id_image_url },
+                            { label: t("drivers.docs.license"), url: driver.license_image_url },
+                            { label: t("drivers.docs.record"), url: driver.criminal_record_url },
+                            { label: t("drivers.docs.vehicle"), url: driver.vehicle_image_url },
                           ].map((doc) => (
                             <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
                               className="px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all hover:opacity-80"
@@ -226,7 +220,7 @@ export default async function DriversPage({
                       
                       <td className="py-3 px-4">
                         <Badge variant={driver.is_verified ? "success" : "warning"} dot>
-                          {driver.is_verified ? "معتمد" : "بانتظار"}
+                          {driver.is_verified ? t("drivers.verified") : t("drivers.pending")}
                         </Badge>
                       </td>
 
@@ -239,7 +233,7 @@ export default async function DriversPage({
                               <button type="submit" id={`verify-driver-${driver.id}`}
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white"
                                 style={{ background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 8px rgba(16,185,129,0.3)" }}>
-                                اعتماد
+                                {t("drivers.verify")}
                               </button>
                             </form>
                           )}
@@ -249,16 +243,16 @@ export default async function DriversPage({
                               <button type="submit" id={`revoke-driver-${driver.id}`}
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
                                 style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-                                إلغاء
+                                {t("common.cancel")}
                               </button>
                             </form>
                           )}
                           <Link href={`/dashboard/drivers/${driver.id}`}
                             className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-opacity hover:opacity-80"
                             style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
-                            التفاصيل
+                            {t("common.details")}
                           </Link>
-                          <DriversRevisionButton driverId={driver.id} driverName={user?.name} />
+                          <DriversRevisionButton driverId={driver.id} driverName={user?.name} label={t("drivers.requestRevision")} />
                         </div>
                       </td>
                     </tr>
@@ -269,7 +263,7 @@ export default async function DriversPage({
                   <tr>
                     <td colSpan={7} className="py-16 text-center text-text-disabled">
                       <Car size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>لا توجد سائقون في هذه الفئة</p>
+                      <p>{t("drivers.noDrivers")}</p>
                     </td>
                   </tr>
                 )}
@@ -304,10 +298,10 @@ export default async function DriversPage({
                   </p>
                   <div className="flex gap-1.5 flex-wrap">
                     {[
-                      { label: "هوية", url: driver.national_id_image_url },
-                      { label: "رخصة", url: driver.license_image_url },
-                      { label: "سجل", url: driver.criminal_record_url },
-                      { label: "مركبة", url: driver.vehicle_image_url },
+                      { label: t("drivers.docs.id"), url: driver.national_id_image_url },
+                      { label: t("drivers.docs.license"), url: driver.license_image_url },
+                      { label: t("drivers.docs.record"), url: driver.criminal_record_url },
+                      { label: t("drivers.docs.vehicle"), url: driver.vehicle_image_url },
                     ].map((doc) => (
                       <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
                         className="px-2 py-1 rounded-lg text-[10px] font-bold"
@@ -332,7 +326,7 @@ export default async function DriversPage({
                       </form>
                     )}
                     <div className="flex-1">
-                      <DriversRevisionButton driverId={driver.id} driverName={user?.name} mobile />
+                      <DriversRevisionButton driverId={driver.id} driverName={user?.name} label={t("drivers.requestRevision")} mobile />
                     </div>
                     <div className="flex-1">
                       <Link href={`/dashboard/drivers/${driver.id}`}
@@ -349,13 +343,9 @@ export default async function DriversPage({
         </div>
       ) : (
         
-        <div className="rounded-2xl overflow-hidden" style={{
-          background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-        }}>
-          <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
-            <h3 className="text-[13px] font-bold text-text-primary">طلبات المراجعة المعلقة</h3>
+        <div className="dash-card">
+          <div className="dash-section-header">
+            <h3 className="text-[13px] font-bold text-text-primary">{t("drivers.revisionRequests")}</h3>
           </div>
           <div className="divide-y" style={{ borderColor: "var(--divider)" }}>
             {revisionDrivers.map((rev: unknown) => {
@@ -377,7 +367,7 @@ export default async function DriversPage({
                   </div>
 
                   <div className="p-3 rounded-xl" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}>
-                    <p className="text-[12px] font-bold text-purple-300 mb-1">الحقول المطلوبة:</p>
+                    <p className="text-[12px] font-bold text-purple-300 mb-1">{t("drivers.requestedFields")}:</p>
                     <div className="flex gap-1.5 flex-wrap">
                       {(r.fields_requested || []).map((f: string) => (
                         <span key={f} className="px-2 py-0.5 rounded-lg text-[10px] font-bold"
@@ -411,7 +401,7 @@ export default async function DriversPage({
             {revisionDrivers.length === 0 && (
               <div className="py-16 text-center text-text-disabled">
                 <CheckCircle size={32} className="mx-auto mb-3 opacity-30" />
-                <p>لا توجد طلبات مراجعة معلقة</p>
+                <p>{t("drivers.noRevisionRequests")}</p>
               </div>
             )}
           </div>
@@ -423,7 +413,7 @@ export default async function DriversPage({
 }
 
 
-function DriversRevisionButton({ driverId, driverName, mobile }: { driverId: string; driverName: string; mobile?: boolean }) {
+function DriversRevisionButton({ driverId, driverName, label, mobile }: { driverId: string; driverName: string; label: string; mobile?: boolean }) {
   return (
     <a
       href={`/dashboard/drivers/revision?driver_id=${driverId}&name=${encodeURIComponent(driverName)}`}
@@ -432,7 +422,7 @@ function DriversRevisionButton({ driverId, driverName, mobile }: { driverId: str
       style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.2)" }}
     >
       <AlertCircle size={10} />
-      طلب مراجعة
+      {label}
     </a>
   );
 }

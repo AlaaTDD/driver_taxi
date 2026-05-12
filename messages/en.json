@@ -3,6 +3,178 @@
     "title": "Taxi - Admin Dashboard",
     "description": "Taxi App Admin Management Dashboard"
   },
+  "sidebar": {
+    "collapse": "Collapse Menu",
+    "expand": "Expand Menu",
+    "logout": "Logout",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "sections": {
+      "people": "People",
+      "operations": "Operations",
+      "financial": "Financial",
+      "system": "System",
+      "settings": "Settings"
+    }
+  },
+  "userCoupons": {
+    "title": "User Coupons",
+    "subtitle": "Manage discount coupons for users",
+    "stats": {
+      "assigned": "Assigned",
+      "used": "Used",
+      "unused": "Unused",
+      "totalDiscount": "Total Discounts"
+    },
+    "filters": {
+      "all": "All",
+      "used": "Used",
+      "unused": "Unused"
+    },
+    "table": {
+      "user": "User",
+      "phone": "Phone",
+      "code": "Coupon Code",
+      "discountType": "Discount Type",
+      "value": "Value",
+      "status": "Status",
+      "assignedAt": "Assigned At",
+      "usedAt": "Used At"
+    },
+    "status": {
+      "used": "Used",
+      "unused": "Unused"
+    },
+    "discountType": {
+      "percentage": "Percentage",
+      "fixed": "Fixed Amount"
+    },
+    "noCoupons": "No Assigned Coupons"
+  },
+  "vehicleTypes": {
+    "title": "Vehicle Types",
+    "subtitle": "Manage vehicle types and pricing",
+    "manage": "Manage",
+    "addType": "Add New Type",
+    "editType": "Edit Type",
+    "form": {
+      "name": "Name (unique)",
+      "displayName": "Display Name",
+      "icon": "Icon",
+      "baseFare": "Base Fare",
+      "pricePerKm": "Price per KM",
+      "sortOrder": "Sort Order",
+      "saving": "Saving...",
+      "update": "Update",
+      "add": "Add"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "noTypes": "No Vehicle Types",
+    "noTypesDesc": "Add a new vehicle type to begin"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Manage and view all sent notifications",
+    "unread": "Unread",
+    "total": "Notification",
+    "noNotifications": "No Notifications",
+    "noNotificationsDesc": "New notifications will appear here",
+    "read": "Read",
+    "unknownUser": "Unknown",
+    "types": {
+      "tripOffer": "Trip Offer",
+      "offerAccepted": "Offer Accepted",
+      "driverArriving": "Driver Arriving",
+      "tripStarted": "Trip Started",
+      "tripCompleted": "Trip Completed",
+      "tripCancelled": "Trip Cancelled",
+      "noDrivers": "No Drivers",
+      "newMessage": "New Message",
+      "accountVerified": "Account Verified"
+    }
+  },
+  "adminLogs": {
+    "title": "Admin Logs",
+    "subtitle": "Track admin activities in the system",
+    "stats": {
+      "total": "Total Logs",
+      "activeAdmins": "Active Admins"
+    },
+    "filters": {
+      "allAdmins": "All Admins",
+      "allActions": "All Actions",
+      "apply": "Apply Filter",
+      "reset": "Reset"
+    },
+    "table": {
+      "action": "Action",
+      "table": "Table",
+      "admin": "Admin",
+      "date": "Date",
+      "ip": "IP"
+    },
+    "unknownAdmin": "Unknown",
+    "noLogs": "No Logs",
+    "noLogsDesc": "Activities will appear here when executed",
+    "actions": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "verify": "Verify",
+      "revoke": "Revoke Verification",
+      "block": "Block",
+      "unblock": "Unblock",
+      "sendNotification": "Send Notification"
+    },
+    "tables": {
+      "users": "Users",
+      "driversProfile": "Driver Profile",
+      "trips": "Trips",
+      "complaints": "Complaints",
+      "coupons": "Coupons",
+      "vehicleTypes": "Vehicle Types",
+      "notifications": "Notifications",
+      "supportMessages": "Support Messages",
+      "ratings": "Ratings"
+    }
+  },
+  "messages": {
+    "title": "Messages & Chats",
+    "subtitle": "Track support messages and trip chats",
+    "total": "message",
+    "tabs": {
+      "support": "Support Messages",
+      "trip": "Trip Chats"
+    },
+    "support": {
+      "unknownUser": "Unknown User",
+      "noMessages": "No Support Messages",
+      "noMessagesDesc": "Support messages will appear here"
+    },
+    "trip": {
+      "searchPlaceholder": "Search by Trip ID...",
+      "search": "Search",
+      "clear": "Clear",
+      "title": "Trip Chats",
+      "filter": "Filter",
+      "driver": "Driver",
+      "user": "User",
+      "table": {
+        "sender": "Sender",
+        "receiver": "Receiver",
+        "message": "Message",
+        "trip": "Trip",
+        "read": "Read",
+        "date": "Date"
+      },
+      "noMessages": "No Trip Messages",
+      "noMessagesDesc": "Trip chats will appear here"
+    }
+  },
   "common": {
     "dashboard": "Dashboard",
     "users": "Users",
@@ -20,7 +192,7 @@
     "tripOffers": "Trip Offers",
     "driverLocations": "Driver Locations",
     "settings": "Settings",
-    "search": "Search",
+    "search": "Search by name, phone or email...",
     "filter": "Filter",
     "export": "Export",
     "add": "Add",
@@ -34,6 +206,7 @@
     "next": "Next",
     "previous": "Previous",
     "view": "View",
+    "reply": "Reply",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
@@ -48,8 +221,10 @@
     "online": "Online",
     "offline": "Offline",
     "total": "Total",
-    "noData": "No data available",
     "loading": "Loading",
+    "noData": "No data available",
+    "driver": "Driver",
+    "vehicle": "Vehicle",
     "error": "An error occurred",
     "success": "Success",
     "warning": "Warning",
@@ -75,7 +250,25 @@
     "system": "System",
     "logout": "Logout",
     "profile": "Profile",
-    "all": "All"
+    "all": "All",
+    "allStatuses": "All Statuses",
+    "allTypes": "All Types",
+    "tryChangeFilters": "Try changing filters",
+    "page": "Page",
+    "of": "of",
+    "activeFilter": "Active Filter",
+    "price": "Price",
+    "type": "Type",
+    "km": "KM",
+    "user": "User",
+    "accept": "Accept",
+    "reject": "Reject",
+    "enable": "Enable",
+    "disable": "Disable",
+    "unexpectedError": "Unexpected Error",
+    "optional": "Optional",
+    "saving": "Saving",
+    "saved": "Saved"
   },
   "login": {
     "title": "Sign In",
@@ -85,21 +278,32 @@
     "submit": "Sign In",
     "error": "Invalid email or password"
   },
-  "sidebar": {
-    "sections": {
-      "operations": "Operations",
-      "marketing": "Marketing",
-      "system": "System"
-    }
-  },
+
   "dashboard": {
     "overview": "Overview",
+    "welcome": "Welcome to Taxi Dashboard",
+    "operationalKPIs": "Operational Performance Indicators",
+    "recentTripsSubtitle": "Last {count} registered trips",
+    "kpis": {
+      "availableDrivers": "Available Drivers",
+      "outOf": "Out of",
+      "onlineNow": "Online Now",
+      "pendingDrivers": "Pending Drivers",
+      "awaitingReview": "Awaiting Review",
+      "completionRate": "Completion Rate",
+      "ofTotalTrips": "of Total Trips",
+      "acceptanceRate": "Acceptance Rate",
+      "ofTotalRequests": "of Total Requests"
+    },
     "stats": {
       "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
       "totalDrivers": "Total Drivers",
+      "availableDriversSubtitle": "Available Drivers",
       "totalTrips": "Total Trips",
       "completedTrips": "Completed Trips",
       "activeTrips": "Active Trips",
+      "noActiveTrips": "No Active Trips Currently",
       "cancelledTrips": "Cancelled Trips",
       "totalRevenue": "Total Revenue",
       "verifiedDrivers": "Verified Drivers",
@@ -120,6 +324,8 @@
       "totalTrips": "trips total",
       "tripsLabel": "trips",
       "revenueByVehicle": "Revenue by Vehicle Type",
+      "car": "Car",
+      "motorcycle": "Motorcycle",
       "totalLabel": "Total",
       "revenueLabel": "Revenue"
     }
@@ -138,13 +344,30 @@
     },
     "blockUser": "Block User",
     "unblockUser": "Unblock User",
-    "blockReason": "Block Reason",
+    "confirmBlock": "Confirm Block",
+    "confirmUnblock": "Unblock",
+    "blockReason": "Block Reason (Optional)",
     "setRole": "Set Role",
-    "userDetails": "User Details"
+    "roleSupervisorWarning": "Supervisors will be able to view and reply to complaints and review drivers.",
+    "roleUserWarning": "The user will lose supervisor privileges immediately.",
+    "userDetails": "User Details",
+    "stats": {
+      "totalRegistered": "Total Registered",
+      "blockedAccounts": "Blocked Accounts",
+      "activeSupervisors": "Active Supervisors",
+      "fullAccess": "Full Access"
+    }
   },
   "drivers": {
-    "title": "Driver Management",
-    "subtitle": "Approve drivers and manage their documents",
+    "title": "Drivers Management",
+    "subtitle": "Verify and manage system drivers",
+    "documents": "Documents",
+    "rating": "Rating",
+    "tripDetails": "Trip Details",
+    "tripList": "Trip List",
+    "noTrips": "No Trips Found",
+    "cancelTrip": "Cancel Trip",
+    "cancelReason": "Cancellation Reason",
     "tabs": {
       "pending": "Pending Approval",
       "approved": "Approved",
@@ -154,12 +377,18 @@
     "verify": "Verify",
     "revoke": "Revoke",
     "requestRevision": "Request Revision",
-    "documents": {
-      "nationalId": "ID",
+    "docs": {
+      "id": "ID",
       "license": "License",
-      "criminalRecord": "Record",
+      "record": "Record",
       "vehicle": "Vehicle"
     },
+    "verified": "Verified",
+    "pending": "Pending",
+    "noDrivers": "No drivers in this category",
+    "revisionRequests": "Pending Revision Requests",
+    "requestedFields": "Requested Fields",
+    "noRevisionRequests": "No pending revision requests",
     "vehicleInfo": "Vehicle Info",
     "driverDetails": "Driver Details",
     "backToList": "Back to List",
@@ -174,6 +403,8 @@
     "title": "Trip Management",
     "subtitle": "Track and manage all trips",
     "tripDetails": "Trip Details",
+    "tripList": "Trip List",
+    "noTrips": "No Trips Found",
     "cancelTrip": "Cancel Trip",
     "cancelReason": "Cancellation Reason",
     "statuses": {
@@ -188,15 +419,134 @@
     "to": "To",
     "price": "Price",
     "driver": "Driver",
-    "passenger": "Passenger"
+    "passenger": "Passenger",
+    "distance": "Distance",
+    "backToList": "Back to List"
+  },
+  "driverLocations": {
+    "title": "Driver Locations",
+    "subtitle": "Track drivers in real-time",
+    "stats": {
+      "total": "Total Locations",
+      "online": "Online Now",
+      "offline": "Offline",
+      "activeUsers": "Active Users"
+    },
+    "registeredLocations": "Registered Driver Locations",
+    "table": {
+      "status": "Status",
+      "driver": "Driver",
+      "phone": "Phone",
+      "vehicle": "Vehicle",
+      "plate": "Plate",
+      "coordinates": "Coordinates",
+      "heading": "Heading",
+      "geohash": "Geohash",
+      "lastUpdate": "Last Update",
+      "user": "User",
+      "lastSeen": "Last Seen"
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "noLocations": "No Locations Recorded",
+    "userPresence": "User Presence",
+    "activeUser": "active user",
+    "noPresenceData": "No presence data"
+  },
+  "tripOffers": {
+    "title": "Trip Offers",
+    "subtitle": "Manage and track trip offers",
+    "stats": {
+      "all": "All",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "list": "Offers List",
+    "pagination": "Page {page} of {total} — {count} offers",
+    "clearFilter": "Clear Filter",
+    "table": {
+      "driver": "Driver",
+      "passenger": "Passenger",
+      "address": "Address",
+      "offerStatus": "Offer Status",
+      "tripStatus": "Trip Status",
+      "sentAt": "Sent At",
+      "respondedAt": "Responded At",
+      "action": "Action"
+    },
+    "trip": "Trip",
+    "cancel": "Cancel",
+    "noOffers": "No Offers",
+    "noOffersDesc": "No trip offers have been sent yet"
+  },
+  "pricing": {
+    "title": "Vehicle Types & Pricing",
+    "subtitle": "Add and edit vehicle types and prices",
+    "manage": "Manage",
+    "vehicleTypes": "Vehicle Types",
+    "active": "Active",
+    "inactive": "Inactive",
+    "addType": "Add New Type",
+    "edit": "Edit",
+    "enable": "Enable",
+    "disable": "Disable",
+    "delete": "Delete",
+    "baseFare": "Base Fare",
+    "pricePerKm": "Price/KM",
+    "sortOrder": "Order",
+    "noTypes": "No Vehicle Types",
+    "noTypesDesc": "Click 'Add New Type' to create the first type",
+    "modal": {
+      "editTitle": "Edit Vehicle Type",
+      "addTitle": "Add New Vehicle Type",
+      "techName": "Technical Name",
+      "techNamePlaceholder": "Example: luxury_car",
+      "techNameDesc": "Used in code, no spaces",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Example: Luxury Car",
+      "icon": "Icon",
+      "color": "Color",
+      "saveChanges": "Save Changes",
+      "add": "Add Type"
+    },
+    "messages": {
+      "saveFailed": "Save failed",
+      "toggleFailed": "Toggle failed",
+      "confirmDelete": "Are you sure you want to delete this type?",
+      "deleteFailed": "Delete failed - Type might be used in trips"
+    },
+    "icons": {
+      "car": "Car",
+      "bike": "Bike",
+      "truck": "Truck",
+      "electric": "Electric",
+      "premium": "Premium"
+    },
+    "colors": {
+      "blue": "Blue",
+      "green": "Green",
+      "red": "Red",
+      "yellow": "Yellow",
+      "purple": "Purple",
+      "pink": "Pink",
+      "cyan": "Cyan",
+      "orange": "Orange"
+    }
   },
   "complaints": {
     "title": "Complaint Management",
     "subtitle": "Track and resolve user complaints",
     "complaintDetails": "Complaint Details",
+    "complaintList": "Complaint List",
+    "subject": "Subject",
+    "category": "Category",
+    "noComplaints": "No complaints found",
     "reply": "Reply",
     "resolve": "Resolve",
     "priority": {
+      "label": "Priority",
       "low": "Low",
       "normal": "Normal",
       "high": "High",
@@ -213,90 +563,69 @@
       "trip": "Trip",
       "driver": "Driver",
       "payment": "Payment",
-      "technical": "Technical"
-    }
+      "technical": "Technical",
+      "app": "App",
+      "other": "Other"
+    },
+    "backToList": "Back to List"
   },
   "ratings": {
     "title": "Ratings",
     "subtitle": "User ratings for drivers",
-    "rating": "Rating",
-    "comment": "Comment",
-    "deleteRating": "Delete Rating"
+    "tabs": {
+      "driverRatings": "Driver Ratings",
+      "userRatings": "User Ratings"
+    },
+    "stats": {
+      "total": "Total Ratings",
+      "average": "Average Rating",
+      "fiveStars": "5 Stars",
+      "oneTwoStars": "1-2 Stars"
+    },
+    "distribution": "Ratings Distribution",
+    "filters": {
+      "allDrivers": "All Drivers",
+      "allRatings": "All Ratings",
+      "fourPlus": "4+ Stars",
+      "threePlus": "3+ Stars",
+      "oneTwo": "1-2 Stars",
+      "apply": "Apply Filter",
+      "reset": "Reset"
+    },
+    "trip": "Trip",
+    "deleteRating": "Delete Rating",
+    "noRatings": "No Ratings",
+    "noRatingsDesc": "Ratings will appear here after trips are completed"
   },
   "coupons": {
-    "title": "Coupon Management",
+    "title": "Coupons Management",
     "subtitle": "Create and manage discount coupons",
     "addCoupon": "Add Coupon",
-    "code": "Code",
-    "discountType": "Discount Type",
-    "discountValue": "Discount Value",
-    "minTripPrice": "Min Trip Price",
-    "maxUses": "Max Uses",
-    "expiresAt": "Expires At",
-    "isActive": "Active",
-    "usedCount": "Used Count",
-    "discountTypes": {
-      "percentage": "Percentage",
+    "newCoupon": "New Coupon",
+    "addDiscount": "Add discount coupon for users",
+    "couponList": "Coupons List",
+    "totalCoupons": "total coupons",
+    "noCoupons": "No coupons found",
+    "addCouponPrompt": "Add a new coupon to start",
+    "noExpiration": "No expiration",
+    "fields": {
+      "code": "Coupon Code",
+      "discountType": "Discount Type",
+      "discountValue": "Discount Value",
+      "minTripPrice": "Min Trip Price",
+      "maxUses": "Max Uses",
+      "uses": "Uses",
+      "expiresAt": "Expires At"
+    },
+    "types": {
+      "percentage": "Percentage %",
       "fixed": "Fixed Amount"
     }
   },
-  "userCoupons": {
-    "title": "User Coupons",
-    "subtitle": "Track user coupons and their usage",
-    "assignCoupon": "Assign Coupon",
-    "used": "Used",
-    "notUsed": "Not Used",
-    "assignedAt": "Assigned At",
-    "usedAt": "Used At"
-  },
-  "notifications": {
-    "title": "Notifications",
-    "subtitle": "Send and manage notifications",
-    "sendNotification": "Send Notification",
-    "sendBroadcast": "Send Broadcast",
-    "titleField": "Title",
-    "messageField": "Message",
-    "type": "Type",
-    "types": {
-      "general": "General",
-      "trip": "Trip",
-      "promo": "Promo",
-      "system": "System",
-      "trip_offer": "Trip Offer",
-      "trip_completed": "Completed",
-      "trip_cancelled": "Cancelled",
-      "account_verified": "Verified"
-    }
-  },
+
   "pricing": {
     "title": "Pricing & Rates",
     "subtitle": "Manage vehicle pricing and fare configurations"
-  },
-  "vehicleTypes": {
-    "title": "Vehicle Types",
-    "subtitle": "Manage vehicle types and pricing",
-    "addType": "Add Type",
-    "name": "Name",
-    "displayName": "Display Name",
-    "baseFare": "Base Fare",
-    "pricePerKm": "Price per KM",
-    "sortOrder": "Sort Order",
-    "icon": "Icon"
-  },
-  "adminLogs": {
-    "title": "Admin Logs",
-    "subtitle": "Track all admin actions",
-    "action": "Action",
-    "tableName": "Table",
-    "recordId": "Record ID",
-    "admin": "Admin",
-    "ip": "IP Address",
-    "oldData": "Old Data",
-    "newData": "New Data"
-  },
-  "messages": {
-    "title": "Messages",
-    "subtitle": "Manage support messages"
   },
   "tripOffers": {
     "title": "Trip Offers",
@@ -326,11 +655,57 @@
     "commission": "Commission",
     "totalSpent": "Total Spent",
     "totalToppedUp": "Total Topped Up",
-    "adjustBalance": "Adjust Balance"
+    "adjustBalance": "Adjust Balance",
+    "stats": {
+      "driverBalance": "Drivers Balance",
+      "driverEarned": "Drivers Total Earned",
+      "driverWithdrawn": "Total Withdrawn",
+      "userBalance": "Users Balance"
+    },
+    "tabs": {
+      "driverWallets": "Driver Wallets",
+      "userWallets": "User Wallets",
+      "transactions": "Transactions"
+    },
+    "fields": {
+      "balance": "Balance",
+      "totalEarned": "Total Earned",
+      "totalWithdrawn": "Total Withdrawn",
+      "pendingWithdrawal": "Pending Withdrawal",
+      "commission": "Commission",
+      "totalSpent": "Total Spent",
+      "totalToppedUp": "Total Topped Up",
+      "type": "Type",
+      "category": "Category",
+      "amount": "Amount",
+      "before": "Before",
+      "after": "After"
+    },
+    "txHistory": "Transaction History",
+    "noDriverWallets": "No driver wallets found",
+    "noUserWallets": "No user wallets found",
+    "noTransactions": "No transactions found",
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "reversed": "Reversed",
+      "pending": "Pending"
+    },
+    "txTypes": {
+      "trip_earning": "Trip Earning",
+      "trip_payment": "Trip Payment",
+      "withdrawal": "Withdrawal",
+      "withdrawal_refund": "Withdrawal Refund",
+      "top_up": "Top Up",
+      "refund": "Refund",
+      "bonus": "Bonus",
+      "penalty": "Penalty",
+      "adjustment": "Adjustment"
+    }
   },
   "withdrawals": {
     "title": "Withdrawal Requests",
-    "subtitle": "Manage driver earnings withdrawal requests",
+    "subtitle": "Manage driver withdrawal requests",
     "approve": "Approve",
     "reject": "Reject",
     "pending": "Pending",
@@ -340,11 +715,24 @@
     "rejected": "Rejected",
     "amount": "Amount",
     "method": "Payment Method",
+    "noWithdrawals": "No withdrawal requests found",
+    "noWithdrawalsDesc": "Driver requests will appear here",
+    "stats": {
+      "pending": "Pending Requests",
+      "approved": "Approved / Processing",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
     "methods": {
       "bank_transfer": "Bank Transfer",
       "vodafone_cash": "Vodafone Cash",
       "instapay": "InstaPay",
-      "orange_money": "Orange Cash"
+      "orange_money": "Orange Money"
+    },
+    "status": {
+      "approved": "Approved",
+      "processing": "Processing",
+      "rejected": "Rejected"
     }
   },
   "errors": {

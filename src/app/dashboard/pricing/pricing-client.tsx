@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Plus, Save, X, Trash2, Power, PowerOff, Car, Bike, Truck, Zap, Star } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
@@ -20,27 +21,28 @@ interface PricingClientProps {
   configs: VehicleType[];
 }
 
-const ICON_OPTIONS = [
-  { value: "directions_car", label: "سيارة", icon: Car },
-  { value: "two_wheeler", label: "موتوسيكل", icon: Bike },
-  { value: "local_shipping", label: "شاحنة", icon: Truck },
-  { value: "electric_car", label: "كهربائي", icon: Zap },
-  { value: "star", label: "مميز", icon: Star },
-];
-
-const COLORS = [
-  { name: "أزرق", value: "#3B82F6" },
-  { name: "أخضر", value: "#10B981" },
-  { name: "أحمر", value: "#EF4444" },
-  { name: "أصفر", value: "#F59E0B" },
-  { name: "بنفسجي", value: "#8B5CF6" },
-  { name: "وردي", value: "#EC4899" },
-  { name: "سماوي", value: "#06B6D4" },
-  { name: "برتقالي", value: "#F97316" },
-];
-
 export default function PricingClient({ configs }: PricingClientProps) {
+  const t = useTranslations();
   const router = useRouter();
+
+  const ICON_OPTIONS = [
+    { value: "directions_car", label: t("pricing.icons.car"), icon: Car },
+    { value: "two_wheeler", label: t("pricing.icons.bike"), icon: Bike },
+    { value: "local_shipping", label: t("pricing.icons.truck"), icon: Truck },
+    { value: "electric_car", label: t("pricing.icons.electric"), icon: Zap },
+    { value: "star", label: t("pricing.icons.premium"), icon: Star },
+  ];
+
+  const COLORS = [
+    { name: t("pricing.colors.blue"), value: "#3B82F6" },
+    { name: t("pricing.colors.green"), value: "#10B981" },
+    { name: t("pricing.colors.red"), value: "#EF4444" },
+    { name: t("pricing.colors.yellow"), value: "#F59E0B" },
+    { name: t("pricing.colors.purple"), value: "#8B5CF6" },
+    { name: t("pricing.colors.pink"), value: "#EC4899" },
+    { name: t("pricing.colors.cyan"), value: "#06B6D4" },
+    { name: t("pricing.colors.orange"), value: "#F97316" },
+  ];
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -117,7 +119,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "فشل الحفظ");
+        alert(data.error || t("pricing.messages.saveFailed"));
       }
     } finally {
       setLoading(false);
@@ -139,7 +141,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
       if (res.ok) {
         router.refresh();
       } else {
-        alert("فشل التبديل");
+        alert(t("pricing.messages.toggleFailed"));
       }
     } finally {
       setLoading(false);
@@ -147,7 +149,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
   };
 
   const deleteType = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذا النوع؟")) return;
+    if (!confirm(t("pricing.messages.confirmDelete"))) return;
 
     setLoading(true);
     try {
@@ -160,7 +162,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
       if (res.ok) {
         router.refresh();
       } else {
-        alert("فشل الحذف - قد يكون النوع مستخدماً في رحلات");
+        alert(t("pricing.messages.deleteFailed"));
       }
     } finally {
       setLoading(false);
@@ -178,19 +180,18 @@ export default function PricingClient({ configs }: PricingClientProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
+            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">{t("pricing.manage")}</span>
             <span className="w-1 h-1 rounded-full bg-green-500/60" />
-            <span className="text-[11px] text-text-disabled">أنواع المركبات</span>
+            <span className="text-[11px] text-text-disabled">{t("pricing.vehicleTypes")}</span>
           </div>
-          <h1 className="page-title">أنواع المركبات والتسعير</h1>
-          <p className="page-subtitle">إضافة وتعديل أنواع المركبات وأسعارها</p>
+
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-[12px]">
-            <span className="px-2 py-1 rounded-lg bg-success/10 text-success">{activeCount} نشط</span>
+            <span className="px-2 py-1 rounded-lg bg-success/10 text-success">{activeCount} {t("pricing.active")}</span>
             {inactiveCount > 0 && (
-              <span className="px-2 py-1 rounded-lg bg-text-disabled/10 text-text-disabled">{inactiveCount} معطل</span>
+              <span className="px-2 py-1 rounded-lg bg-text-disabled/10 text-text-disabled">{inactiveCount} {t("pricing.inactive")}</span>
             )}
           </div>
           <button
@@ -202,7 +203,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
             }}
           >
             <Plus size={16} />
-            إضافة نوع جديد
+            {t("pricing.addType")}
           </button>
         </div>
       </div>
@@ -220,9 +221,9 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 !isActive ? "opacity-60" : ""
               }`}
               style={{
-                background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
+                background: "var(--surface)",
                 border: `1px solid ${isActive ? "rgba(255,255,255,0.08)" : "var(--divider)"}`,
-                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                boxShadow: "var(--shadow-md)",
               }}
             >
               
@@ -261,7 +262,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     <button
                       onClick={() => openEditModal(config)}
                       className="p-2 rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-text-primary transition-colors"
-                      title="تعديل"
+                      title={t("pricing.edit")}
                     >
                       <Save size={14} />
                     </button>
@@ -272,14 +273,14 @@ export default function PricingClient({ configs }: PricingClientProps) {
                           ? "hover:bg-success/10 text-success"
                           : "hover:bg-text-disabled/10 text-text-disabled"
                       }`}
-                      title={isActive ? "تعطيل" : "تفعيل"}
+                      title={isActive ? t("pricing.disable") : t("pricing.enable")}
                     >
                       {isActive ? <Power size={14} /> : <PowerOff size={14} />}
                     </button>
                     <button
                       onClick={() => deleteType(config.id)}
                       className="p-2 rounded-lg hover:bg-error/10 text-text-tertiary hover:text-error transition-colors"
-                      title="حذف"
+                      title={t("pricing.delete")}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -292,7 +293,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     className="flex items-center justify-between p-3 rounded-xl"
                     style={{ background: "var(--surface-glass)" }}
                   >
-                    <span className="text-[12px] text-text-secondary">الأجرة الأساسية</span>
+                    <span className="text-[12px] text-text-secondary">{t("pricing.baseFare")}</span>
                     <span className="text-[14px] font-bold text-success">
                       {formatCurrency(Number(config.base_fare))}
                     </span>
@@ -301,7 +302,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     className="flex items-center justify-between p-3 rounded-xl"
                     style={{ background: "var(--surface-glass)" }}
                   >
-                    <span className="text-[12px] text-text-secondary">السعر/كم</span>
+                    <span className="text-[12px] text-text-secondary">{t("pricing.pricePerKm")}</span>
                     <span className="text-[14px] font-bold text-success">
                       {formatCurrency(Number(config.price_per_km))}
                     </span>
@@ -317,9 +318,9 @@ export default function PricingClient({ configs }: PricingClientProps) {
                       color: isActive ? "#10B981" : "var(--text-disabled)",
                     }}
                   >
-                    {isActive ? "✓ نشط" : "✗ معطل"}
+                    {isActive ? `✓ ${t("pricing.active")}` : `✗ ${t("pricing.inactive")}`}
                   </span>
-                  <span className="text-[10px] text-text-disabled">ترتيب: {config.sort_order}</span>
+                  <span className="text-[10px] text-text-disabled">{t("pricing.sortOrder").replace("{order}", String(config.sort_order))}</span>
                 </div>
               </div>
             </div>
@@ -336,8 +337,8 @@ export default function PricingClient({ configs }: PricingClientProps) {
           >
             <Car size={28} className="text-text-disabled opacity-40" />
           </div>
-          <p className="text-text-secondary font-semibold">لا توجد أنواع مركبات</p>
-          <p className="text-text-tertiary text-sm">اضغط &quot;إضافة نوع جديد&quot; لإنشاء أول نوع</p>
+          <p className="text-text-secondary font-semibold">{t("pricing.noTypes")}</p>
+          <p className="text-text-tertiary text-sm">{t("pricing.noTypesDesc")}</p>
         </div>
       )}
 
@@ -350,7 +351,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
           <div
             className="relative w-full max-w-md rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
+              background: "var(--surface)",
               border: "1px solid rgba(16,185,129,0.2)",
               boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
             }}
@@ -362,7 +363,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
             >
               <div>
                 <h3 className="text-[16px] font-black text-text-primary">
-                  {editingId ? "تعديل نوع المركبة" : "إضافة نوع مركبة جديد"}
+                  {editingId ? t("pricing.modal.editTitle") : t("pricing.modal.addTitle")}
                 </h3>
               </div>
               <button
@@ -378,13 +379,13 @@ export default function PricingClient({ configs }: PricingClientProps) {
               
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                  الاسم التقني (بالإنجليزية)
+                  {t("pricing.modal.techName")}
                 </label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value.toLowerCase().replace(/\s/g, "_") })}
-                  placeholder="مثال: luxury_car"
+                  placeholder={t("pricing.modal.techNamePlaceholder")}
                   className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                   style={{
                     background: "var(--surface-glass)",
@@ -395,19 +396,19 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   disabled={!!editingId}
                   dir="ltr"
                 />
-                <p className="text-[10px] text-text-disabled mt-1">يُستخدم في الكود، لا مسافات</p>
+                <p className="text-[10px] text-text-disabled mt-1">{t("pricing.modal.techNameDesc")}</p>
               </div>
 
               
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                  الاسم المعروض (بالعربية)
+                  {t("pricing.modal.displayName")}
                 </label>
                 <input
                   type="text"
                   value={form.display_name}
                   onChange={(e) => setForm({ ...form, display_name: e.target.value })}
-                  placeholder="مثال: سيارة فاخرة"
+                  placeholder={t("pricing.modal.displayNamePlaceholder")}
                   className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
                   style={{
                     background: "var(--surface-glass)",
@@ -421,7 +422,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                  الأيقونة
+                  {t("pricing.modal.icon")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {ICON_OPTIONS.map((iconOpt) => {
@@ -451,7 +452,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                  اللون
+                  {t("pricing.modal.color")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {COLORS.map((color) => (
@@ -479,7 +480,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                    الأجرة الأساسية
+                    {t("pricing.baseFare")}
                   </label>
                   <input
                     type="number"
@@ -499,7 +500,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                    السعر لكل كم
+                    {t("pricing.pricePerKm")}
                   </label>
                   <input
                     type="number"
@@ -522,7 +523,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
               
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                  الترتيب
+                  {t("pricing.sortOrder").split(":")[0]}
                 </label>
                 <input
                   type="number"
@@ -546,7 +547,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary transition-all hover:text-text-primary"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
-                  إلغاء
+                  {t("common.cancel") || "إلغاء"}
                 </button>
                 <button
                   type="submit"
@@ -565,7 +566,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   ) : (
                     <>
                       <Save size={16} />
-                      {editingId ? "حفظ التعديلات" : "إضافة النوع"}
+                      {editingId ? t("pricing.modal.saveChanges") : t("pricing.modal.add")}
                     </>
                   )}
                 </button>

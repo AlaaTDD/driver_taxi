@@ -28,8 +28,8 @@ export default async function MessagesPage({
   ]);
 
   const tabs = [
-    { key: "support", label: "رسائل الدعم", count: supportCountRes.count || 0, icon: Headphones, color: "#06B6D4" },
-    { key: "trip", label: "رسائل الرحلات", count: tripMsgCountRes.count || 0, icon: MapPin, color: "#8B5CF6" },
+    { key: "support", label: t("messages.tabs.support"), count: supportCountRes.count || 0, icon: Headphones, color: "#06B6D4" },
+    { key: "trip", label: t("messages.tabs.trip"), count: tripMsgCountRes.count || 0, icon: MapPin, color: "#8B5CF6" },
   ];
 
   /* ── Support Messages ── */
@@ -106,7 +106,7 @@ export default async function MessagesPage({
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/5 border border-cyan-500/20 text-cyan-500">
               <MessageSquare size={11} />
-              {(supportCountRes.count || 0) + (tripMsgCountRes.count || 0)} رسالة
+              {(supportCountRes.count || 0) + (tripMsgCountRes.count || 0)} {t("messages.total")}
             </div>
           </div>
         </div>
@@ -153,12 +153,7 @@ export default async function MessagesPage({
               return (
                 <div
                   key={msg.id}
-                  className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
-                  style={{
-                    background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-                    border: "1px solid rgba(255,255,255,0.04)",
-                    boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
-                  }}
+                  className="group relative dash-card overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: "0 0 30px rgba(6,182,212,0.04) inset" }} />
                   <div className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "linear-gradient(to left, transparent, rgba(6,182,212,0.4), transparent)" }} />
@@ -172,7 +167,7 @@ export default async function MessagesPage({
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <div className="flex items-center gap-1.5">
                           <User size={11} className="text-text-disabled" />
-                          <span className="text-[13px] font-bold text-text-primary">{user?.name || "مستخدم غير معروف"}</span>
+                          <span className="text-[13px] font-bold text-text-primary">{user?.name || t("messages.support.unknownUser")}</span>
                         </div>
                         <div className="w-1 h-1 rounded-full" style={{ background: "var(--text-disabled)" }} />
                         <div className="flex items-center gap-1.5">
@@ -195,8 +190,8 @@ export default async function MessagesPage({
                   <Headphones size={32} className="text-text-disabled opacity-40" />
                 </div>
                 <div className="text-center">
-                  <p className="text-text-secondary font-semibold">لا توجد رسائل دعم</p>
-                  <p className="text-text-tertiary text-sm mt-1">ستظهر رسائل الدعم هنا</p>
+                  <p className="text-text-secondary font-semibold">{t("messages.support.noMessages")}</p>
+                  <p className="text-text-tertiary text-sm mt-1">{t("messages.support.noMessagesDesc")}</p>
                 </div>
               </div>
             )}
@@ -212,36 +207,36 @@ export default async function MessagesPage({
               <input
                 name="trip_id"
                 defaultValue={tripIdFilter}
-                placeholder="ابحث برقم الرحلة (Trip ID)..."
+                placeholder={t("messages.trip.searchPlaceholder")}
                 className="flex-1 max-w-xs px-4 py-2.5 rounded-xl text-[13px] outline-none"
                 style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}
               />
-              <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>بحث</button>
+              <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>{t("messages.trip.search")}</button>
               {tripIdFilter && (
                 <Link href="/dashboard/messages?tab=trip" className="px-3 py-2.5 rounded-xl text-[12px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>
-                  مسح
+                  {t("messages.trip.clear")}
                 </Link>
               )}
             </form>
 
-            <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+            <div className="dash-table-card">
+              <div className="dash-section-header justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #8B5CF6, #6D28D9)", boxShadow: "0 0 8px rgba(139,92,246,0.5)" }} />
-                  <h3 className="text-[13px] font-bold text-text-primary">محادثات الرحلات</h3>
+                  <h3 className="text-[13px] font-bold text-text-primary">{t("messages.trip.title")}</h3>
                   <span className="text-text-disabled text-[11px]">({tripMsgCount})</span>
                 </div>
                 {tripIdFilter && (
                   <span className="text-[11px] text-amber-400 px-2.5 py-1 rounded-lg" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
-                    فلتر: {tripIdFilter.substring(0, 8)}...
+                    {t("messages.trip.filter")}: {tripIdFilter.substring(0, 8)}...
                   </span>
                 )}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                      {["المرسل", "المستقبل", "الرسالة", "الرحلة", "مقروءة", "التاريخ"].map((h) => (
+                    <tr className="dash-table-head">
+                      {[t("messages.trip.table.sender"), t("messages.trip.table.receiver"), t("messages.trip.table.message"), t("messages.trip.table.trip"), t("messages.trip.table.read"), t("messages.trip.table.date")].map((h) => (
                         <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
@@ -251,7 +246,7 @@ export default async function MessagesPage({
                       const sender = msg.sender as { name: string; role: string } | undefined;
                       const receiver = msg.receiver as { name: string; role: string } | undefined;
                       return (
-                        <tr key={msg.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                        <tr key={msg.id} className="group/row dash-table-row">
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2">
                               <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold" style={{ background: sender?.role === "driver" ? "rgba(52,211,153,0.15)" : "rgba(96,165,250,0.15)", color: sender?.role === "driver" ? "#34D399" : "#60A5FA" }}>
@@ -259,7 +254,7 @@ export default async function MessagesPage({
                               </div>
                               <div>
                                 <p className="text-[12px] font-bold text-text-primary">{sender?.name || "—"}</p>
-                                <p className="text-[10px] text-text-disabled">{sender?.role === "driver" ? "سائق" : "مستخدم"}</p>
+                                <p className="text-[10px] text-text-disabled">{sender?.role === "driver" ? t("messages.trip.driver") : t("messages.trip.user")}</p>
                               </div>
                             </div>
                           </td>
@@ -295,8 +290,8 @@ export default async function MessagesPage({
                       <tr>
                         <td colSpan={6} className="py-16 text-center text-text-disabled">
                           <MapPin size={32} className="mx-auto mb-3 opacity-30" />
-                          <p className="text-text-secondary font-semibold">لا توجد رسائل رحلات</p>
-                          <p className="text-text-tertiary text-sm mt-1">ستظهر محادثات الرحلات هنا</p>
+                          <p className="text-text-secondary font-semibold">{t("messages.trip.noMessages")}</p>
+                          <p className="text-text-tertiary text-sm mt-1">{t("messages.trip.noMessagesDesc")}</p>
                         </td>
                       </tr>
                     )}

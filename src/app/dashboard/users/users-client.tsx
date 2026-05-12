@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Search, ShieldBan, Shield, UserCheck, UserX,
   ChevronLeft, ChevronRight, SlidersHorizontal, X,
@@ -54,11 +55,11 @@ const avatarGrad = (user: User) =>
     ? { bg: "linear-gradient(135deg,rgba(16,185,129,0.22),rgba(16,185,129,0.06))", color: "#34D399", border: "rgba(16,185,129,0.2)" }
     : { bg: "linear-gradient(135deg,rgba(59,130,246,0.22),rgba(59,130,246,0.06))", color: "#93C5FD", border: "rgba(59,130,246,0.2)" };
 
-const roleLabel = (user: User) =>
-  user.is_admin ? { label: "أدمن", bg: "rgba(245,158,11,0.12)", color: "#FCD34D", border: "rgba(245,158,11,0.22)" }
-  : user.role === "driver" ? { label: "سائق", bg: "rgba(16,185,129,0.12)", color: "#34D399", border: "rgba(16,185,129,0.22)" }
-  : user.role === "supervisor" ? { label: "مشرف", bg: "rgba(139,92,246,0.12)", color: "#C4B5FD", border: "rgba(139,92,246,0.22)" }
-  : { label: "مستخدم", bg: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "rgba(59,130,246,0.22)" };
+const roleLabel = (user: User, t: any) =>
+  user.is_admin ? { label: t("users.roles.admin"), bg: "rgba(245,158,11,0.12)", color: "#FCD34D", border: "rgba(245,158,11,0.22)" }
+  : user.role === "driver" ? { label: t("users.roles.driver"), bg: "rgba(16,185,129,0.12)", color: "#34D399", border: "rgba(16,185,129,0.22)" }
+  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), bg: "rgba(139,92,246,0.12)", color: "#C4B5FD", border: "rgba(139,92,246,0.22)" }
+  : { label: t("users.roles.user"), bg: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "rgba(59,130,246,0.22)" };
 
 /* ─── ActionMenu (three-dot dropdown) ───────────────────── */
 function ActionMenu({
@@ -139,6 +140,7 @@ export default function UsersClient({
   users, totalCount, currentPage, totalPages,
   searchQuery, filterRole, filterStatus, currentUserId,
 }: UsersClientProps) {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -248,7 +250,7 @@ export default function UsersClient({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="بحث بالاسم أو التليفون أو البريد..."
+              placeholder={t("common.search")}
               className="w-full pr-9 pl-9 py-2.5 rounded-xl text-[13px] outline-none transition-all"
               style={{ background: "var(--surface)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}
             />
@@ -266,7 +268,7 @@ export default function UsersClient({
             className="px-4 py-2.5 rounded-xl text-[12px] font-bold text-white flex-shrink-0 btn-action"
             style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}
           >
-            بحث
+            {t("common.search")}
           </button>
         </form>
 
@@ -277,7 +279,7 @@ export default function UsersClient({
         <div className="flex gap-2 flex-wrap items-center">
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px]" style={{ color: "var(--text-tertiary)" }}>
             <Filter size={11} />
-            <span className="font-semibold">تصفية</span>
+            <span className="font-semibold">{t("common.filter")}</span>
           </div>
 
           {/* role */}
@@ -294,10 +296,10 @@ export default function UsersClient({
                 color: filterRole ? "#C4B5FD" : "var(--text-secondary)",
               }}
             >
-              <option value="">كل الأدوار</option>
-              <option value="user">مستخدم</option>
-              <option value="driver">سائق</option>
-              <option value="supervisor">مشرف</option>
+              <option value="">{t("common.all")}</option>
+              <option value="user">{t("users.roles.user")}</option>
+              <option value="driver">{t("users.roles.driver")}</option>
+              <option value="supervisor">{t("users.roles.supervisor")}</option>
             </select>
             <ChevronLeft size={10} className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-disabled)" }} />
           </div>
@@ -315,10 +317,10 @@ export default function UsersClient({
                 color: filterStatus === "blocked" ? "#F87171" : filterStatus === "active" ? "#34D399" : "var(--text-secondary)",
               }}
             >
-              <option value="">كل الحالات</option>
-              <option value="active">نشط</option>
-              <option value="blocked">محظور</option>
-              <option value="inactive">غير نشط</option>
+              <option value="">{t("common.all")}</option>
+              <option value="active">{t("common.active")}</option>
+              <option value="blocked">{t("common.blocked")}</option>
+              <option value="inactive">{t("common.inactive")}</option>
             </select>
           </div>
 
@@ -338,38 +340,31 @@ export default function UsersClient({
           {isPending ? (
             <span className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              جاري البحث...
+              {t("common.loading")}...
             </span>
           ) : (
             <span className="text-[11px] font-semibold px-2 py-1 rounded-lg"
               style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.15)" }}>
-              {totalCount} مستخدم
+              {totalCount} {t("common.users")}
             </span>
           )}
         </div>
       </div>
 
       {/* ── Table ───────────────────────────────────────────── */}
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(160deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.04)",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-        }}
-      >
+      <div className="dash-table-card">
         {/* Desktop table */}
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
+              <tr className="dash-table-head">
                 {[
-                  { label: "المستخدم", w: "w-[30%]" },
-                  { label: "التليفون", w: "w-[14%]" },
-                  { label: "الدور", w: "w-[11%]" },
-                  { label: "الرحلات", w: "w-[10%]" },
-                  { label: "الحالة", w: "w-[13%]" },
-                  { label: "إجراءات", w: "w-[10%]" },
+                  { label: t("common.name"), w: "w-[30%]" },
+                  { label: t("common.phone"), w: "w-[14%]" },
+                  { label: t("common.role"), w: "w-[11%]" },
+                  { label: t("common.trips"), w: "w-[10%]" },
+                  { label: t("common.status"), w: "w-[13%]" },
+                  { label: t("common.actions"), w: "w-[10%]" },
                 ].map((h) => (
                   <th key={h.label} className={`${h.w} text-right py-3 px-5 text-[10px] font-black uppercase tracking-widest whitespace-nowrap`}
                     style={{ color: "var(--text-tertiary)" }}>
@@ -381,14 +376,13 @@ export default function UsersClient({
             <tbody>
               {users.map((user, i) => {
                 const av = avatarGrad(user);
-                const rl = roleLabel(user);
+                const rl = roleLabel(user, t);
                 const canAct = user.id !== currentUserId && !user.is_admin;
                 return (
                   <tr
                     key={user.id}
-                    className="row-animate group/row hover-lift"
+                    className="row-animate group/row dash-table-row hover-lift"
                     style={{
-                      borderBottom: "1px solid rgba(26,45,71,0.45)",
                       animationDelay: `${i * 28}ms`,
                     }}
                   >
@@ -437,7 +431,7 @@ export default function UsersClient({
                     <td className="py-3.5 px-5">
                       <div className="flex flex-col">
                         <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
-                        <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>رحلة</span>
+                        <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>{t("common.trips")}</span>
                       </div>
                     </td>
 
@@ -447,7 +441,7 @@ export default function UsersClient({
                         <div className="flex flex-col gap-0.5">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
                             style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-                            <Lock size={9} /> محظور
+                            <Lock size={9} /> {t("common.blocked")}
                           </span>
                           {user.blocked_reason && (
                             <span className="text-[10px] px-1 truncate max-w-[110px]" style={{ color: "var(--text-disabled)" }} title={user.blocked_reason}>
@@ -459,12 +453,12 @@ export default function UsersClient({
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
                           style={{ background: "rgba(16,185,129,0.12)", color: "#34D399", border: "1px solid rgba(16,185,129,0.2)" }}>
                           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
-                          نشط
+                          {t("common.active")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
                           style={{ background: "rgba(100,116,139,0.14)", color: "#94A3B8", border: "1px solid rgba(100,116,139,0.2)" }}>
-                          غير نشط
+                          {t("common.inactive")}
                         </span>
                       )}
                     </td>
@@ -509,8 +503,8 @@ export default function UsersClient({
                         <UserX size={26} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
                       </div>
                       <div>
-                        <p className="font-bold text-[14px]" style={{ color: "var(--text-secondary)" }}>لا توجد نتائج</p>
-                        <p className="text-[12px] mt-0.5" style={{ color: "var(--text-disabled)" }}>جرب تعديل معايير البحث</p>
+                        <p className="font-bold text-[14px]" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
+                        <p className="text-[12px] mt-0.5" style={{ color: "var(--text-disabled)" }}>-</p>
                       </div>
                     </div>
                   </td>
@@ -524,7 +518,7 @@ export default function UsersClient({
         <div className="lg:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
           {users.map((user, i) => {
             const av = avatarGrad(user);
-            const rl = roleLabel(user);
+            const rl = roleLabel(user, t);
             const canAct = user.id !== currentUserId && !user.is_admin;
             return (
               <div
@@ -556,7 +550,7 @@ export default function UsersClient({
                     {user.is_blocked && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
                         style={{ background: "rgba(239,68,68,0.12)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-                        محظور
+                        {t("common.blocked")}
                       </span>
                     )}
                   </div>
@@ -567,19 +561,19 @@ export default function UsersClient({
                   style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
                   <div className="flex flex-col items-center">
                     <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
-                    <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>رحلة</span>
+                    <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>{t("common.trips")}</span>
                   </div>
                   <div className="w-px h-6" style={{ background: "var(--divider)" }} />
                   <div>
                     {user.is_blocked ? (
-                      <span className="text-[11px] font-bold" style={{ color: "#F87171" }}>محظور</span>
+                      <span className="text-[11px] font-bold" style={{ color: "#F87171" }}>{t("common.blocked")}</span>
                     ) : user.is_active ? (
                       <span className="flex items-center gap-1 text-[11px] font-bold" style={{ color: "#34D399" }}>
                         <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34D399" }} />
-                        نشط
+                        {t("common.active")}
                       </span>
                     ) : (
-                      <span className="text-[11px] font-bold" style={{ color: "#94A3B8" }}>غير نشط</span>
+                      <span className="text-[11px] font-bold" style={{ color: "#94A3B8" }}>{t("common.inactive")}</span>
                     )}
                   </div>
                 </div>
@@ -619,7 +613,7 @@ export default function UsersClient({
                 style={{ background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.15)" }}>
                 <UserX size={22} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
               </div>
-              <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>لا توجد نتائج</p>
+              <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
             </div>
           )}
         </div>
@@ -706,7 +700,7 @@ export default function UsersClient({
                   </div>
                   <div>
                     <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
-                      {blockModal.action === "block" ? "حظر المستخدم" : "رفع الحظر"}
+                      {blockModal.action === "block" ? t("users.blockUser") : t("users.unblockUser")}
                     </h3>
                     <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{blockModal.user.name}</p>
                   </div>
@@ -723,7 +717,7 @@ export default function UsersClient({
               {blockModal.action === "block" && (
                 <div className="mb-4">
                   <label className="block text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>
-                    سبب الحظر (اختياري)
+                    {t("users.blockReason")}
                   </label>
                   <textarea
                     value={blockReason}
@@ -773,8 +767,8 @@ export default function UsersClient({
                   }}
                 >
                   {actionLoading
-                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> جاري...</span>
-                    : blockModal.action === "block" ? "تأكيد الحظر" : "رفع الحظر"
+                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> {t("common.loading")}...</span>
+                    : blockModal.action === "block" ? t("users.confirmBlock") : t("users.confirmUnblock")
                   }
                 </button>
               </div>
@@ -815,7 +809,7 @@ export default function UsersClient({
                   </div>
                   <div>
                     <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
-                      {roleModal.role === "supervisor" ? "تعيين مشرف" : "إلغاء صلاحية المشرف"}
+                      {t("users.setRole")}
                     </h3>
                     <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{roleModal.user.name}</p>
                   </div>
@@ -836,8 +830,8 @@ export default function UsersClient({
                 <AlertTriangle size={14} style={{ color: "#FCD34D", flexShrink: 0, marginTop: 1 }} />
                 <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
                   {roleModal.role === "supervisor"
-                    ? "سيتمكن المشرف من عرض الشكاوي والرد عليها وطلب مراجعة السائقين."
-                    : "سيفقد المستخدم صلاحيات الإشراف فوراً."}
+                    ? t("users.roleSupervisorWarning")
+                    : t("users.roleUserWarning")}
                 </p>
               </div>
 
@@ -847,7 +841,7 @@ export default function UsersClient({
                   className="flex-1 py-3 rounded-xl text-[13px] font-bold btn-action"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   onClick={handleSetRole}
@@ -860,8 +854,8 @@ export default function UsersClient({
                   }}
                 >
                   {actionLoading
-                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> جاري...</span>
-                    : "تأكيد"
+                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> {t("common.loading")}...</span>
+                    : t("common.confirm")
                   }
                 </button>
               </div>

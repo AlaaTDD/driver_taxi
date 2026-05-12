@@ -10,81 +10,122 @@ interface StatCardProps {
   className?: string;
   accentColor?: string;
   subtitle?: string;
+  /** optional sparkline-style mini chart */
+  sparkColor?: string;
+  trendPercent?: string;
+  trendUp?: boolean;
 }
 
 export function StatCard({
   title,
   value,
   icon,
-  iconColor = "text-primary",
-  iconBg = "bg-primary/10",
+  iconColor = "text-white",
+  iconBg = "bg-primary",
   trend,
   className,
-  accentColor = "#3B82F6",
+  accentColor = "var(--primary)",
   subtitle,
+  sparkColor,
+  trendPercent,
+  trendUp = true,
 }: StatCardProps) {
   return (
     <div
       className={cn(
         "group relative rounded-2xl overflow-hidden transition-all duration-300 cursor-default",
-        "hover:-translate-y-1 hover:shadow-2xl",
+        "hover:-translate-y-1 hover:shadow-xl",
         className
       )}
       style={{
         background: "var(--surface)",
         border: "1px solid var(--divider)",
-        boxShadow: "var(--shadow-md)",
+        boxShadow: "var(--shadow-sm)",
       }}
     >
-      
-      <div
-        className="absolute top-0 left-0 right-0 h-[2px]"
-        style={{
-          background: `linear-gradient(to left, transparent, ${accentColor}, transparent)`,
-          opacity: 0.6,
-        }}
-      />
-
-
       <div className="relative p-5 z-10">
-        
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <p className="text-text-tertiary text-[11px] font-semibold uppercase tracking-widest mb-0.5">{title}</p>
-            {subtitle && <p className="text-text-disabled text-[10px]">{subtitle}</p>}
+        {/* Top row: title + icon */}
+        <div className="flex items-start justify-between gap-3">
+          {/* Left: title + value */}
+          <div className="flex-1 min-w-0">
+            <p className="text-text-tertiary text-[12px] font-semibold mb-2">{title}</p>
+            <div className="text-[28px] font-black tracking-tight text-text-primary leading-none num">
+              {value}
+            </div>
+
+            {/* Trend percentage */}
+            {trendPercent && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <span
+                  className="text-[12px] font-bold flex items-center gap-0.5"
+                  style={{ color: trendUp ? "var(--success)" : "var(--error)" }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ transform: trendUp ? "none" : "rotate(180deg)" }}>
+                    <path d="M6 2L10 7H2L6 2Z" fill="currentColor" />
+                  </svg>
+                  {trendPercent}
+                </span>
+              </div>
+            )}
+
+            {/* Sparkline mini chart */}
+            {sparkColor && (
+              <svg className="mt-3 w-full h-[32px]" viewBox="0 0 120 32" fill="none" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id={`spark-grad-${title}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={sparkColor} stopOpacity="0.4" />
+                    <stop offset="100%" stopColor={sparkColor} stopOpacity="0.01" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4"
+                  stroke={sparkColor}
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  fill="none"
+                  opacity="0.9"
+                  style={{ filter: `drop-shadow(0 2px 4px ${sparkColor}40)` }}
+                />
+                <path
+                  d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4 L120 32 L0 32 Z"
+                  fill={`url(#spark-grad-${title})`}
+                />
+              </svg>
+            )}
+
+            {/* Trend info */}
+            {trend && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <span style={{ color: accentColor }} className="text-[12px] font-bold num">{trend.value}</span>
+                <span className="text-[11px] text-text-tertiary">{trend.label}</span>
+              </div>
+            )}
           </div>
+
+          {/* Right: big colored icon box */}
           <div
             className={cn(
-              "relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110",
-              iconBg,
+              "relative flex-shrink-0 w-[52px] h-[52px] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105",
               iconColor
             )}
             style={{
-              boxShadow: "var(--shadow-sm)",
-              border: "1px solid var(--divider)",
+              background: accentColor,
+              boxShadow: `0 4px 14px ${accentColor}44`,
             }}
           >
             {icon}
           </div>
         </div>
 
-        
-        <div className="text-3xl font-black tracking-tight text-text-primary transition-all duration-300 num">
-          {value}
-        </div>
-
-        
-        {trend && (
-          <div className="flex items-center gap-2 mt-2">
-            <div
-              className="h-[3px] rounded-full flex-1 opacity-30"
-              style={{ background: `linear-gradient(to left, transparent, ${accentColor})` }}
-            />
-            <span className="text-[11px] text-text-tertiary font-medium">
-              <span style={{ color: accentColor }} className="font-bold">{trend.value}</span>
-              {" "}{trend.label}
-            </span>
-          </div>
+        {/* Bottom bar indicator */}
+        {!sparkColor && !trendPercent && !trend && (
+          <div
+            className="mt-4 h-[3px] rounded-full opacity-30"
+            style={{ 
+              background: `linear-gradient(to left, transparent, ${accentColor})`,
+              width: "60%",
+            }}
+          />
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DriversClientProps {
@@ -21,6 +22,7 @@ export default function DriversClient({ tab, currentPage, totalPages, searchQuer
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const t = useTranslations();
   const [search, setSearch] = useState(searchQuery);
 
   const updateSearch = () => {
@@ -46,7 +48,7 @@ export default function DriversClient({ tab, currentPage, totalPages, searchQuer
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && updateSearch()}
-          placeholder="بحث بالاسم أو اللوحة أو الهوية..."
+          placeholder={t("common.search")}
           id="drivers-search-input"
           className="pr-8 pl-8 py-2 rounded-xl text-[12px] outline-none w-48 sm:w-60"
           style={selectStyle}
@@ -61,7 +63,7 @@ export default function DriversClient({ tab, currentPage, totalPages, searchQuer
       <button onClick={updateSearch} id="drivers-search-btn"
         className="px-3 py-2 rounded-xl text-[11px] font-bold text-white"
         style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))" }}>
-        بحث
+        {t("common.search")}
       </button>
 
       

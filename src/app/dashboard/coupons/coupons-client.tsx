@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, X, Tag, Check } from "lucide-react";
 import { createCoupon } from "./actions";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const inputStyle = {
   background: "var(--surface-glass)",
@@ -13,6 +14,7 @@ const inputStyle = {
 
 export default function CouponsClient() {
   const router = useRouter();
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -38,7 +40,7 @@ export default function CouponsClient() {
       if (form.expires_at) formData.set("expires_at", form.expires_at);
 
       const result = await createCoupon(formData);
-      if (result.error) { alert("حدث خطأ: " + result.error); return; }
+      if (result.error) { alert(`${t("common.error")}: ${result.error}`); return; }
 
       setSaved(true);
       setTimeout(() => {
@@ -47,7 +49,7 @@ export default function CouponsClient() {
         setForm({ code: "", discount_type: "percentage", discount_value: "", min_trip_price: "", max_uses: "", expires_at: "" });
         router.refresh();
       }, 1000);
-    } catch { alert("حدث خطأ غير متوقع"); }
+    } catch { alert(t("common.unexpectedError")); }
     finally { setLoading(false); }
   };
 
@@ -65,7 +67,7 @@ export default function CouponsClient() {
         }}
       >
         <Plus size={15} />
-        كوبون جديد
+        {t("coupons.newCoupon")}
       </button>
 
       {isOpen && (
@@ -76,7 +78,7 @@ export default function CouponsClient() {
           <div
             className="relative w-full max-w-md rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
+              background: "var(--surface)",
               border: "1px solid rgba(245,158,11,0.2)",
               boxShadow: "0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
@@ -97,8 +99,8 @@ export default function CouponsClient() {
                     <Tag size={16} className="text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="text-[15px] font-black text-text-primary">كوبون جديد</h3>
-                    <p className="text-text-tertiary text-[11px] mt-0.5">أضف كوبون خصم للمستخدمين</p>
+                    <h3 className="text-[15px] font-black text-text-primary">{t("coupons.newCoupon")}</h3>
+                    <p className="text-text-tertiary text-[11px] mt-0.5">{t("coupons.addDiscount")}</p>
                   </div>
                 </div>
                 <button
@@ -113,7 +115,7 @@ export default function CouponsClient() {
               <form onSubmit={handleSubmit} className="space-y-4" id="create-coupon-form">
                 
                 <div>
-                  <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">كود الكوبون</label>
+                  <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">{t("coupons.fields.code")}</label>
                   <input
                     type="text"
                     value={form.code}
@@ -129,20 +131,20 @@ export default function CouponsClient() {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">نوع الخصم</label>
+                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">{t("coupons.fields.discountType")}</label>
                     <select
                       value={form.discount_type}
                       onChange={(e) => setForm({ ...form, discount_type: e.target.value })}
                       className="w-full px-3 py-3 rounded-xl text-[13px] outline-none cursor-pointer"
                       style={inputStyle}
                     >
-                      <option value="percentage">نسبة %</option>
-                      <option value="fixed">مبلغ ثابت</option>
+                      <option value="percentage">{t("coupons.types.percentage")}</option>
+                      <option value="fixed">{t("coupons.types.fixed")}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">
-                      القيمة {form.discount_type === "percentage" ? "(%)" : "(ج.م)"}
+                      {t("coupons.fields.discountValue")} {form.discount_type === "percentage" ? "(%)" : "($)"}
                     </label>
                     <input
                       type="number"
@@ -159,21 +161,21 @@ export default function CouponsClient() {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">حد أدنى (ج.م)</label>
+                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">{t("coupons.fields.minTripPrice")} ($)</label>
                     <input
                       type="number" value={form.min_trip_price}
                       onChange={(e) => setForm({ ...form, min_trip_price: e.target.value })}
-                      min="0" step="0.01" placeholder="50 (اختياري)"
+                      min="0" step="0.01" placeholder={`50 (${t("common.optional")})`}
                       className="w-full px-3 py-3 rounded-xl text-[13px] outline-none num"
                       style={inputStyle}
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">أقصى استخدام</label>
+                    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">{t("coupons.fields.maxUses")}</label>
                     <input
                       type="number" value={form.max_uses}
                       onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
-                      min="1" placeholder="∞ (اختياري)"
+                      min="1" placeholder={`∞ (${t("common.optional")})`}
                       className="w-full px-3 py-3 rounded-xl text-[13px] outline-none num"
                       style={inputStyle}
                     />
@@ -182,7 +184,7 @@ export default function CouponsClient() {
 
                 
                 <div>
-                  <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">تاريخ الانتهاء (اختياري)</label>
+                  <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">{t("coupons.fields.expiresAt")} ({t("common.optional")})</label>
                   <input
                     type="datetime-local"
                     value={form.expires_at}
@@ -200,7 +202,7 @@ export default function CouponsClient() {
                     className="flex-1 py-3 rounded-xl text-[13px] font-bold text-text-secondary transition-all hover:text-text-primary"
                     style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                   >
-                    إلغاء
+                    {t("common.cancel")}
                   </button>
                   <button
                     type="submit"
@@ -215,11 +217,11 @@ export default function CouponsClient() {
                     }}
                   >
                     {loading ? (
-                      <><svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>جاري الإضافة...</>
+                      <><svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>{t("common.saving")}</>
                     ) : saved ? (
-                      <><Check size={14} />✓ تم الإضافة</>
+                      <><Check size={14} />✓ {t("common.saved")}</>
                     ) : (
-                      <><Tag size={14} />إضافة الكوبون</>
+                      <><Tag size={14} />{t("coupons.addCoupon")}</>
                     )}
                   </button>
                 </div>

@@ -82,17 +82,10 @@ function DriverRevisionForm() {
         
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl overflow-hidden"
-          style={{
-            background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-            border: "1px solid rgba(139,92,246,0.2)",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-          }}
+          className="dash-card overflow-hidden"
+          style={{ border: "1px solid rgba(139,92,246,0.2)" }}
         >
-          <div
-            className="flex items-center gap-2 px-5 py-4"
-            style={{ borderBottom: "1px solid var(--divider)" }}
-          >
+          <div className="dash-section-header">
             <div
               className="w-[3px] h-5 rounded-full"
               style={{

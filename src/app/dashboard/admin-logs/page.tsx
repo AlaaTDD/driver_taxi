@@ -42,26 +42,26 @@ export default async function AdminLogsPage({
   const totalPages = Math.ceil((count || 0) / pageSize);
 
   const actionLabels: Record<string, { label: string; color: string; bg: string }> = {
-    create: { label: "إنشاء", color: "#10B981", bg: "rgba(16,185,129,0.1)" },
-    update: { label: "تعديل", color: "#3B82F6", bg: "rgba(59,130,246,0.1)" },
-    delete: { label: "حذف", color: "#EF4444", bg: "rgba(239,68,68,0.1)" },
-    verify: { label: "اعتماد", color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
-    revoke: { label: "إلغاء اعتماد", color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
-    block: { label: "حظر", color: "#EC4899", bg: "rgba(236,72,153,0.1)" },
-    unblock: { label: "فك حظر", color: "#06B6D4", bg: "rgba(6,182,212,0.1)" },
-    send_notification: { label: "إرسال إشعار", color: "#6366F1", bg: "rgba(99,102,241,0.1)" },
+    create: { label: t("adminLogs.actions.create"), color: "#10B981", bg: "rgba(16,185,129,0.1)" },
+    update: { label: t("adminLogs.actions.update"), color: "#3B82F6", bg: "rgba(59,130,246,0.1)" },
+    delete: { label: t("adminLogs.actions.delete"), color: "#EF4444", bg: "rgba(239,68,68,0.1)" },
+    verify: { label: t("adminLogs.actions.verify"), color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
+    revoke: { label: t("adminLogs.actions.revoke"), color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
+    block: { label: t("adminLogs.actions.block"), color: "#EC4899", bg: "rgba(236,72,153,0.1)" },
+    unblock: { label: t("adminLogs.actions.unblock"), color: "#06B6D4", bg: "rgba(6,182,212,0.1)" },
+    send_notification: { label: t("adminLogs.actions.sendNotification"), color: "#6366F1", bg: "rgba(99,102,241,0.1)" },
   };
 
   const tableLabels: Record<string, string> = {
-    users: "المستخدمين",
-    drivers_profile: "ملف السائق",
-    trips: "الرحلات",
-    complaints: "الشكاوي",
-    coupons: "الكوبونات",
-    vehicle_types: "أنواع المركبات",
-    notifications: "الإشعارات",
-    support_messages: "رسائل الدعم",
-    ratings: "التقييمات",
+    users: t("adminLogs.tables.users"),
+    drivers_profile: t("adminLogs.tables.driversProfile"),
+    trips: t("adminLogs.tables.trips"),
+    complaints: t("adminLogs.tables.complaints"),
+    coupons: t("adminLogs.tables.coupons"),
+    vehicle_types: t("adminLogs.tables.vehicleTypes"),
+    notifications: t("adminLogs.tables.notifications"),
+    support_messages: t("adminLogs.tables.supportMessages"),
+    ratings: t("adminLogs.tables.ratings"),
   };
 
   return (
@@ -76,16 +76,12 @@ export default async function AdminLogsPage({
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي السجلات", value: count || 0, icon: FileText, color: "#3B82F6" },
-          { label: "المشرفين النشطين", value: (admins || []).length, icon: User, color: "#10B981" },
+          { label: t("adminLogs.stats.total"), value: count || 0, icon: FileText, color: "#3B82F6" },
+          { label: t("adminLogs.stats.activeAdmins"), value: (admins || []).length, icon: User, color: "#10B981" },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl p-4"
-            style={{
-              background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-              border: "1px solid rgba(255,255,255,0.05)",
-            }}
+            className="dash-card p-4"
           >
             <div className="flex items-center gap-3">
               <div
@@ -115,7 +111,7 @@ export default async function AdminLogsPage({
             color: "var(--text-primary)",
           }}
         >
-          <option value="">كل المشرفين</option>
+          <option value="">{t("adminLogs.filters.allAdmins")}</option>
           {(admins || []).map((admin) => (
             <option key={admin.id} value={admin.id}>
               {admin.name || admin.id.slice(0, 8)}
@@ -133,7 +129,7 @@ export default async function AdminLogsPage({
             color: "var(--text-primary)",
           }}
         >
-          <option value="">كل الإجراءات</option>
+          <option value="">{t("adminLogs.filters.allActions")}</option>
           {Object.entries(actionLabels).map(([key, val]) => (
             <option key={key} value={key}>
               {val.label}
@@ -146,7 +142,7 @@ export default async function AdminLogsPage({
           className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white"
           style={{ background: "#3B82F6" }}
         >
-          تطبيق الفلتر
+          {t("adminLogs.filters.apply")}
         </button>
 
         {(adminFilter || actionFilter) && (
@@ -155,37 +151,31 @@ export default async function AdminLogsPage({
             className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary"
             style={{ border: "1px solid var(--divider)" }}
           >
-            إعادة ضبط
+            {t("adminLogs.filters.reset")}
           </a>
         )}
       </form>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-        }}
-      >
+      <div className="dash-table-card">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: "1px solid var(--divider)" }}>
+              <tr className="dash-table-head">
                 <th className="px-5 py-3.5 text-right text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
-                  الإجراء
+                  {t("adminLogs.table.action")}
                 </th>
                 <th className="px-5 py-3.5 text-right text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
-                  الجدول
+                  {t("adminLogs.table.table")}
                 </th>
                 <th className="px-5 py-3.5 text-right text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
-                  الأدمن
+                  {t("adminLogs.table.admin")}
                 </th>
                 <th className="px-5 py-3.5 text-right text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
-                  التاريخ
+                  {t("adminLogs.table.date")}
                 </th>
                 <th className="px-5 py-3.5 text-right text-[11px] font-bold text-text-tertiary uppercase tracking-wider">
-                  IP
+                  {t("adminLogs.table.ip")}
                 </th>
               </tr>
             </thead>
@@ -201,8 +191,7 @@ export default async function AdminLogsPage({
                 return (
                   <tr
                     key={log.id}
-                    className="group hover:bg-white/2 transition-colors"
-                    style={{ borderBottom: "1px solid var(--divider)" }}
+                    className="group dash-table-row"
                   >
                     <td className="px-5 py-4">
                       <span
@@ -232,7 +221,7 @@ export default async function AdminLogsPage({
                         </div>
                         <div>
                           <p className="text-[13px] text-text-primary font-medium">
-                            {admin?.name || "غير معروف"}
+                            {admin?.name || t("adminLogs.unknownAdmin")}
                           </p>
                           <p className="text-[10px] text-text-disabled">{admin?.email || log.admin_id?.slice(0, 8)}</p>
                         </div>
@@ -266,8 +255,8 @@ export default async function AdminLogsPage({
               <Shield size={28} className="text-text-disabled opacity-40" />
             </div>
             <div className="text-center">
-              <p className="text-text-secondary font-semibold">لا توجد سجلات</p>
-              <p className="text-text-tertiary text-sm mt-1">ستظهر الإجراءات هنا عند تنفيذها</p>
+              <p className="text-text-secondary font-semibold">{t("adminLogs.noLogs")}</p>
+              <p className="text-text-tertiary text-sm mt-1">{t("adminLogs.noLogsDesc")}</p>
             </div>
           </div>
         )}
@@ -279,7 +268,7 @@ export default async function AdminLogsPage({
             style={{ borderTop: "1px solid var(--divider)" }}
           >
             <div className="text-[11px] text-text-tertiary">
-              صفحة {page} من {totalPages}
+              {t("common.page")} {page} {t("common.of")} {totalPages}
             </div>
             <div className="flex gap-2">
               {page > 1 && (
@@ -288,7 +277,7 @@ export default async function AdminLogsPage({
                   className="px-3 py-1.5 rounded-lg text-[12px] text-text-secondary hover:text-text-primary transition-colors"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
-                  السابق
+                  {t("common.previous") || "السابق"}
                 </a>
               )}
               {page < totalPages && (
@@ -297,7 +286,7 @@ export default async function AdminLogsPage({
                   className="px-3 py-1.5 rounded-lg text-[12px] text-text-secondary hover:text-text-primary transition-colors"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >
-                  التالي
+                  {t("common.next") || "التالي"}
                 </a>
               )}
             </div>

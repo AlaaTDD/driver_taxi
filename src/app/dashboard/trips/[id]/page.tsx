@@ -94,7 +94,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         
-        <div className="lg:col-span-2 rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
+        <div className="lg:col-span-2 dash-card p-6">
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">
             <Navigation size={16} className="text-blue-400" />
             مسار الرحلة
@@ -129,7 +129,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         
-        <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
+        <div className="dash-card p-6">
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">
             <DollarSign size={16} className="text-emerald-400" />
             التفاصيل المالية
@@ -158,7 +158,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         
-        <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="dash-card p-6">
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2">
               <User size={16} className="text-blue-400" />
@@ -187,7 +187,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         
-        <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="dash-card p-6">
           <div className="flex justify-between items-start mb-6">
             <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2">
               <Car size={16} className="text-emerald-400" />
@@ -227,7 +227,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
       
       {complaints && complaints.length > 0 && (
-        <div className="rounded-2xl p-6" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(239,68,68,0.15)", boxShadow: "0 4px 20px rgba(239,68,68,0.05)" }}>
+        <div className="dash-card p-6" style={{ border: "1px solid rgba(239,68,68,0.15)", boxShadow: "0 4px 20px rgba(239,68,68,0.05)" }}>
           <h3 className="text-[14px] font-black text-text-primary flex items-center gap-2 mb-6">
             <ShieldAlert size={16} className="text-red-400" />
             الشكاوي المرتبطة بهذه الرحلة ({complaints.length})

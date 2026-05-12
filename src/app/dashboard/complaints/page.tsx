@@ -63,12 +63,12 @@ export default async function ComplaintsPage({
   };
 
   const statusLabel = (s: string) => {
-    const map: Record<string, string> = { open: "مفتوح", in_progress: "قيد المعالجة", resolved: "محلول", closed: "مغلق" };
+    const map: Record<string, string> = { open: t("complaints.statuses.open"), in_progress: t("complaints.statuses.in_progress"), resolved: t("complaints.statuses.resolved"), closed: t("complaints.statuses.closed") };
     return map[s] || s;
   };
 
   const categoryLabel = (c: string) => {
-    const map: Record<string, string> = { general: "عام", driver: "سائق", trip: "رحلة", payment: "دفع", app: "تطبيق", other: "أخرى" };
+    const map: Record<string, string> = { general: t("complaints.categories.general"), driver: t("complaints.categories.driver"), trip: t("complaints.categories.trip"), payment: t("complaints.categories.payment"), app: t("complaints.categories.app"), other: t("complaints.categories.other") };
     return map[c] || c;
   };
 
@@ -91,12 +91,7 @@ export default async function ComplaintsPage({
       
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="group relative rounded-xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1"
-            style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-              border: "1px solid rgba(255,255,255,0.05)",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
-            }}>
+          <div key={i} className="group relative dash-card overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1">
             <div className="absolute top-0 left-0 right-0 h-[2px]"
               style={{ background: `linear-gradient(to left, transparent, ${stat.color}, transparent)`, opacity: 0.6 }} />
             <div className="flex items-center justify-between">
@@ -112,19 +107,13 @@ export default async function ComplaintsPage({
       </div>
 
       
-      <div className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-        }}>
+      <div className="dash-table-card">
         
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4"
-          style={{ borderBottom: "1px solid var(--divider)" }}>
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5 flex-1">
             <div className="w-[3px] h-5 rounded-full"
               style={{ background: "linear-gradient(to bottom, #EF4444, #DC2626)", boxShadow: "0 0 8px rgba(239,68,68,0.5)" }} />
-            <h3 className="text-[13px] font-bold text-text-primary">قائمة الشكاوي</h3>
+            <h3 className="text-[13px] font-bold text-text-primary">{t("complaints.complaintList")}</h3>
             <span className="text-text-disabled text-[11px]">({count || 0})</span>
           </div>
           <ComplaintsClient
@@ -140,8 +129,8 @@ export default async function ComplaintsPage({
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["المستخدم", "الموضوع", "التصنيف", "الأولوية", "الحالة", "التاريخ", "إجراء"].map(h => (
+              <tr className="dash-table-head">
+                {[t("common.user"), t("complaints.subject"), t("complaints.category"), t("complaints.priority.label"), t("common.status"), t("common.date"), t("common.actions")].map(h => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -151,7 +140,7 @@ export default async function ComplaintsPage({
                 
                 const user = (complaint as any).users;
                 return (
-                  <tr key={complaint.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                  <tr key={complaint.id} className="group/row dash-table-row">
                     <td className="py-3 px-4">
                       <p className="font-bold text-text-primary text-[13px]">{user?.name}</p>
                       <p className="text-text-disabled text-[11px] num">{user?.phone}</p>
@@ -168,7 +157,7 @@ export default async function ComplaintsPage({
                     <td className="py-3 px-4">
                       <span className="text-[12px] font-bold"
                         style={{ color: priorityColor(complaint.priority) }}>
-                        {complaint.priority === "urgent" ? "⚡ عاجل" : complaint.priority === "high" ? "↑ مرتفع" : complaint.priority === "normal" ? "— عادي" : "↓ منخفض"}
+                        {complaint.priority === "urgent" ? `⚡ ${t("complaints.priority.urgent")}` : complaint.priority === "high" ? `↑ ${t("complaints.priority.high")}` : complaint.priority === "normal" ? `— ${t("complaints.priority.normal")}` : `↓ ${t("complaints.priority.low")}`}
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -178,7 +167,7 @@ export default async function ComplaintsPage({
                     </td>
                     <td className="py-3 px-4 text-text-tertiary text-[12px] whitespace-nowrap">{formatDate(complaint.created_at)}</td>
                     <td className="py-3 px-4">
-                      <ComplaintReplyButton complaint={complaint} />
+                      <ComplaintReplyButton complaint={complaint} label={t("common.reply")} />
                     </td>
                   </tr>
                 );
@@ -187,7 +176,7 @@ export default async function ComplaintsPage({
                 <tr>
                   <td colSpan={7} className="py-16 text-center text-text-disabled">
                     <MessageSquareWarning size={32} className="mx-auto mb-3 opacity-30" />
-                    <p>لا توجد شكاوي</p>
+                    <p>{t("complaints.noComplaints")}</p>
                   </td>
                 </tr>
               )}
@@ -214,11 +203,11 @@ export default async function ComplaintsPage({
                 <p className="text-text-secondary text-[12px] line-clamp-2">{complaint.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px]" style={{ color: priorityColor(complaint.priority) }}>
-                    {complaint.priority === "urgent" ? "⚡ عاجل" : "— " + complaint.priority}
+                    {complaint.priority === "urgent" ? `⚡ ${t("complaints.priority.urgent")}` : "— " + complaint.priority}
                   </span>
                   <span className="text-text-disabled text-[11px]">{formatDate(complaint.created_at)}</span>
                 </div>
-                <ComplaintReplyButton complaint={complaint} />
+                <ComplaintReplyButton complaint={complaint} label={t("common.reply")} />
               </div>
             );
           })}
@@ -229,14 +218,14 @@ export default async function ComplaintsPage({
   );
 }
 
-function ComplaintReplyButton({ complaint }: { complaint: { id: string; title: string; status: string; description: string } }) {
+function ComplaintReplyButton({ complaint, label }: { complaint: { id: string; title: string; status: string; description: string }, label: string }) {
   if (complaint.status === "closed") return null;
   return (
     <a href={`/dashboard/complaints/${complaint.id}`}
       id={`reply-complaint-${complaint.id}`}
       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
       style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
-      <MessageSquareWarning size={11} /> رد
+      <MessageSquareWarning size={11} /> {label}
     </a>
   );
 }

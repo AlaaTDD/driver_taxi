@@ -62,10 +62,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
       </div>
 
       
-      <div className="rounded-2xl p-5" style={{
-        background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-        border: "1px solid rgba(255,255,255,0.05)",
-      }}>
+      <div className="dash-card p-5">
         <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider mb-3">المستخدم</h3>
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[15px]"
@@ -80,10 +77,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
       </div>
 
       
-      <div className="rounded-2xl p-5" style={{
-        background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
-        border: "1px solid rgba(255,255,255,0.05)",
-      }}>
+      <div className="dash-card p-5">
         <div className="flex items-center gap-2 mb-3">
           <MessageSquareWarning size={14} className="text-text-tertiary" />
           <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider">نص الشكوى</h3>

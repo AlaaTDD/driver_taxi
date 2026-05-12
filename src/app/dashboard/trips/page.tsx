@@ -86,19 +86,9 @@ export default async function TripsPage({
       />
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
+      <div className="dash-card">
         
-        <div
-          className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: "1px solid var(--divider)" }}
-        >
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div
               className="w-[3px] h-5 rounded-full"
@@ -108,9 +98,9 @@ export default async function TripsPage({
               }}
             />
             <div>
-              <h3 className="text-[13px] font-bold text-text-primary">قائمة الرحلات</h3>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("trips.tripList")}</h3>
               <p className="text-[10px] text-text-tertiary">
-                صفحة {page} من {totalPages || 1}
+                {t("common.page")} {page} {t("common.of")} {totalPages || 1}
               </p>
             </div>
           </div>
@@ -118,7 +108,7 @@ export default async function TripsPage({
           {(statusFilter || vehicleFilter) && (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-amber-400"
               style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
-              فلتر نشط
+              {t("common.activeFilter")}
             </div>
           )}
         </div>
@@ -126,8 +116,8 @@ export default async function TripsPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["من", "إلى", "المسافة", "السعر", "النوع", "المستخدم", "السائق", "الحالة", "التاريخ", "إجراء"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("trips.from"), t("trips.to"), t("trips.distance"), t("common.price"), t("common.type"), t("trips.passenger"), t("trips.driver"), t("common.status"), t("common.date"), t("common.actions")].map((h) => (
                   <th
                     key={h}
                     className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap"
@@ -141,8 +131,7 @@ export default async function TripsPage({
               {(trips || []).map((trip) => (
                 <tr
                   key={trip.id}
-                  className="group/row table-row-hover"
-                  style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}
+                  className="group/row dash-table-row"
                 >
                   <td className="py-3.5 px-4 max-w-[140px] truncate text-[13px] text-text-primary">
                     <span className="flex items-center gap-2">
@@ -157,7 +146,7 @@ export default async function TripsPage({
                     {trip.destination_address}
                   </td>
                   <td className="py-3.5 px-4 text-text-tertiary text-[13px] num whitespace-nowrap">
-                    {Number(trip.distance_km).toFixed(1)} كم
+                    {Number(trip.distance_km).toFixed(1)} {t("common.km")}
                   </td>
                   <td className="py-3.5 px-4 text-[13px] font-black num text-emerald-400 whitespace-nowrap">
                     {formatCurrency(Number(trip.price))}
@@ -172,7 +161,7 @@ export default async function TripsPage({
                       }}
                     >
                       {trip.vehicle_type === "car" ? "🚗" : "🏍"}
-                      {trip.vehicle_type === "car" ? "عربية" : "مكنة"}
+                      {trip.vehicle_type === "car" ? t("dashboard.charts.car") : t("dashboard.charts.motorcycle")}
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
@@ -219,7 +208,7 @@ export default async function TripsPage({
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
                       style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
                     >
-                      <Eye size={12} /> عرض
+                      <Eye size={12} /> {t("common.view")}
                     </Link>
                   </td>
                 </tr>
@@ -236,8 +225,8 @@ export default async function TripsPage({
                         <MapPin size={24} className="opacity-40" />
                       </div>
                       <div>
-                        <p className="text-text-secondary font-semibold">لا توجد رحلات</p>
-                        <p className="text-text-tertiary text-sm mt-1">جرب تغيير الفلاتر</p>
+                        <p className="text-text-secondary font-semibold">{t("trips.noTrips")}</p>
+                        <p className="text-text-tertiary text-sm mt-1">{t("common.tryChangeFilters")}</p>
                       </div>
                     </div>
                   </td>

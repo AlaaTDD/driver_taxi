@@ -14,12 +14,11 @@ export function DataTable({ headers, children, emptyMessage = "لا توجد ب�
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--divider-strong)" }}>
+          <tr className="dash-table-head">
             {headers.map((h) => (
               <th
                 key={h.key}
-                className="text-right py-3 px-4 text-xs font-bold uppercase tracking-wider whitespace-nowrap"
-                style={{ color: "var(--text-tertiary)" }}
+                className="text-right py-3 px-4 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-text-tertiary"
               >
                 {h.label}
               </th>

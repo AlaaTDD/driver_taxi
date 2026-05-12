@@ -35,15 +35,15 @@ export default async function NotificationsPage({
   const unreadCount = (notifications || []).filter((n) => !n.is_read).length;
 
   const typeLabels: Record<string, string> = {
-    trip_offer: "عرض رحلة",
-    offer_accepted: "قبول عرض",
-    driver_arriving: "سائق قادم",
-    trip_started: "بدء الرحلة",
-    trip_completed: "رحلة مكتملة",
-    trip_cancelled: "رحلة ملغية",
-    no_drivers: "لا سائقين",
-    new_message: "رسالة جديدة",
-    account_verified: "حساب معتمد",
+    trip_offer: t("notifications.types.tripOffer"),
+    offer_accepted: t("notifications.types.offerAccepted"),
+    driver_arriving: t("notifications.types.driverArriving"),
+    trip_started: t("notifications.types.tripStarted"),
+    trip_completed: t("notifications.types.tripCompleted"),
+    trip_cancelled: t("notifications.types.tripCancelled"),
+    no_drivers: t("notifications.types.noDrivers"),
+    new_message: t("notifications.types.newMessage"),
+    account_verified: t("notifications.types.accountVerified"),
   };
 
   const typeBadgeVariants: Record<string, "success" | "warning" | "error" | "info" | "default" | "purple" | "cyan"> = {
@@ -78,7 +78,7 @@ export default async function NotificationsPage({
                 className="w-1.5 h-1.5 rounded-full bg-error"
                 style={{ boxShadow: "0 0 5px rgba(239,68,68,0.6)" }}
               />
-              {unreadCount} غير مقروء
+              {unreadCount} {t("notifications.unread")}
             </div>
           )}
           <div
@@ -86,7 +86,7 @@ export default async function NotificationsPage({
             style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#93C5FD" }}
           >
             <Bell size={11} />
-            {count || 0} إشعار
+            {count || 0} {t("notifications.total")}
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ export default async function NotificationsPage({
                   : "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
                 border: isUnread
                   ? "1px solid rgba(59,130,246,0.2)"
-                  : "1px solid rgba(255,255,255,0.04)",
+                  : "1px solid var(--divider)",
                 boxShadow: isUnread
                   ? "0 2px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.08)"
                   : "0 1px 6px rgba(0,0,0,0.2)",
@@ -184,7 +184,7 @@ export default async function NotificationsPage({
                     <div className="flex items-center gap-4 mt-3">
                       <div className="flex items-center gap-1.5">
                         <User size={11} className="text-text-disabled" />
-                        <span className="text-[11px] text-text-tertiary">{user?.name || "غير محدد"}</span>
+                        <span className="text-[11px] text-text-tertiary">{user?.name || t("notifications.unknownUser")}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock size={11} className="text-text-disabled" />
@@ -193,7 +193,7 @@ export default async function NotificationsPage({
                       {!isUnread && (
                         <div className="flex items-center gap-1">
                           <Eye size={11} className="text-success opacity-60" />
-                          <span className="text-[10px] text-success opacity-60">مقروء</span>
+                          <span className="text-[10px] text-success opacity-60">{t("notifications.read")}</span>
                         </div>
                       )}
                     </div>
@@ -214,8 +214,8 @@ export default async function NotificationsPage({
               <Bell size={32} className="text-text-disabled opacity-40" />
             </div>
             <div className="text-center">
-              <p className="text-text-secondary font-semibold">لا توجد إشعارات</p>
-              <p className="text-text-tertiary text-sm mt-1">ستظهر الإشعارات الجديدة هنا</p>
+              <p className="text-text-secondary font-semibold">{t("notifications.noNotifications")}</p>
+              <p className="text-text-tertiary text-sm mt-1">{t("notifications.noNotificationsDesc")}</p>
             </div>
           </div>
         )}

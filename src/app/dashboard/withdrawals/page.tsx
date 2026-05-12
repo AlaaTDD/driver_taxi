@@ -43,10 +43,10 @@ export default async function WithdrawalsPage({
   };
 
   const statCards = [
-    { label: "طلبات معلقة", value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "#FBBF24", icon: Clock },
-    { label: "مقبولة / قيد المعالجة", value: stats.approved, color: "#60A5FA", icon: Loader2 },
-    { label: "مكتملة", value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "#34D399", icon: CheckCircle },
-    { label: "مرفوضة", value: stats.rejected, color: "#F87171", icon: XCircle },
+    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "#FBBF24", icon: Clock },
+    { label: t("withdrawals.stats.approved"), value: stats.approved, color: "#60A5FA", icon: Loader2 },
+    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "#34D399", icon: CheckCircle },
+    { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "#F87171", icon: XCircle },
   ];
 
   /* ── Query ── */
@@ -76,19 +76,19 @@ export default async function WithdrawalsPage({
   const adminMap = new Map((admins || []).map((a) => [a.id, a.name]));
 
   const methodLabels: Record<string, { label: string; icon: typeof CreditCard }> = {
-    bank_transfer: { label: "تحويل بنكي", icon: CreditCard },
-    vodafone_cash: { label: "فودافون كاش", icon: Smartphone },
-    instapay: { label: "انستاباي", icon: Smartphone },
-    orange_money: { label: "اورانج كاش", icon: Smartphone },
+    bank_transfer: { label: t("withdrawals.methods.bank_transfer"), icon: CreditCard },
+    vodafone_cash: { label: t("withdrawals.methods.vodafone_cash"), icon: Smartphone },
+    instapay: { label: t("withdrawals.methods.instapay"), icon: Smartphone },
+    orange_money: { label: t("withdrawals.methods.orange_money"), icon: Smartphone },
   };
 
   const statusLabels: Record<string, { label: string; variant: "success" | "warning" | "error" | "info" | "default" }> = {
-    pending: { label: "معلق", variant: "warning" },
-    approved: { label: "مقبول", variant: "info" },
-    processing: { label: "قيد المعالجة", variant: "info" },
-    completed: { label: "مكتمل", variant: "success" },
-    rejected: { label: "مرفوض", variant: "error" },
-    cancelled: { label: "ملغي", variant: "default" },
+    pending: { label: t("wallets.status.pending"), variant: "warning" },
+    approved: { label: t("withdrawals.status.approved"), variant: "info" },
+    processing: { label: t("withdrawals.status.processing"), variant: "info" },
+    completed: { label: t("wallets.status.completed"), variant: "success" },
+    rejected: { label: t("withdrawals.status.rejected"), variant: "error" },
+    cancelled: { label: t("common.cancelled"), variant: "default" },
   };
 
   return (
@@ -96,8 +96,8 @@ export default async function WithdrawalsPage({
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-text-primary">طلبات السحب</h1>
-          <p className="text-sm text-text-secondary mt-1">إدارة طلبات سحب أرباح السائقين</p>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("withdrawals.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("withdrawals.subtitle")}</p>
         </div>
 
         {/* Stats */}
@@ -119,11 +119,11 @@ export default async function WithdrawalsPage({
         {/* Status Filter */}
         <div className="flex gap-2 flex-wrap">
           {[
-            { label: "الكل", value: "", count: stats.total },
-            { label: "معلق", value: "pending", count: stats.pending },
-            { label: "مقبول", value: "approved", count: stats.approved },
-            { label: "مكتمل", value: "completed", count: stats.completed },
-            { label: "مرفوض", value: "rejected", count: stats.rejected },
+            { label: t("common.all"), value: "", count: stats.total },
+            { label: t("wallets.status.pending"), value: "pending", count: stats.pending },
+            { label: t("withdrawals.status.approved"), value: "approved", count: stats.approved },
+            { label: t("wallets.status.completed"), value: "completed", count: stats.completed },
+            { label: t("withdrawals.status.rejected"), value: "rejected", count: stats.rejected },
           ].map((f) => (
             <Link
               key={f.value}
@@ -142,22 +142,19 @@ export default async function WithdrawalsPage({
         </div>
 
         {/* Requests Table */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}
-        >
-          <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+        <div className="dash-table-card">
+          <div className="dash-section-header justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #E879F9, #A855F7)", boxShadow: "0 0 8px rgba(232,121,249,0.5)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">طلبات السحب</h3>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("withdrawals.title")}</h3>
               <span className="text-text-disabled text-[11px]">({count || 0})</span>
             </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                  {["السائق", "المبلغ", "طريقة الدفع", "الحالة", "الأدمن", "التاريخ", "إجراءات"].map((h) => (
+                <tr className="dash-table-head">
+                  {[t("common.driver"), t("wallets.fields.amount"), t("withdrawals.method"), t("common.status"), t("users.roles.admin"), t("common.date"), t("common.actions")].map((h) => (
                     <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -169,7 +166,7 @@ export default async function WithdrawalsPage({
                   const status = statusLabels[req.status] || { label: req.status, variant: "default" as const };
 
                   return (
-                    <tr key={req.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                    <tr key={req.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(232,121,249,0.15)", color: "#E879F9" }}>
@@ -204,7 +201,7 @@ export default async function WithdrawalsPage({
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition-all hover:scale-105"
                                 style={{ background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 8px rgba(16,185,129,0.3)" }}
                               >
-                                قبول
+                                {t("common.accept")}
                               </button>
                             </form>
                             <form action="/api/withdrawals/reject" method="POST">
@@ -215,7 +212,7 @@ export default async function WithdrawalsPage({
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
                                 style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
                               >
-                                رفض
+                                {t("common.reject")}
                               </button>
                             </form>
                           </div>
@@ -235,8 +232,8 @@ export default async function WithdrawalsPage({
                   <tr>
                     <td colSpan={7} className="py-16 text-center text-text-disabled">
                       <Banknote size={32} className="mx-auto mb-3 opacity-30" />
-                      <p className="text-text-secondary font-semibold">لا توجد طلبات سحب</p>
-                      <p className="text-text-tertiary text-sm mt-1">ستظهر طلبات السائقين هنا</p>
+                      <p className="text-text-secondary font-semibold">{t("withdrawals.noWithdrawals")}</p>
+                      <p className="text-text-tertiary text-sm mt-1">{t("withdrawals.noWithdrawalsDesc")}</p>
                     </td>
                   </tr>
                 )}
@@ -250,14 +247,14 @@ export default async function WithdrawalsPage({
               {page > 1 && (
                 <Link href={`/dashboard/withdrawals?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
                   className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                  السابق
+                  {t("common.previous")}
                 </Link>
               )}
-              <span className="text-[12px] text-text-tertiary">صفحة {page} من {totalPages}</span>
+              <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
               {page < totalPages && (
                 <Link href={`/dashboard/withdrawals?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
                   className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                  التالي
+                  {t("common.next")}
                 </Link>
               )}
             </div>

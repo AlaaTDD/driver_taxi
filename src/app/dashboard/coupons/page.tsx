@@ -49,19 +49,9 @@ export default async function CouponsPage({
       </div>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
+      <div className="dash-table-card">
         
-        <div
-          className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: "1px solid var(--divider)" }}
-        >
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div
               className="w-[3px] h-5 rounded-full"
@@ -71,8 +61,8 @@ export default async function CouponsPage({
               }}
             />
             <div>
-              <h3 className="text-[13px] font-bold text-text-primary">قائمة الكوبونات</h3>
-              <p className="text-[10px] text-text-tertiary">{count || 0} كوبون إجمالاً</p>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("coupons.couponList")}</h3>
+              <p className="text-[10px] text-text-tertiary">{count || 0} {t("coupons.totalCoupons")}</p>
             </div>
           </div>
         </div>
@@ -80,8 +70,8 @@ export default async function CouponsPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["الكود", "نوع الخصم", "قيمة الخصم", "حد أدنى", "الاستخدامات", "تاريخ الانتهاء", "الحالة", "إجراءات"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("coupons.fields.code"), t("coupons.fields.discountType"), t("coupons.fields.discountValue"), t("coupons.fields.minTripPrice"), t("coupons.fields.uses"), t("coupons.fields.expiresAt"), t("common.status"), t("common.actions")].map((h) => (
                   <th
                     key={h}
                     className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap"
@@ -98,8 +88,7 @@ export default async function CouponsPage({
                 return (
                   <tr
                     key={coupon.id}
-                    className="group/row table-row-hover"
-                    style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}
+                    className="group/row dash-table-row"
                   >
                     
                     <td className="py-3.5 px-4">
@@ -126,7 +115,7 @@ export default async function CouponsPage({
                           <Hash size={12} className="text-text-tertiary" />
                         )}
                         <span className="text-text-secondary text-[13px]">
-                          {coupon.discount_type === "percentage" ? "نسبة مئوية" : "مبلغ ثابت"}
+                          {coupon.discount_type === "percentage" ? t("coupons.types.percentage") : t("coupons.types.fixed")}
                         </span>
                       </div>
                     </td>
@@ -162,14 +151,14 @@ export default async function CouponsPage({
                           {isExpired ? "⚠ " : ""}{formatDate(coupon.expires_at)}
                         </span>
                       ) : (
-                        <span className="text-text-disabled text-[12px]">بدون انتهاء</span>
+                        <span className="text-text-disabled text-[12px]">{t("coupons.noExpiration")}</span>
                       )}
                     </td>
 
                     
                     <td className="py-3.5 px-4">
                       <Badge variant={coupon.is_active ? "success" : "error"} dot>
-                        {coupon.is_active ? "نشط" : "معطّل"}
+                        {coupon.is_active ? t("common.active") : t("common.inactive")}
                       </Badge>
                     </td>
 
@@ -184,7 +173,7 @@ export default async function CouponsPage({
                             className={`btn py-1.5 px-3 text-[11px] ${coupon.is_active ? "btn-warning" : "btn-success"}`}
                             id={`toggle-coupon-${coupon.id}`}
                           >
-                            {coupon.is_active ? "تعطيل" : "تفعيل"}
+                            {coupon.is_active ? t("common.disable") : t("common.enable")}
                           </button>
                         </form>
                         <form action={`/api/coupons/delete`} method="POST">
@@ -194,7 +183,7 @@ export default async function CouponsPage({
                             className="btn btn-error py-1.5 px-3 text-[11px]"
                             id={`delete-coupon-${coupon.id}`}
                           >
-                            حذف
+                            {t("common.delete")}
                           </button>
                         </form>
                       </div>
@@ -214,8 +203,8 @@ export default async function CouponsPage({
                         <Tag size={24} className="opacity-40" />
                       </div>
                       <div>
-                        <p className="text-text-secondary font-semibold">لا توجد كوبونات</p>
-                        <p className="text-text-tertiary text-sm mt-1">أضف كوبون جديد للبدء</p>
+                        <p className="text-text-secondary font-semibold">{t("coupons.noCoupons")}</p>
+                        <p className="text-text-tertiary text-sm mt-1">{t("coupons.addCouponPrompt")}</p>
                       </div>
                     </div>
                   </td>

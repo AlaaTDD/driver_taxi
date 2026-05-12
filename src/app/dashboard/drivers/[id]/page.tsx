@@ -110,23 +110,23 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
             المعلومات الشخصية
           </h2>
           <div className="space-y-4">
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">الاسم</span>
               <span className="text-text-primary font-bold">{user.name}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">رقم الهاتف</span>
               <span className="text-text-primary font-bold num flex items-center gap-1"><Phone size={12} className="text-text-tertiary" /> {user.phone}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">البريد الإلكتروني</span>
               <span className="text-text-primary font-bold flex items-center gap-1">{user.email ? <><Mail size={12} className="text-text-tertiary" /> {user.email}</> : "—"}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">الرقم القومي</span>
               <span className="text-text-primary font-bold num">{driver.national_id || "—"}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">رقم الرخصة</span>
               <span className="text-text-primary font-bold num">{driver.license_number || "—"}</span>
             </div>
@@ -140,25 +140,25 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
             تفاصيل المركبة
           </h2>
           <div className="space-y-4">
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">نوع المركبة</span>
               <span className="text-text-primary font-bold">{driver.vehicle_type === "car" ? "سيارة 🚗" : "دراجة نارية 🏍"}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">الماركة والموديل</span>
               <span className="text-text-primary font-bold">{driver.vehicle_brand} - {driver.vehicle_model}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">سنة الصنع</span>
               <span className="text-text-primary font-bold num">{driver.vehicle_year || "—"}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">لون المركبة</span>
               <span className="text-text-primary font-bold">{driver.vehicle_color || "—"}</span>
             </div>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+            <div className="flex justify-between items-center pb-2" style={{ borderBottom: "1px dashed var(--divider)" }}>
               <span className="text-text-disabled text-sm">رقم اللوحة</span>
-              <span className="text-text-primary font-bold num" style={{ background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: "4px" }}>{driver.vehicle_plate || "—"}</span>
+              <span className="text-text-primary font-bold num" style={{ background: "var(--surface-glass)", padding: "2px 8px", borderRadius: "4px" }}>{driver.vehicle_plate || "—"}</span>
             </div>
           </div>
         </div>

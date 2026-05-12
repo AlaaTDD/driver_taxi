@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface TripsClientProps {
@@ -26,6 +27,7 @@ export default function TripsClient({
 }: TripsClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations();
 
   const updateParams = (key: string, value: string) => {
     const params = new URLSearchParams();
@@ -46,7 +48,7 @@ export default function TripsClient({
         className="px-3 py-2 rounded-xl text-[12px] font-semibold whitespace-nowrap"
         style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
       >
-        إجمالي: <span className="text-text-primary font-black num">{totalCount}</span>
+        {t("common.total")}: <span className="text-text-primary font-black num">{totalCount}</span>
       </div>
 
       <div className="flex gap-3 flex-1 justify-end flex-wrap">
@@ -60,13 +62,13 @@ export default function TripsClient({
             className="appearance-none pr-9 pl-8 py-2.5 rounded-xl text-[13px] outline-none cursor-pointer"
             style={selectStyle}
           >
-            <option value="">كل الحالات</option>
-            <option value="searching">جاري البحث</option>
-            <option value="accepted">تم القبول</option>
-            <option value="driver_arriving">السائق قادم</option>
-            <option value="in_progress">جارية</option>
-            <option value="completed">مكتملة</option>
-            <option value="cancelled">ملغية</option>
+            <option value="">{t("common.allStatuses")}</option>
+            <option value="searching">{t("trips.statuses.searching")}</option>
+            <option value="accepted">{t("trips.statuses.accepted")}</option>
+            <option value="driver_arriving">{t("trips.statuses.driver_arriving")}</option>
+            <option value="in_progress">{t("trips.statuses.in_progress")}</option>
+            <option value="completed">{t("trips.statuses.completed")}</option>
+            <option value="cancelled">{t("trips.statuses.cancelled")}</option>
           </select>
           <ChevronLeft size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
         </div>
@@ -80,9 +82,9 @@ export default function TripsClient({
             className="appearance-none px-4 py-2.5 rounded-xl text-[13px] outline-none cursor-pointer"
             style={selectStyle}
           >
-            <option value="">كل الأنواع</option>
-            <option value="car">عربية 🚗</option>
-            <option value="motorcycle">مكنة 🏍</option>
+            <option value="">{t("common.allTypes")}</option>
+            <option value="car">{t("dashboard.charts.car")} 🚗</option>
+            <option value="motorcycle">{t("dashboard.charts.motorcycle")} 🏍</option>
           </select>
         </div>
       </div>

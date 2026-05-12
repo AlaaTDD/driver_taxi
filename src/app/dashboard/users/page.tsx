@@ -69,28 +69,28 @@ export default async function UsersPage({
       label: t("dashboard.stats.totalUsers"),
       value: totalRes.count || 0,
       icon: <Users size={16} />,
-      subLabel: "إجمالي المسجّلين",
+      subLabel: t("users.stats.totalRegistered"),
     },
     {
       key: "blocked" as const,
       label: t("common.blocked"),
       value: blockedRes.count || 0,
       icon: <ShieldBan size={16} />,
-      subLabel: "حساب محظور",
+      subLabel: t("users.stats.blockedAccounts"),
     },
     {
       key: "supervisor" as const,
       label: t("users.roles.supervisor"),
       value: supervisorRes.count || 0,
       icon: <Shield size={16} />,
-      subLabel: "مشرف نشط",
+      subLabel: t("users.stats.activeSupervisors"),
     },
     {
       key: "admin" as const,
       label: t("users.roles.admin"),
       value: adminsRes.count || 0,
       icon: <Crown size={16} />,
-      subLabel: "صلاحية كاملة",
+      subLabel: t("users.stats.fullAccess"),
     },
   ];
 
@@ -130,9 +130,9 @@ export default async function UsersPage({
               color: "var(--text-tertiary)",
             }}
           >
-            <span>لوحة التحكم</span>
+            <span>{t("common.dashboard")}</span>
             <span style={{ color: "var(--text-disabled)" }}>/</span>
-            <span style={{ color: "var(--text-secondary)" }}>المستخدمون</span>
+            <span style={{ color: "var(--text-secondary)" }}>{t("common.users")}</span>
           </div>
         </div>
 
@@ -143,11 +143,9 @@ export default async function UsersPage({
             return (
               <div
                 key={stat.key}
-                className="group relative rounded-2xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                className="group relative rounded-2xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 dash-card"
                 style={{
-                  background: `linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)`,
-                  border: `1px solid ${c.border}`,
-                  boxShadow: `0 2px 10px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04)`,
+                  border: `1px solid ${c.border}`
                 }}
               >
                 {/* top glow line */}

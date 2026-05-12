@@ -154,7 +154,7 @@ export default function NotificationsClient({
           <div
             className="relative w-full max-w-lg rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
+              background: "var(--surface)",
               border: "1px solid rgba(59,130,246,0.2)",
               boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
             }}

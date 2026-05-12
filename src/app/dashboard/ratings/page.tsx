@@ -29,8 +29,8 @@ export default async function RatingsPage({
   ]);
 
   const tabs = [
-    { key: "driver_ratings", label: "تقييمات السائقين", count: driverRatingsCountRes.count || 0, icon: Car, color: "#F59E0B" },
-    { key: "user_ratings", label: "تقييمات المستخدمين", count: userRatingsCountRes.count || 0, icon: Users, color: "#8B5CF6" },
+    { key: "driver_ratings", label: t("ratings.tabs.driverRatings"), count: driverRatingsCountRes.count || 0, icon: Car, color: "#F59E0B" },
+    { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "#8B5CF6" },
   ];
 
   // Driver list for filter
@@ -132,12 +132,12 @@ export default async function RatingsPage({
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "إجمالي التقييمات", value: currentTotal, icon: MessageSquare, color: "#3B82F6" },
-              { label: "متوسط التقييم", value: currentAvg, icon: Star, color: "#F59E0B" },
-              { label: "5 نجوم", value: currentCounts[5], icon: Star, color: "#10B981" },
-              { label: "1-2 نجوم", value: currentCounts[1] + currentCounts[2], icon: Star, color: "#EF4444" },
+              { label: t("ratings.stats.total"), value: currentTotal, icon: MessageSquare, color: "#3B82F6" },
+              { label: t("ratings.stats.average"), value: currentAvg, icon: Star, color: "#F59E0B" },
+              { label: t("ratings.stats.fiveStars"), value: currentCounts[5], icon: Star, color: "#10B981" },
+              { label: t("ratings.stats.oneTwoStars"), value: currentCounts[1] + currentCounts[2], icon: Star, color: "#EF4444" },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-2xl p-4" style={{ background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <div key={stat.label} className="dash-card p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}>
                     <stat.icon size={18} style={{ color: stat.color }} />
@@ -178,8 +178,8 @@ export default async function RatingsPage({
         </div>
 
         {/* Rating Distribution */}
-        <div className="rounded-2xl p-5" style={{ background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)", border: "1px solid rgba(255,255,255,0.05)" }}>
-          <h3 className="text-[13px] font-bold text-text-primary mb-4">توزيع التقييمات</h3>
+        <div className="dash-card p-5">
+          <h3 className="text-[13px] font-bold text-text-primary mb-4">{t("ratings.distribution")}</h3>
           <div className="space-y-3">
             {[5, 4, 3, 2, 1].map((stars) => {
               const count = currentCounts[stars as keyof typeof currentCounts];
@@ -207,20 +207,20 @@ export default async function RatingsPage({
           <form className="flex flex-wrap gap-3 items-center">
             <input type="hidden" name="tab" value="driver_ratings" />
             <select name="driver_id" defaultValue={driverFilter} className="px-4 py-2.5 rounded-xl text-[13px] outline-none" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}>
-              <option value="">كل السائقين</option>
+              <option value="">{t("ratings.filters.allDrivers")}</option>
               {(drivers || []).map((driver) => (
                 <option key={driver.id} value={driver.id}>{driver.name || driver.id.slice(0, 8)}</option>
               ))}
             </select>
             <select name="min_rating" defaultValue={minRating || ""} className="px-4 py-2.5 rounded-xl text-[13px] outline-none" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}>
-              <option value="">كل التقييمات</option>
-              <option value="4">4+ نجوم</option>
-              <option value="3">3+ نجوم</option>
-              <option value="1">1-2 نجوم</option>
+              <option value="">{t("ratings.filters.allRatings")}</option>
+              <option value="4">{t("ratings.filters.fourPlus")}</option>
+              <option value="3">{t("ratings.filters.threePlus")}</option>
+              <option value="1">{t("ratings.filters.oneTwo")}</option>
             </select>
-            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#3B82F6" }}>تطبيق الفلتر</button>
+            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#3B82F6" }}>{t("ratings.filters.apply")}</button>
             {(driverFilter || minRating > 0) && (
-              <Link href="/dashboard/ratings?tab=driver_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>إعادة ضبط</Link>
+              <Link href="/dashboard/ratings?tab=driver_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>{t("ratings.filters.reset")}</Link>
             )}
           </form>
         )}
@@ -230,14 +230,14 @@ export default async function RatingsPage({
           <form className="flex flex-wrap gap-3 items-center">
             <input type="hidden" name="tab" value="user_ratings" />
             <select name="min_rating" defaultValue={minRating || ""} className="px-4 py-2.5 rounded-xl text-[13px] outline-none" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}>
-              <option value="">كل التقييمات</option>
-              <option value="4">4+ نجوم</option>
-              <option value="3">3+ نجوم</option>
-              <option value="1">1-2 نجوم</option>
+              <option value="">{t("ratings.filters.allRatings")}</option>
+              <option value="4">{t("ratings.filters.fourPlus")}</option>
+              <option value="3">{t("ratings.filters.threePlus")}</option>
+              <option value="1">{t("ratings.filters.oneTwo")}</option>
             </select>
-            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>تطبيق الفلتر</button>
+            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>{t("ratings.filters.apply")}</button>
             {minRating > 0 && (
-              <Link href="/dashboard/ratings?tab=user_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>إعادة ضبط</Link>
+              <Link href="/dashboard/ratings?tab=user_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>{t("ratings.filters.reset")}</Link>
             )}
           </form>
         )}
@@ -250,7 +250,7 @@ export default async function RatingsPage({
               const trip = rating.trips as unknown as { id: string; pickup_address: string; destination_address: string } | null;
               const stars = Math.round(Number(rating.rating));
               return (
-                <div key={rating.id} className="rounded-2xl p-5" style={{ background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div key={rating.id} className="dash-card p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "rgba(59,130,246,0.15)", color: "#60A5FA" }}>
@@ -258,7 +258,7 @@ export default async function RatingsPage({
                       </div>
                       <div>
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="font-bold text-text-primary">{user?.name || "مستخدم"}</span>
+                          <span className="font-bold text-text-primary">{user?.name || t("common.user")}</span>
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star key={i} size={14} fill={i < stars ? "#F59E0B" : "transparent"} style={{ color: i < stars ? "#F59E0B" : "var(--text-disabled)" }} />
@@ -272,7 +272,7 @@ export default async function RatingsPage({
                         {trip && (
                           <div className="flex items-center gap-2 text-[11px] text-text-disabled">
                             <Car size={12} />
-                            <span>رحلة: {trip.pickup_address?.slice(0, 30)}... → {trip.destination_address?.slice(0, 30)}...</span>
+                            <span>{t("ratings.trip")}: {trip.pickup_address?.slice(0, 30)}... → {trip.destination_address?.slice(0, 30)}...</span>
                           </div>
                         )}
                         <p className="text-[11px] text-text-disabled mt-2">{formatDate(rating.created_at)}</p>
@@ -280,7 +280,7 @@ export default async function RatingsPage({
                     </div>
                     <form action={`/api/ratings/delete`} method="POST">
                       <input type="hidden" name="rating_id" value={rating.id} />
-                      <button type="submit" className="p-2 rounded-lg hover:bg-error/10 text-text-tertiary hover:text-error transition-colors" title="حذف التقييم">
+                      <button type="submit" className="p-2 rounded-lg hover:bg-error/10 text-text-tertiary hover:text-error transition-colors" title={t("ratings.deleteRating")}>
                         <Trash2 size={16} />
                       </button>
                     </form>
@@ -299,7 +299,7 @@ export default async function RatingsPage({
               const driver = rating.driver as { name: string; role: string } | undefined;
               const stars = Math.round(Number(rating.rating));
               return (
-                <div key={rating.id} className="rounded-2xl p-5" style={{ background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div key={rating.id} className="dash-card p-5">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "#A78BFA" }}>
                       {(driver?.name || "?")[0]}
@@ -308,12 +308,12 @@ export default async function RatingsPage({
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <div className="flex items-center gap-1.5">
                           <Car size={12} className="text-emerald-400" />
-                          <span className="font-bold text-text-primary text-[13px]">{driver?.name || "سائق"}</span>
+                          <span className="font-bold text-text-primary text-[13px]">{driver?.name || t("common.driver")}</span>
                         </div>
                         <span className="text-[11px] text-text-disabled">←</span>
                         <div className="flex items-center gap-1.5">
                           <User size={12} className="text-blue-400" />
-                          <span className="text-text-secondary text-[13px]">{user?.name || "مستخدم"}</span>
+                          <span className="text-text-secondary text-[13px]">{user?.name || t("common.user")}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, i) => (
@@ -341,8 +341,8 @@ export default async function RatingsPage({
               <Star size={28} className="text-text-disabled opacity-40" />
             </div>
             <div className="text-center">
-              <p className="text-text-secondary font-semibold">لا توجد تقييمات</p>
-              <p className="text-text-tertiary text-sm mt-1">ستظهر التقييمات هنا بعد اكتمال الرحلات</p>
+              <p className="text-text-secondary font-semibold">{t("ratings.noRatings")}</p>
+              <p className="text-text-tertiary text-sm mt-1">{t("ratings.noRatingsDesc")}</p>
             </div>
           </div>
         )}
@@ -350,13 +350,13 @@ export default async function RatingsPage({
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
-            <div className="text-[11px] text-text-tertiary">صفحة {page} من {totalPages}</div>
+            <div className="text-[11px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</div>
             <div className="flex gap-2">
               {page > 1 && (
-                <Link href={`?tab=${tab}&page=${page - 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`} className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>السابق</Link>
+                <Link href={`?tab=${tab}&page=${page - 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`} className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>{t("common.previous")}</Link>
               )}
               {page < totalPages && (
-                <Link href={`?tab=${tab}&page=${page + 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`} className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>التالي</Link>
+                <Link href={`?tab=${tab}&page=${page + 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`} className="px-4 py-2 rounded-xl text-[12px] text-text-secondary hover:text-text-primary transition-colors" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>{t("common.next")}</Link>
               )}
             </div>
           </div>

@@ -57,10 +57,10 @@ export default async function DriverLocationsPage() {
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "إجمالي المواقع", value: totalCount, color: "#60A5FA", icon: MapPin },
-          { label: "متصل الآن", value: onlineCount, color: "#34D399", icon: Wifi },
-          { label: "غير متصل", value: totalCount - onlineCount, color: "#F87171", icon: WifiOff },
-          { label: "مستخدمين أونلاين", value: presenceData?.length || 0, color: "#A78BFA", icon: Navigation },
+          { label: t("driverLocations.stats.total"), value: totalCount, color: "#60A5FA", icon: MapPin },
+          { label: t("driverLocations.stats.online"), value: onlineCount, color: "#34D399", icon: Wifi },
+          { label: t("driverLocations.stats.offline"), value: totalCount - onlineCount, color: "#F87171", icon: WifiOff },
+          { label: t("driverLocations.stats.activeUsers"), value: presenceData?.length || 0, color: "#A78BFA", icon: Navigation },
         ].map((s) => (
           <div
             key={s.label}
@@ -77,26 +77,19 @@ export default async function DriverLocationsPage() {
       </div>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+      <div className="dash-table-card">
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #06B6D4, #0891B2)", boxShadow: "0 0 8px rgba(6,182,212,0.5)" }} />
-            <h3 className="text-[13px] font-bold text-text-primary">مواقع السائقين المسجلة</h3>
+            <h3 className="text-[13px] font-bold text-text-primary">{t("driverLocations.registeredLocations")}</h3>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["الحالة", "السائق", "الهاتف", "المركبة", "اللوحة", "الإحداثيات", "الاتجاه", "Geohash", "آخر تحديث"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("driverLocations.table.status"), t("driverLocations.table.driver"), t("driverLocations.table.phone"), t("driverLocations.table.vehicle"), t("driverLocations.table.plate"), t("driverLocations.table.coordinates"), t("driverLocations.table.heading"), t("driverLocations.table.geohash"), t("driverLocations.table.lastUpdate")].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -107,7 +100,7 @@ export default async function DriverLocationsPage() {
                 const profile = profileMap.get(loc.driver_id);
                 const online = isOnline(loc.driver_id);
                 return (
-                  <tr key={loc.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                  <tr key={loc.id} className="group/row dash-table-row">
                     <td className="py-3.5 px-4">
                       <span className="relative flex items-center gap-2">
                         <span
@@ -118,7 +111,7 @@ export default async function DriverLocationsPage() {
                           }}
                         />
                         <span className="text-[11px] font-semibold" style={{ color: online ? "#34D399" : "#6B7280" }}>
-                          {online ? "متصل" : "غير متصل"}
+                          {online ? t("driverLocations.online") : t("driverLocations.offline")}
                         </span>
                       </span>
                     </td>
@@ -160,7 +153,7 @@ export default async function DriverLocationsPage() {
                       <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
                         <MapPin size={24} className="opacity-40" />
                       </div>
-                      <p className="text-text-secondary font-semibold">لا توجد مواقع مسجلة</p>
+                      <p className="text-text-secondary font-semibold">{t("driverLocations.noLocations")}</p>
                     </div>
                   </td>
                 </tr>
@@ -171,20 +164,13 @@ export default async function DriverLocationsPage() {
       </div>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+      <div className="dash-table-card">
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #A78BFA, #7C3AED)", boxShadow: "0 0 8px rgba(167,139,250,0.5)" }} />
             <div>
-              <h3 className="text-[13px] font-bold text-text-primary">المستخدمين المتصلين (User Presence)</h3>
-              <p className="text-[10px] text-text-tertiary">{presenceData?.length || 0} مستخدم نشط</p>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("driverLocations.userPresence")}</h3>
+              <p className="text-[10px] text-text-tertiary">{presenceData?.length || 0} {t("driverLocations.activeUser")}</p>
             </div>
           </div>
         </div>
@@ -192,8 +178,8 @@ export default async function DriverLocationsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["الحالة", "المستخدم", "الإحداثيات", "آخر ظهور"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("driverLocations.table.status"), t("driverLocations.table.user"), t("driverLocations.table.coordinates"), t("driverLocations.table.lastSeen")].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -203,7 +189,7 @@ export default async function DriverLocationsPage() {
                 const online = (now.getTime() - new Date(p.last_seen).getTime()) < 5 * 60 * 1000;
                 const user = driverMap.get(p.user_id);
                 return (
-                  <tr key={p.user_id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                  <tr key={p.user_id} className="group/row dash-table-row">
                     <td className="py-3.5 px-4">
                       <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: online ? "#34D399" : "#6B7280", boxShadow: online ? "0 0 8px rgba(52,211,153,0.6)" : "none" }} />
                     </td>
@@ -219,7 +205,7 @@ export default async function DriverLocationsPage() {
               })}
               {(!presenceData || presenceData.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-text-disabled text-[13px]">لا توجد بيانات حضور</td>
+                  <td colSpan={4} className="py-12 text-center text-text-disabled text-[13px]">{t("driverLocations.noPresenceData")}</td>
                 </tr>
               )}
             </tbody>

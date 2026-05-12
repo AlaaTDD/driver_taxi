@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, Users, Car, MapPin, Tag, DollarSign,
@@ -13,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
+
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES & DATA
 ───────────────────────────────────────────────────────────────────────────── */
@@ -21,7 +23,7 @@ type NavItem = {
   href:   string;
   label:  string;
   icon:   LucideIcon;
-  /** "r,g,b" — used to build rgba() cleanly */
+  /** "r,g,b" — الآن موحد على لون الـ Primary فقط */
   rgb:    string;
   badge?: number;
 };
@@ -32,51 +34,61 @@ type NavGroup = {
   items:  NavItem[];
 };
 
-const NAV_GROUPS: NavGroup[] = [
+/* ────── تم توحيد الألوان كلها على أزرق الكوبالت (#1b4ec0 = 27,78,192) ────── */
+const PRIMARY_RGB = "27,78,192";
+
+const getNavGroups = (t: any): NavGroup[] => [
   {
     id: "overview",
     items: [
-      { href: "/dashboard",                  label: "لوحة التحكم",         icon: LayoutDashboard,      rgb: "96,165,250"  },
+      { href: "/dashboard",                  label: t("dashboard.overview"),          icon: LayoutDashboard,      rgb: PRIMARY_RGB },
     ],
   },
   {
     id: "people",
-    label: "الأشخاص",
+    label: t("sidebar.sections.people"),
     items: [
-      { href: "/dashboard/users",            label: "المستخدمين",          icon: Users,                rgb: "167,139,250" },
-      { href: "/dashboard/drivers",          label: "السائقين",            icon: Car,                  rgb: "34,211,238"  },
-      { href: "/dashboard/driver-locations", label: "مواقع السائقين",      icon: Navigation,           rgb: "99,179,237"  },
+      { href: "/dashboard/users",            label: t("common.users"),          icon: Users,                rgb: PRIMARY_RGB },
+      { href: "/dashboard/drivers",          label: t("common.drivers"),            icon: Car,                  rgb: PRIMARY_RGB },
+      { href: "/dashboard/driver-locations", label: t("common.driverLocations"),      icon: Navigation,           rgb: PRIMARY_RGB },
     ],
   },
   {
     id: "operations",
-    label: "العمليات",
+    label: t("sidebar.sections.operations"),
     items: [
-      { href: "/dashboard/trips",            label: "الرحلات",             icon: MapPin,               rgb: "52,211,153"  },
-      { href: "/dashboard/trip-offers",      label: "عروض الرحلات",        icon: ArrowLeftRight,       rgb: "192,132,252" },
-      { href: "/dashboard/ratings",          label: "التقييمات",           icon: Star,                 rgb: "234,179,8"   },
-      { href: "/dashboard/complaints",       label: "الشكاوي",             icon: MessageSquareWarning, rgb: "248,113,113" },
+      { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/trip-offers",      label: t("common.tripOffers"),        icon: ArrowLeftRight,       rgb: PRIMARY_RGB },
+      { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 rgb: PRIMARY_RGB },
+      { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, rgb: PRIMARY_RGB },
     ],
   },
   {
     id: "financial",
-    label: "المالية",
+    label: t("sidebar.sections.financial"),
     items: [
-      { href: "/dashboard/pricing",          label: "التسعير",             icon: DollarSign,           rgb: "74,222,128"  },
-      { href: "/dashboard/coupons",          label: "الكوبونات",           icon: Tag,                  rgb: "251,191,36"  },
-      { href: "/dashboard/user-coupons",     label: "كوبونات المستخدمين",  icon: Ticket,               rgb: "244,114,182" },
-      { href: "/dashboard/wallets",          label: "المحافظ المالية",     icon: Wallet,               rgb: "163,230,53"  },
-      { href: "/dashboard/withdrawals",      label: "طلبات السحب",         icon: Banknote,             rgb: "232,121,249" },
+      { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           rgb: PRIMARY_RGB },
+      { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  rgb: PRIMARY_RGB },
+      { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             rgb: PRIMARY_RGB },
     ],
   },
   {
     id: "system",
-    label: "النظام",
+    label: t("sidebar.sections.system"),
     items: [
-      { href: "/dashboard/vehicle-types",    label: "أنواع المركبات",      icon: Truck,                rgb: "45,212,191"  },
-      { href: "/dashboard/notifications",    label: "الإشعارات",           icon: Bell,                 rgb: "251,113,133" },
-      { href: "/dashboard/messages",         label: "الرسائل",             icon: MessageSquare,        rgb: "56,189,248"  },
-      { href: "/dashboard/admin-logs",       label: "سجل الأدمن",          icon: Shield,               rgb: "251,146,60"  },
+      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                rgb: PRIMARY_RGB },
+      { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 rgb: PRIMARY_RGB },
+      { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        rgb: PRIMARY_RGB },
+      { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               rgb: PRIMARY_RGB },
+    ],
+  },
+  {
+    id: "settings",
+    label: t("sidebar.sections.settings"),
+    items: [
+      { href: "/dashboard/settings",         label: t("common.settings"),    icon: Shield,               rgb: PRIMARY_RGB },
     ],
   },
 ];
@@ -99,7 +111,6 @@ function FloatingTooltip({ tip }: { tip: TooltipState }) {
       className="pointer-events-none fixed z-[9999] flex items-center"
       style={{ top: tip.y, right: COLLAPSED_W + 8, transform: "translateY(-50%)" }}
     >
-      {/* arrow pointing right toward sidebar */}
       <div
         className="w-0 h-0"
         style={{
@@ -122,7 +133,7 @@ function FloatingTooltip({ tip }: { tip: TooltipState }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   NAV LINK — theme-aware active/hover states
+   NAV LINK — theme-aware active/hover states (الآن كل الألوان موحدة)
 ───────────────────────────────────────────────────────────────────────────── */
 
 function NavLink({
@@ -140,7 +151,7 @@ function NavLink({
   onClose?:  () => void;
   onTooltip: (tip: TooltipState) => void;
 }) {
-  const { rgb } = item;
+  const { rgb } = item; // الآن دائماً سيأخذ PRIMARY_RGB
   const ref = useRef<HTMLAnchorElement>(null);
 
   const showTip = useCallback(() => {
@@ -198,7 +209,7 @@ function NavLink({
         />
       )}
 
-      {/* right accent bar */}
+      {/* right accent bar — بنفس اللون الموحد */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 rounded-l-full"
         style={{
@@ -271,7 +282,7 @@ function NavLink({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SIDEBAR CONTENT
+   SIDEBAR CONTENT (بدون تعديلات كبيرة، بس الألوان موحدة دلوقتي)
 ───────────────────────────────────────────────────────────────────────────── */
 
 function SidebarContent({
@@ -285,6 +296,9 @@ function SidebarContent({
 }) {
   const pathname = usePathname();
   const [tooltip, setTooltip] = useState<TooltipState>(null);
+  const t = useTranslations();
+  
+  const navGroups = getNavGroups(t);
 
   let idx = 0;
   const nextDelay = () => { const d = idx * 0.027; idx++; return d; };
@@ -311,7 +325,6 @@ function SidebarContent({
           collapsed ? "justify-center px-2 py-5" : "gap-3.5 px-5 pt-6 pb-5"
         )}
       >
-        {/* logomark */}
         <div className="relative flex-shrink-0">
           <div
             className="relative flex items-center justify-center rounded-xl border sidebar-logo"
@@ -320,68 +333,45 @@ function SidebarContent({
               height: collapsed ? 38 : 42,
             }}
           >
-            {/* inline taxi SVG */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{ width: collapsed ? 18 : 20, height: collapsed ? 18 : 20 }}
             >
-              {/* car body */}
-              <path
-                d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z"
-                fill="rgba(255,255,255,0.95)"
-              />
-              {/* car roof / windshield */}
-              <path
-                d="M5.5 14l2-5h9l2 5"
-                stroke="rgba(255,255,255,0.95)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="rgba(255,255,255,0.15)"
-              />
-              {/* taxi sign on top */}
+              <path d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" fill="rgba(255,255,255,0.95)" />
+              <path d="M5.5 14l2-5h9l2 5" stroke="rgba(255,255,255,0.95)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(255,255,255,0.15)" />
               <rect x="9" y="6" width="6" height="3" rx="1" fill="#FBBF24" />
               <rect x="10.5" y="6.7" width="3" height="1.5" rx="0.5" fill="#F59E0B" opacity="0.6" />
-              {/* wheels */}
               <circle cx="7" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
               <circle cx="17" cy="18" r="1.5" fill="rgba(255,255,255,0.9)" />
-              {/* headlights */}
               <rect x="19" y="14.5" width="1.5" height="1" rx="0.5" fill="#FBBF24" opacity="0.8" />
               <rect x="3.5" y="14.5" width="1.5" height="1" rx="0.5" fill="#FCA5A5" opacity="0.7" />
             </svg>
           </div>
         </div>
 
-        {/* brand text */}
         <div
           className="flex flex-col gap-0.5 overflow-hidden"
           style={{
-            width:      collapsed ? 0 : "auto",
-            opacity:    collapsed ? 0 : 1,
+            width: collapsed ? 0 : "auto",
+            opacity: collapsed ? 0 : 1,
             transition: "opacity 200ms ease, width 280ms cubic-bezier(0.16,1,0.3,1)",
           }}
         >
-          <span
-            className="sidebar-brand-name text-[16px] font-black leading-none tracking-tight whitespace-nowrap select-none"
-          >
-            تاكسي
+          <span className="sidebar-brand-name text-[16px] font-black leading-none tracking-tight whitespace-nowrap select-none">
+            Taxi
           </span>
-          <span
-            className="sidebar-brand-sub text-[9.5px] font-bold tracking-[0.15em] uppercase whitespace-nowrap select-none"
-          >
-            Admin Panel
+          <span className="sidebar-brand-sub text-[9.5px] font-bold tracking-[0.15em] whitespace-nowrap select-none">
+            {t("common.dashboard")}
           </span>
         </div>
       </div>
 
-      {/* divider */}
       <div className={cn("relative z-10 flex-shrink-0", collapsed ? "mx-2" : "mx-4")}>
         <div className="sidebar-divider h-px" />
       </div>
 
-      {/* ── NAV ─────────────────────────────────────────────────────────── */}
       <nav
         className={cn(
           "relative z-10 flex-1 overflow-y-auto py-3 hide-scrollbar",
@@ -392,10 +382,8 @@ function SidebarContent({
           WebkitMaskImage: "linear-gradient(to bottom, black 86%, transparent 100%)",
         }}
       >
-        {NAV_GROUPS.map((group, gi) => (
+        {navGroups.map((group, gi) => (
           <div key={group.id} className={cn(gi > 0 && "pt-4")}>
-
-            {/* group label — expanded */}
             {group.label && !collapsed && (
               <div className="flex items-center gap-2 px-3 pb-1.5">
                 <span className="sidebar-group-label text-[9px] font-bold tracking-[0.16em] uppercase whitespace-nowrap">
@@ -405,7 +393,6 @@ function SidebarContent({
               </div>
             )}
 
-            {/* collapsed group dot */}
             {group.label && collapsed && gi > 0 && (
               <div className="flex justify-center mb-1">
                 <div className="w-1 h-1 rounded-full sidebar-group-dot" />
@@ -434,17 +421,15 @@ function SidebarContent({
         ))}
       </nav>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
       <div className={cn("relative z-10 flex-shrink-0 pb-4", collapsed ? "px-2" : "px-3")}>
         <div className={cn("mb-3 h-px sidebar-divider", collapsed ? "mx-0" : "mx-1")} />
 
         {collapsed ? (
-          /* ━━ COLLAPSED: vertical stack of icon buttons ━━━━━━━━━━━━━━━ */
           <div className="flex flex-col items-center gap-1.5 mb-2">
             <div
               onMouseEnter={(e) => {
                 const r = e.currentTarget.getBoundingClientRect();
-                setTooltip({ label: "تغيير المظهر", y: r.top + r.height / 2 });
+                setTooltip({ label: t("sidebar.theme") || "تغيير المظهر", y: r.top + r.height / 2 });
               }}
               onMouseLeave={() => setTooltip(null)}
             >
@@ -453,7 +438,7 @@ function SidebarContent({
             <div
               onMouseEnter={(e) => {
                 const r = e.currentTarget.getBoundingClientRect();
-                setTooltip({ label: "تغيير اللغة", y: r.top + r.height / 2 });
+                setTooltip({ label: t("sidebar.language") || "تغيير اللغة", y: r.top + r.height / 2 });
               }}
               onMouseLeave={() => setTooltip(null)}
             >
@@ -461,69 +446,19 @@ function SidebarContent({
             </div>
           </div>
         ) : (
-          /* ━━ EXPANDED: settings card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-          <div
-            className="rounded-xl overflow-hidden mb-3"
-            style={{
-              background: "var(--sb-icon-bg)",
-              border: "1px solid var(--sb-nav-hover-border)",
-            }}
-          >
-            {/* theme toggle row */}
-            <div className="p-1.5">
-              <ThemeToggle collapsed={false} />
-            </div>
-
-            {/* divider */}
-            <div className="mx-2 h-px" style={{ background: "var(--sb-nav-hover-border)" }} />
-
-            {/* bottom row: language */}
-            <div className="p-1.5">
-              <LanguageSwitcher collapsed={false} />
-            </div>
+          <div className="mb-3 space-y-0.5">
+            <ThemeToggle collapsed={false} />
+            <LanguageSwitcher collapsed={false} />
           </div>
         )}
 
-        {/* collapse toggle */}
-        <button
-          onClick={onToggleCollapse}
-          onMouseEnter={(e) => {
-            if (!collapsed) return;
-            const r = e.currentTarget.getBoundingClientRect();
-            setTooltip({ label: "توسيع القائمة", y: r.top + r.height / 2 });
-          }}
-          onMouseLeave={() => setTooltip(null)}
-          className={cn(
-            "sidebar-footer-btn group relative flex w-full items-center rounded-xl text-[12px] font-semibold",
-            "transition-all duration-200 overflow-hidden mb-0.5",
-            collapsed ? "justify-center p-2" : "gap-3 px-3 py-2"
-          )}
-        >
-          <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 sidebar-nav-hover-fill" />
-          <div
-            className="relative flex-shrink-0 flex items-center justify-center rounded-lg transition-all duration-200"
-            style={{ width: collapsed ? 36 : 28, height: collapsed ? 36 : 28 }}
-          >
-            {collapsed
-              ? <PanelRightClose size={13} className="sidebar-footer-icon transition-colors" />
-              : <PanelRightOpen  size={13} className="sidebar-footer-icon transition-colors" />
-            }
-          </div>
-          {!collapsed && (
-            <span className="relative sidebar-footer-text transition-colors">
-              تصغير القائمة
-            </span>
-          )}
-        </button>
-
-        {/* logout */}
         <form action="/api/auth/logout" method="POST">
           <button
             type="submit"
             onMouseEnter={(e) => {
               if (!collapsed) return;
               const r = e.currentTarget.getBoundingClientRect();
-              setTooltip({ label: "تسجيل الخروج", y: r.top + r.height / 2 });
+              setTooltip({ label: t("sidebar.logout"), y: r.top + r.height / 2 });
             }}
             onMouseLeave={() => setTooltip(null)}
             className={cn(
@@ -543,36 +478,64 @@ function SidebarContent({
               />
             </div>
             {!collapsed && (
-              <span className="relative sidebar-logout-text transition-colors duration-200">
-                تسجيل الخروج
+              <span className="relative sidebar-logout-text transition-colors duration-200" style={{ color: "var(--error)" }}>
+                {t("sidebar.logout")}
               </span>
             )}
           </button>
         </form>
 
-        {/* version stamp */}
+        <button
+          onClick={onToggleCollapse}
+          onMouseEnter={(e) => {
+            if (!collapsed) return;
+            const r = e.currentTarget.getBoundingClientRect();
+            setTooltip({ label: t("sidebar.expand"), y: r.top + r.height / 2 });
+          }}
+          onMouseLeave={() => setTooltip(null)}
+          className={cn(
+            "sidebar-footer-btn group relative flex w-full items-center rounded-xl text-[12px] font-semibold",
+            "transition-all duration-200 overflow-hidden mt-1",
+            collapsed ? "justify-center p-2" : "gap-3 px-3 py-2"
+          )}
+        >
+          <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 sidebar-nav-hover-fill" />
+          <div
+            className="relative flex-shrink-0 flex items-center justify-center rounded-lg transition-all duration-200"
+            style={{ width: collapsed ? 36 : 28, height: collapsed ? 36 : 28 }}
+          >
+            {collapsed
+              ? <PanelRightClose size={13} className="sidebar-footer-icon transition-colors" />
+              : <PanelRightOpen  size={13} className="sidebar-footer-icon transition-colors" />
+            }
+          </div>
+          {!collapsed && (
+            <span className="relative sidebar-footer-text transition-colors">
+              {t("sidebar.collapse")}
+            </span>
+          )}
+        </button>
+
         {!collapsed && (
           <p className="sidebar-version text-center text-[9px] font-bold tracking-[0.15em] uppercase mt-3">
-            v2.0 · نظام إدارة تاكسي
+            v2.0 · {t("metadata.title")}
           </p>
         )}
       </div>
 
-      {/* floating tooltip — outside overflow clipping */}
       <FloatingTooltip tip={tooltip} />
     </div>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MAIN EXPORT
+   MAIN EXPORT (بدون تغيير)
 ───────────────────────────────────────────────────────────────────────────── */
 
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed,  setCollapsed]  = useState(false);
 
-  /* hydrate collapse preference */
   useEffect(() => {
     setTimeout(() => {
       try {
@@ -592,7 +555,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ── mobile toggle ─────────────────────────────────────────── */}
       <button
         onClick={() => setMobileOpen((v) => !v)}
         className="lg:hidden fixed top-4 right-4 z-50 p-2.5 rounded-xl sidebar-mobile-toggle"
@@ -601,7 +563,6 @@ export default function Sidebar() {
         {mobileOpen ? <X size={17} /> : <Menu size={17} />}
       </button>
 
-      {/* ── mobile backdrop ───────────────────────────────────────── */}
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 z-40 sidebar-backdrop backdrop-blur-sm"
@@ -609,7 +570,6 @@ export default function Sidebar() {
         />
       )}
 
-      {/* ── mobile drawer ─────────────────────────────────────────── */}
       <aside
         className={cn(
           "lg:hidden fixed inset-y-0 right-0 z-40 flex flex-col",
@@ -628,7 +588,6 @@ export default function Sidebar() {
         />
       </aside>
 
-      {/* ── desktop sidebar ───────────────────────────────────────── */}
       <aside
         className="hidden lg:flex flex-col sticky top-0 h-screen sidebar-panel border-l"
         style={{

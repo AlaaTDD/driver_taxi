@@ -16,6 +16,7 @@ import {
   Gauge,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface VehicleType {
   id: string;
@@ -34,6 +35,7 @@ export default function VehicleTypesClient({
 }: {
   vehicleTypes: VehicleType[];
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -113,12 +115,12 @@ export default function VehicleTypesClient({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">إدارة</span>
+            <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">{t("vehicleTypes.manage")}</span>
             <span className="w-1 h-1 rounded-full bg-teal-500/60" />
-            <span className="text-[11px] text-text-disabled">أنواع المركبات</span>
+            <span className="text-[11px] text-text-disabled">{t("vehicleTypes.title")}</span>
           </div>
-          <h1 className="page-title">أنواع المركبات</h1>
-          <p className="page-subtitle">إدارة أنواع المركبات والتسعير الخاص بكل نوع</p>
+          <h1 className="page-title">{t("vehicleTypes.title")}</h1>
+          <p className="page-subtitle">{t("vehicleTypes.subtitle")}</p>
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
@@ -126,23 +128,16 @@ export default function VehicleTypesClient({
           style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6)", color: "#fff", boxShadow: "0 4px 16px rgba(59,130,246,0.3)" }}
         >
           <Plus size={14} />
-          إضافة نوع جديد
+          {t("vehicleTypes.addType")}
         </button>
       </div>
 
       
       {showForm && (
-        <div
-          className="rounded-2xl p-6 space-y-5"
-          style={{
-            background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-            border: "1px solid rgba(255,255,255,0.05)",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-          }}
-        >
+        <div className="dash-card p-6 space-y-5">
           <div className="flex items-center justify-between">
             <h3 className="text-[15px] font-bold text-text-primary">
-              {editId ? "تعديل النوع" : "إضافة نوع جديد"}
+              {editId ? t("vehicleTypes.editType") : t("vehicleTypes.addType")}
             </h3>
             <button onClick={resetForm} className="p-1.5 rounded-lg hover:bg-white/5 text-text-tertiary">
               <X size={16} />
@@ -150,7 +145,7 @@ export default function VehicleTypesClient({
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">الاسم (فريد)</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.name")}</label>
               <input
                 type="text"
                 required
@@ -163,7 +158,7 @@ export default function VehicleTypesClient({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">الاسم المعروض</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.displayName")}</label>
               <input
                 type="text"
                 required
@@ -175,7 +170,7 @@ export default function VehicleTypesClient({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">الأيقونة</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.icon")}</label>
               <input
                 type="text"
                 required
@@ -187,7 +182,7 @@ export default function VehicleTypesClient({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">أجرة البدء</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.baseFare")}</label>
               <input
                 type="number"
                 step="0.01"
@@ -200,7 +195,7 @@ export default function VehicleTypesClient({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">سعر الكيلو</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.pricePerKm")}</label>
               <input
                 type="number"
                 step="0.01"
@@ -213,7 +208,7 @@ export default function VehicleTypesClient({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">الترتيب</label>
+              <label className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("vehicleTypes.form.sortOrder")}</label>
               <input
                 type="number"
                 required
@@ -226,7 +221,7 @@ export default function VehicleTypesClient({
             </div>
             <div className="sm:col-span-2 lg:col-span-3 flex justify-end gap-3 pt-2">
               <button type="button" onClick={resetForm} className="px-5 py-2 rounded-xl text-[13px] font-semibold text-text-secondary hover:text-text-primary transition-colors" style={{ border: "1px solid var(--divider)" }}>
-                إلغاء
+                {t("common.cancel") || "إلغاء"}
               </button>
               <button
                 type="submit"
@@ -235,7 +230,7 @@ export default function VehicleTypesClient({
                 style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}
               >
                 <Save size={13} />
-                {loading === "submit" ? "جاري الحفظ..." : editId ? "تحديث" : "إضافة"}
+                {loading === "submit" ? t("vehicleTypes.form.saving") : editId ? t("vehicleTypes.form.update") : t("vehicleTypes.form.add")}
               </button>
             </div>
           </form>
@@ -247,11 +242,9 @@ export default function VehicleTypesClient({
         {vehicleTypes.map((vt) => (
           <div
             key={vt.id}
-            className="group rounded-2xl p-5 transition-all hover:scale-[1.005]"
+            className="group dash-card p-5 transition-all hover:scale-[1.005]"
             style={{
-              background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-              border: `1px solid ${vt.is_active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)"}`,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)",
+              border: `1px solid ${vt.is_active ? "rgba(16,185,129,0.15)" : "var(--divider)"}`,
               opacity: vt.is_active ? 1 : 0.6,
             }}
           >
@@ -278,7 +271,7 @@ export default function VehicleTypesClient({
                         border: `1px solid ${vt.is_active ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
                       }}
                     >
-                      {vt.is_active ? "فعال" : "معطل"}
+                      {vt.is_active ? t("vehicleTypes.status.active") : t("vehicleTypes.status.inactive")}
                     </span>
                   </div>
                   <p className="text-[12px] text-text-tertiary mt-0.5 font-mono">{vt.name} • ترتيب: {vt.sort_order}</p>
@@ -288,12 +281,12 @@ export default function VehicleTypesClient({
               
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">أجرة البدء</div>
+                  <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">{t("vehicleTypes.form.baseFare")}</div>
                   <div className="text-[16px] font-black text-emerald-400 num">{formatCurrency(Number(vt.base_fare))}</div>
                 </div>
                 <div className="w-px h-10 bg-divider" />
                 <div className="text-center">
-                  <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">سعر الكيلو</div>
+                  <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">{t("vehicleTypes.form.pricePerKm")}</div>
                   <div className="text-[16px] font-black text-blue-400 num">{formatCurrency(Number(vt.price_per_km))}</div>
                 </div>
               </div>
@@ -338,8 +331,8 @@ export default function VehicleTypesClient({
                 <Car size={24} className="opacity-40" />
               </div>
               <div>
-                <p className="text-text-secondary font-semibold">لا توجد أنواع مركبات</p>
-                <p className="text-text-tertiary text-sm mt-1">أضف نوع مركبة جديد للبدء</p>
+                <p className="text-text-secondary font-semibold">{t("vehicleTypes.noTypes")}</p>
+                <p className="text-text-tertiary text-sm mt-1">{t("vehicleTypes.noTypesDesc")}</p>
               </div>
             </div>
           </div>

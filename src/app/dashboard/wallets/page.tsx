@@ -51,16 +51,16 @@ export default async function WalletsPage({
   const totalUserBalance = userWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
 
   const statCards = [
-    { label: "رصيد السائقين", value: formatCurrency(totalDriverBalance), color: "#34D399", icon: Car },
-    { label: "إجمالي أرباح السائقين", value: formatCurrency(totalDriverEarned), color: "#60A5FA", icon: TrendingUp },
-    { label: "إجمالي المسحوب", value: formatCurrency(totalDriverWithdrawn), color: "#F87171", icon: TrendingDown },
-    { label: "رصيد المستخدمين", value: formatCurrency(totalUserBalance), color: "#A78BFA", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), color: "#34D399", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), color: "#60A5FA", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), color: "#F87171", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), color: "#A78BFA", icon: User },
   ];
 
   const tabs = [
-    { key: "driver_wallets", label: "محافظ السائقين", count: driverWallets.length, color: "#34D399" },
-    { key: "user_wallets", label: "محافظ المستخدمين", count: userWallets.length, color: "#A78BFA" },
-    { key: "transactions", label: "المعاملات المالية", count: txRes.count || 0, color: "#60A5FA" },
+    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, color: "#34D399" },
+    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, color: "#A78BFA" },
+    { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, color: "#60A5FA" },
   ];
 
   /* ── Driver wallets with user info ── */
@@ -118,15 +118,15 @@ export default async function WalletsPage({
   }
 
   const txTypeLabels: Record<string, { label: string; color: string }> = {
-    trip_earning: { label: "أرباح رحلة", color: "#34D399" },
-    trip_payment: { label: "دفع رحلة", color: "#60A5FA" },
-    withdrawal: { label: "سحب", color: "#F87171" },
-    withdrawal_refund: { label: "استرداد سحب", color: "#FBBF24" },
-    top_up: { label: "شحن", color: "#A78BFA" },
-    refund: { label: "استرداد", color: "#06B6D4" },
-    bonus: { label: "بونص", color: "#10B981" },
-    penalty: { label: "غرامة", color: "#EF4444" },
-    adjustment: { label: "تعديل", color: "#8B5CF6" },
+    trip_earning: { label: t("wallets.txTypes.trip_earning"), color: "#34D399" },
+    trip_payment: { label: t("wallets.txTypes.trip_payment"), color: "#60A5FA" },
+    withdrawal: { label: t("wallets.txTypes.withdrawal"), color: "#F87171" },
+    withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), color: "#FBBF24" },
+    top_up: { label: t("wallets.txTypes.top_up"), color: "#A78BFA" },
+    refund: { label: t("wallets.txTypes.refund"), color: "#06B6D4" },
+    bonus: { label: t("wallets.txTypes.bonus"), color: "#10B981" },
+    penalty: { label: t("wallets.txTypes.penalty"), color: "#EF4444" },
+    adjustment: { label: t("wallets.txTypes.adjustment"), color: "#8B5CF6" },
   };
 
   return (
@@ -134,8 +134,8 @@ export default async function WalletsPage({
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-text-primary">المحافظ المالية</h1>
-          <p className="text-sm text-text-secondary mt-1">إدارة محافظ السائقين والمستخدمين والمعاملات المالية</p>
+          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("wallets.title")}</h1>
+          <p className="text-sm text-text-secondary mt-1">{t("wallets.subtitle")}</p>
         </div>
 
         {/* Stats */}
@@ -183,24 +183,24 @@ export default async function WalletsPage({
 
         {/* ── DRIVER WALLETS TAB ── */}
         {tab === "driver_wallets" && (
-          <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-            <div className="flex items-center gap-2.5 px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+          <div className="dash-table-card">
+            <div className="dash-section-header">
               <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #34D399, #059669)", boxShadow: "0 0 8px rgba(52,211,153,0.5)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">محافظ السائقين</h3>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.driverWallets")}</h3>
               <span className="text-text-disabled text-[11px]">({driverWalletsCount})</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                    {["السائق", "الهاتف", "الرصيد", "إجمالي الأرباح", "إجمالي المسحوب", "معلق السحب", "العمولة"].map((h) => (
+                  <tr className="dash-table-head">
+                    {[t("common.driver"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalEarned"), t("wallets.fields.totalWithdrawn"), t("wallets.fields.pendingWithdrawal"), t("wallets.fields.commission")].map((h) => (
                       <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {driverWalletsData.map((w) => (
-                    <tr key={w.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                    <tr key={w.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
@@ -220,7 +220,7 @@ export default async function WalletsPage({
                   {driverWalletsData.length === 0 && (
                     <tr><td colSpan={7} className="py-16 text-center text-text-disabled">
                       <Wallet size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>لا توجد محافظ سائقين</p>
+                      <p>{t("wallets.noDriverWallets")}</p>
                     </td></tr>
                   )}
                 </tbody>
@@ -231,24 +231,24 @@ export default async function WalletsPage({
 
         {/* ── USER WALLETS TAB ── */}
         {tab === "user_wallets" && (
-          <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-            <div className="flex items-center gap-2.5 px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+          <div className="dash-table-card">
+            <div className="dash-section-header">
               <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #A78BFA, #7C3AED)", boxShadow: "0 0 8px rgba(167,139,250,0.5)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">محافظ المستخدمين</h3>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.userWallets")}</h3>
               <span className="text-text-disabled text-[11px]">({userWalletsCount})</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                    {["المستخدم", "الهاتف", "الرصيد", "إجمالي المصروف", "إجمالي الشحن", "آخر تحديث"].map((h) => (
+                  <tr className="dash-table-head">
+                    {[t("common.user"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalSpent"), t("wallets.fields.totalToppedUp"), t("common.date")].map((h) => (
                       <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {userWalletsData.map((w) => (
-                    <tr key={w.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                    <tr key={w.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(167,139,250,0.15)", color: "#A78BFA" }}>
@@ -267,7 +267,7 @@ export default async function WalletsPage({
                   {userWalletsData.length === 0 && (
                     <tr><td colSpan={6} className="py-16 text-center text-text-disabled">
                       <Wallet size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>لا توجد محافظ مستخدمين</p>
+                      <p>{t("wallets.noUserWallets")}</p>
                     </td></tr>
                   )}
                 </tbody>
@@ -281,24 +281,24 @@ export default async function WalletsPage({
           <>
             {/* Filters */}
             <div className="flex items-center gap-3 flex-wrap">
-              <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>الكل</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>سائقين</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>مستخدمين</Link>
+              <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.all")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.drivers")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.users")}</Link>
             </div>
 
-            <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+            <div className="dash-table-card">
+              <div className="dash-section-header justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #3B82F6, #1D4ED8)", boxShadow: "0 0 8px rgba(59,130,246,0.5)" }} />
-                  <h3 className="text-[13px] font-bold text-text-primary">سجل المعاملات</h3>
+                  <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.txHistory")}</h3>
                   <span className="text-text-disabled text-[11px]">({txCount})</span>
                 </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                      {["المستخدم", "النوع", "الفئة", "المبلغ", "قبل", "بعد", "الحالة", "التاريخ"].map((h) => (
+                    <tr className="dash-table-head">
+                      {[t("common.user"), t("wallets.fields.type"), t("wallets.fields.category"), t("wallets.fields.amount"), t("wallets.fields.before"), t("wallets.fields.after"), t("common.status"), t("common.date")].map((h) => (
                         <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
@@ -308,11 +308,11 @@ export default async function WalletsPage({
                       const txMeta = txTypeLabels[tx.type] || { label: tx.type, color: "#9CA3AF" };
                       const isPositive = Number(tx.amount) > 0;
                       return (
-                        <tr key={tx.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                        <tr key={tx.id} className="group/row dash-table-row">
                           <td className="py-3.5 px-4 text-[12px] text-text-primary font-medium">{tx.user_name || tx.wallet_id?.substring(0, 8) + "..."}</td>
                           <td className="py-3.5 px-4">
                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: tx.wallet_type === "driver" ? "rgba(52,211,153,0.1)" : "rgba(167,139,250,0.1)", color: tx.wallet_type === "driver" ? "#34D399" : "#A78BFA", border: `1px solid ${tx.wallet_type === "driver" ? "rgba(52,211,153,0.2)" : "rgba(167,139,250,0.2)"}` }}>
-                              {tx.wallet_type === "driver" ? "سائق" : "مستخدم"}
+                              {tx.wallet_type === "driver" ? t("common.driver") : t("common.user")}
                             </span>
                           </td>
                           <td className="py-3.5 px-4">
@@ -327,7 +327,7 @@ export default async function WalletsPage({
                           <td className="py-3.5 px-4 text-[12px] num text-text-secondary font-medium">{formatCurrency(Number(tx.balance_after))}</td>
                           <td className="py-3.5 px-4">
                             <Badge variant={tx.status === "completed" ? "success" : tx.status === "failed" ? "error" : "warning"} dot>
-                              {tx.status === "completed" ? "مكتمل" : tx.status === "failed" ? "فشل" : tx.status === "reversed" ? "معكوس" : "معلق"}
+                              {tx.status === "completed" ? t("wallets.status.completed") : tx.status === "failed" ? t("wallets.status.failed") : tx.status === "reversed" ? t("wallets.status.reversed") : t("wallets.status.pending")}
                             </Badge>
                           </td>
                           <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{formatDate(tx.created_at)}</td>
@@ -337,7 +337,7 @@ export default async function WalletsPage({
                     {transactions.length === 0 && (
                       <tr><td colSpan={8} className="py-16 text-center text-text-disabled">
                         <ArrowUpDown size={32} className="mx-auto mb-3 opacity-30" />
-                        <p>لا توجد معاملات</p>
+                        <p>{t("wallets.noTransactions")}</p>
                       </td></tr>
                     )}
                   </tbody>
@@ -350,14 +350,14 @@ export default async function WalletsPage({
                   {page > 1 && (
                     <Link href={`/dashboard/wallets?tab=transactions&page=${page - 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
                       className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                      السابق
+                      {t("common.previous")}
                     </Link>
                   )}
-                  <span className="text-[12px] text-text-tertiary">صفحة {page} من {txTotalPages}</span>
+                  <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {txTotalPages}</span>
                   {page < txTotalPages && (
                     <Link href={`/dashboard/wallets?tab=transactions&page=${page + 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
                       className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                      التالي
+                      {t("common.next")}
                     </Link>
                   )}
                 </div>

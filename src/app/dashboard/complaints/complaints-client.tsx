@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 
 interface ComplaintsClientProps {
   filterStatus: string;
@@ -24,6 +25,7 @@ export default function ComplaintsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const t = useTranslations();
 
   const updateParams = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -45,33 +47,33 @@ export default function ComplaintsClient({
       <select value={filterStatus} onChange={(e) => updateParams("status", e.target.value)}
         className="appearance-none px-3 py-2 rounded-xl text-[12px] outline-none cursor-pointer"
         style={selectStyle} id="complaints-status-filter">
-        <option value="">كل الحالات</option>
-        <option value="open">مفتوح</option>
-        <option value="in_progress">قيد المعالجة</option>
-        <option value="resolved">محلول</option>
-        <option value="closed">مغلق</option>
+        <option value="">{t("common.allStatuses")}</option>
+        <option value="open">{t("complaints.statuses.open")}</option>
+        <option value="in_progress">{t("complaints.statuses.in_progress")}</option>
+        <option value="resolved">{t("complaints.statuses.resolved")}</option>
+        <option value="closed">{t("complaints.statuses.closed")}</option>
       </select>
 
       <select value={filterPriority} onChange={(e) => updateParams("priority", e.target.value)}
         className="appearance-none px-3 py-2 rounded-xl text-[12px] outline-none cursor-pointer"
         style={selectStyle} id="complaints-priority-filter">
-        <option value="">كل الأولويات</option>
-        <option value="urgent">عاجل</option>
-        <option value="high">مرتفع</option>
-        <option value="normal">عادي</option>
-        <option value="low">منخفض</option>
+        <option value="">{t("common.all")} {t("complaints.priority.label")}</option>
+        <option value="urgent">{t("complaints.priority.urgent")}</option>
+        <option value="high">{t("complaints.priority.high")}</option>
+        <option value="normal">{t("complaints.priority.normal")}</option>
+        <option value="low">{t("complaints.priority.low")}</option>
       </select>
 
       <select value={filterCategory} onChange={(e) => updateParams("category", e.target.value)}
         className="appearance-none px-3 py-2 rounded-xl text-[12px] outline-none cursor-pointer"
         style={selectStyle} id="complaints-category-filter">
-        <option value="">كل التصنيفات</option>
-        <option value="general">عام</option>
-        <option value="driver">سائق</option>
-        <option value="trip">رحلة</option>
-        <option value="payment">دفع</option>
-        <option value="app">تطبيق</option>
-        <option value="other">أخرى</option>
+        <option value="">{t("common.all")} {t("complaints.category")}</option>
+        <option value="general">{t("complaints.categories.general")}</option>
+        <option value="driver">{t("complaints.categories.driver")}</option>
+        <option value="trip">{t("complaints.categories.trip")}</option>
+        <option value="payment">{t("complaints.categories.payment")}</option>
+        <option value="app">{t("complaints.categories.app")}</option>
+        <option value="other">{t("complaints.categories.other")}</option>
       </select>
 
       {totalPages > 1 && (

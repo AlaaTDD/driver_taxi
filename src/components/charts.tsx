@@ -48,55 +48,6 @@ const TOOLTIP_STYLE = {
   padding: "10px 14px",
 };
 
-function ChartCard({
-  children,
-  title,
-  accent = "#3B82F6",
-  subtitle,
-}: {
-  children: React.ReactNode;
-  title: string;
-  accent?: string;
-  subtitle?: string;
-}) {
-  return (
-    <div
-      className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--divider)",
-        boxShadow: "var(--shadow-md)",
-      }}
-    >
-      
-      <div
-        className="absolute top-0 left-0 right-0 h-[2px]"
-        style={{
-          background: `linear-gradient(to left, transparent, ${accent}, transparent)`,
-          opacity: 0.5,
-        }}
-      />
-
-      <div className="relative p-5">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div
-            className="w-[3px] h-5 rounded-full shrink-0"
-            style={{
-              background: `linear-gradient(to bottom, ${accent}, ${accent}88)`,
-              boxShadow: `0 0 8px ${accent}60`,
-            }}
-          />
-          <div>
-            <h3 className="text-[13px] font-bold text-text-primary">{title}</h3>
-            {subtitle && <p className="text-[11px] text-text-tertiary mt-0.5">{subtitle}</p>}
-          </div>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function useChartSize() {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -121,83 +72,81 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
   const t = useTranslations();
   const { ref, width } = useChartSize();
   const total = data.reduce((s, d) => s + d.value, 0);
+  
+  /* Find the largest slice for center text */
+  const maxEntry = data.reduce((a, b) => (a.value > b.value ? a : b), data[0] || { value: 0, name: "" });
+  const maxPercent = total > 0 ? Math.round((maxEntry.value / total) * 100) : 0;
 
   return (
-    <ChartCard title={t("dashboard.charts.tripStatus")} subtitle={`${total} ${t("dashboard.charts.totalTrips")}`} accent="#3B82F6">
-      <div ref={ref} className="w-full flex flex-col items-center">
-        <div className="h-56 w-full">
+    <div ref={ref} className="w-full">
+      <div className="flex flex-col lg:flex-row items-center gap-6">
+        {/* Donut chart with center label */}
+        <div className="relative flex-shrink-0" style={{ width: Math.min(width * 0.55, 220), height: Math.min(width * 0.55, 220) }}>
           {width > 0 && data.length > 0 ? (
-            <PieChart width={width} height={224}>
-              <Pie
-                data={data}
-                cx={width / 2}
-                cy={105}
-                innerRadius={Math.min(width, 224) * 0.26}
-                outerRadius={Math.min(width, 224) * 0.42}
-                paddingAngle={3}
-                dataKey="value"
-                strokeWidth={0}
-                labelLine={false}
-                label={({ cx, cy, midAngle, outerRadius, value }) => {
-                  const RADIAN = Math.PI / 180;
-                  const radius = (outerRadius ?? 0) + 18;
-                  const mAngle = midAngle ?? 0;
-                  const x = cx + radius * Math.cos(-mAngle * RADIAN);
-                  const y = cy + radius * Math.sin(-mAngle * RADIAN);
-                  return (
-                    <text
-                      x={x}
-                      y={y}
-                      textAnchor={x > cx ? "start" : "end"}
-                      dominantBaseline="central"
-                      fill="var(--text-secondary)"
-                      fontSize={11}
-                      fontFamily="'Cairo', sans-serif"
-                    >
-                      {((Number(value) / total) * 100).toFixed(0)}%
-                    </text>
-                  );
-                }}
-              >
-                {data.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={PIE_COLORS[index % PIE_COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={TOOLTIP_STYLE}
-                formatter={(value: unknown, name?: unknown) => {
-                  const v = Number(value ?? 0);
-                  return [`${v} ${t("dashboard.charts.tripsLabel")} (${((v / total) * 100).toFixed(1)}%)`, String(name ?? "")] as unknown as [string, string];
-                }}
-              />
-            </PieChart>
+            <>
+              <PieChart width={Math.min(width * 0.55, 220)} height={Math.min(width * 0.55, 220)}>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="60%"
+                  outerRadius="85%"
+                  paddingAngle={3}
+                  dataKey="value"
+                  strokeWidth={0}
+                  labelLine={false}
+                >
+                  {data.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={TOOLTIP_STYLE}
+                  formatter={(value: unknown, name?: unknown) => {
+                    const v = Number(value ?? 0);
+                    return [`${v} ${t("dashboard.charts.tripsLabel")} (${((v / total) * 100).toFixed(1)}%)`, String(name ?? "")] as unknown as [string, string];
+                  }}
+                />
+              </PieChart>
+              {/* Center percentage text */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-[28px] font-black text-text-primary num leading-none">{maxPercent}%</span>
+                <span className="text-[10px] text-text-tertiary mt-1 font-medium">إجمالي الرحلات</span>
+              </div>
+            </>
           ) : (
             <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
           )}
         </div>
-        
-        {data.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2 pb-1">
-            {data.map((entry, index) => (
-              <div key={entry.name} className="flex items-center gap-1.5">
-                <span
-                  className="inline-block rounded-full"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    background: PIE_COLORS[index % PIE_COLORS.length],
-                  }}
-                />
-                <span className="text-[11px] text-text-secondary">{entry.name}</span>
-              </div>
-            ))}
+
+        {/* Legend on the right */}
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="mb-3">
+            <p className="text-[11px] text-text-tertiary font-medium">إجمالي الرحلات</p>
+            <p className="text-[18px] font-black text-primary num">{total} <span className="text-[12px] text-text-tertiary font-medium">رحلة إجمالاً</span></p>
           </div>
-        )}
+          {data.map((entry, index) => (
+            <div key={entry.name} className="flex items-center gap-2.5 py-1">
+              <span
+                className="w-3 h-3 rounded-full flex-shrink-0"
+                style={{
+                  background: PIE_COLORS[index % PIE_COLORS.length],
+                }}
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-[12px] font-semibold text-text-primary">{entry.name}</span>
+              </div>
+              <span className="text-[11px] text-text-tertiary font-medium num">
+                {entry.value} ({total > 0 ? Math.round((entry.value / total) * 100) : 0}%) رحلة
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-    </ChartCard>
+    </div>
   );
 }
 
@@ -207,85 +156,83 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
   return (
-    <ChartCard title={t("dashboard.charts.revenueByVehicle")} subtitle={`${t("dashboard.charts.totalLabel")}: ${formatCurrency(total)}`} accent="#10B981">
-      <div ref={ref} className="h-64 w-full">
-        {width > 0 && height > 0 && data.length > 0 ? (
-          <BarChart data={data} width={width} height={height} barCategoryGap="40%">
-            <defs>
-              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.7} />
-              </linearGradient>
-              <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10B981" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#059669" stopOpacity={0.7} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgba(26,45,71,0.6)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="name"
-              stroke="var(--text-tertiary)"
-              fontSize={12}
-              fontFamily="'Cairo', sans-serif"
-              tick={{ fill: "var(--text-secondary)" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              stroke="var(--text-tertiary)"
-              fontSize={11}
-              tick={{ fill: "var(--text-tertiary)" }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-            />
-            <Tooltip
-              contentStyle={TOOLTIP_STYLE}
-              cursor={{ fill: "rgba(59,130,246,0.06)", radius: 8 }}
-              formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), t("dashboard.charts.revenueLabel")]}
-            />
-            <Bar
-              dataKey="revenue"
-              radius={[8, 8, 0, 0]}
-              maxBarSize={80}
-            >
-              {data.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={index === 0 ? "url(#barGradient)" : "url(#barGradient2)"}
-                  style={{ filter: "drop-shadow(0 4px 8px rgba(59,130,246,0.2))" }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        ) : (
-          <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
-        )}
-      </div>
-      
-      {data.length > 0 && (
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {data.map((d, i) => (
-            <div
-              key={d.name}
-              className="flex items-center justify-between p-2.5 rounded-xl"
-              style={{
-                background: "var(--surface-elevated)",
-                border: "1px solid var(--divider)",
-              }}
-            >
-              <span className="text-[11px] text-text-tertiary">{d.name}</span>
-              <span className="text-[12px] font-bold" style={{ color: i === 0 ? "#60A5FA" : "#34D399" }}>
-                {formatCurrency(d.revenue)}
-              </span>
+    <div ref={ref} className="w-full">
+      <div className="flex flex-col gap-4">
+        {/* Revenue summary */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-text-tertiary font-medium">إجمالي الإيرادات</p>
+            <p className="text-[22px] font-black text-primary num">{formatCurrency(total)}</p>
+            <div className="flex items-center gap-1 mt-0.5">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 2L10 7H2L6 2Z" fill="var(--success)" />
+              </svg>
+              <span className="text-[11px] font-bold" style={{ color: "var(--success)" }}>12.5%</span>
+              <span className="text-[10px] text-text-disabled">عن الشهر السابق</span>
             </div>
-          ))}
+          </div>
+          {/* Period selector */}
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-text-secondary hover:bg-surface-elevated transition-all"
+            style={{ border: "1px solid var(--divider)" }}
+          >
+            هذا الشهر
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M3 4L5 6L7 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
-      )}
-    </ChartCard>
+
+        {/* Bar chart */}
+        <div className="h-52 w-full">
+          {width > 0 && data.length > 0 ? (
+            <BarChart data={data} width={width} height={208} barCategoryGap="40%">
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.75} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--divider)"
+                vertical={false}
+                opacity={0.5}
+              />
+              <XAxis
+                dataKey="name"
+                stroke="var(--text-tertiary)"
+                fontSize={12}
+                fontFamily="'Cairo', sans-serif"
+                tick={{ fill: "var(--text-secondary)" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                stroke="var(--text-tertiary)"
+                fontSize={11}
+                tick={{ fill: "var(--text-tertiary)" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${v} ج.م`}
+              />
+              <Tooltip
+                contentStyle={TOOLTIP_STYLE}
+                cursor={{ fill: "rgba(59,130,246,0.06)", radius: 8 }}
+                formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), t("dashboard.charts.revenueLabel")]}
+              />
+              <Bar
+                dataKey="revenue"
+                radius={[8, 8, 0, 0]}
+                maxBarSize={60}
+                fill="url(#barGradient)"
+              />
+            </BarChart>
+          ) : (
+            <div className="h-full flex items-center justify-center text-text-tertiary text-sm">{t("common.noData")}</div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

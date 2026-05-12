@@ -37,13 +37,11 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden"
+    <form onSubmit={handleSubmit} className="dash-card overflow-hidden"
       style={{
-        background: "linear-gradient(145deg, var(--surface-elevated), var(--surface))",
         border: "1px solid rgba(59,130,246,0.15)",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.2)",
       }}>
-      <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+      <div className="dash-section-header">
         <div className="w-[3px] h-5 rounded-full"
           style={{ background: "linear-gradient(to bottom, #3B82F6, #6366F1)", boxShadow: "0 0 8px rgba(59,130,246,0.5)" }} />
         <h3 className="text-[13px] font-bold text-text-primary">الرد على الشكوى</h3>

@@ -66,11 +66,11 @@ export default async function TripOffersPage({
   };
 
   const statCards = [
-    { label: "الكل", value: stats.total, color: "#60A5FA", bg: "rgba(59,130,246,0.1)", href: "?" },
-    { label: "معلق", value: stats.pending, color: "#FBBF24", bg: "rgba(245,158,11,0.1)", href: "?status=pending" },
-    { label: "مقبول", value: stats.accepted, color: "#34D399", bg: "rgba(16,185,129,0.1)", href: "?status=accepted" },
-    { label: "مرفوض", value: stats.rejected, color: "#F87171", bg: "rgba(239,68,68,0.1)", href: "?status=rejected" },
-    { label: "منتهي", value: stats.expired, color: "#9CA3AF", bg: "rgba(107,114,128,0.1)", href: "?status=expired" },
+    { label: t("tripOffers.stats.all"), value: stats.total, color: "#60A5FA", bg: "rgba(59,130,246,0.1)", href: "?" },
+    { label: t("tripOffers.stats.pending"), value: stats.pending, color: "#FBBF24", bg: "rgba(245,158,11,0.1)", href: "?status=pending" },
+    { label: t("tripOffers.stats.accepted"), value: stats.accepted, color: "#34D399", bg: "rgba(16,185,129,0.1)", href: "?status=accepted" },
+    { label: t("tripOffers.stats.rejected"), value: stats.rejected, color: "#F87171", bg: "rgba(239,68,68,0.1)", href: "?status=rejected" },
+    { label: t("tripOffers.stats.expired"), value: stats.expired, color: "#9CA3AF", bg: "rgba(107,114,128,0.1)", href: "?status=expired" },
   ];
 
   return (
@@ -103,20 +103,13 @@ export default async function TripOffersPage({
       </div>
 
       
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
-        }}
-      >
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--divider)" }}>
+      <div className="dash-table-card">
+        <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #8B5CF6, #6D28D9)", boxShadow: "0 0 8px rgba(139,92,246,0.5)" }} />
             <div>
-              <h3 className="text-[13px] font-bold text-text-primary">قائمة العروض</h3>
-              <p className="text-[10px] text-text-tertiary">صفحة {page} من {totalPages || 1} — {count || 0} عرض</p>
+              <h3 className="text-[13px] font-bold text-text-primary">{t("tripOffers.list")}</h3>
+              <p className="text-[10px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages || 1} — {count || 0}</p>
             </div>
           </div>
           {statusFilter && (
@@ -126,7 +119,7 @@ export default async function TripOffersPage({
               style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
             >
               <X size={10} />
-              مسح الفلتر
+              {t("tripOffers.clearFilter")}
             </Link>
           )}
         </div>
@@ -134,8 +127,8 @@ export default async function TripOffersPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: "var(--surface-glass)", borderBottom: "1px solid var(--divider)" }}>
-                {["السائق", "الراكب", "العنوان", "حالة العرض", "حالة الرحلة", "تاريخ الإرسال", "تاريخ الرد", "إجراء"].map((h) => (
+              <tr className="dash-table-head">
+                {[t("tripOffers.table.driver"), t("tripOffers.table.passenger"), t("tripOffers.table.address"), t("tripOffers.table.offerStatus"), t("tripOffers.table.tripStatus"), t("tripOffers.table.sentAt"), t("tripOffers.table.respondedAt"), t("tripOffers.table.action")].map((h) => (
                   <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">
                     {h}
                   </th>
@@ -146,7 +139,7 @@ export default async function TripOffersPage({
               {(offers || []).map((offer) => {
                 const trip = tripMap.get(offer.trip_id);
                 return (
-                  <tr key={offer.id} className="group/row table-row-hover" style={{ borderBottom: "1px solid rgba(26,45,71,0.5)" }}>
+                  <tr key={offer.id} className="group/row dash-table-row">
                     <td className="py-3.5 px-4">
                       <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
                         <Car size={11} className="text-cyan-400" />
@@ -190,7 +183,7 @@ export default async function TripOffersPage({
                           style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
                         >
                           <Eye size={12} />
-                          الرحلة
+                          {t("tripOffers.trip")}
                         </Link>
                         {offer.status === "pending" && (
                           <form action="/api/trip-offers/cancel" method="POST">
@@ -202,7 +195,7 @@ export default async function TripOffersPage({
                               style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
                             >
                               <X size={12} />
-                              إلغاء
+                              {t("tripOffers.cancel")}
                             </button>
                           </form>
                         )}
@@ -220,8 +213,8 @@ export default async function TripOffersPage({
                         <ArrowLeftRight size={24} className="opacity-40" />
                       </div>
                       <div>
-                        <p className="text-text-secondary font-semibold">لا توجد عروض</p>
-                        <p className="text-text-tertiary text-sm mt-1">لم يتم إرسال أي عروض رحلات بعد</p>
+                        <p className="text-text-secondary font-semibold">{t("tripOffers.noOffers")}</p>
+                        <p className="text-text-tertiary text-sm mt-1">{t("tripOffers.noOffersDesc")}</p>
                       </div>
                     </div>
                   </td>
@@ -240,17 +233,17 @@ export default async function TripOffersPage({
                 className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition"
                 style={{ border: "1px solid var(--divider)" }}
               >
-                السابق
+                {t("common.previous")}
               </Link>
             )}
-            <span className="text-[12px] text-text-tertiary">صفحة {page} من {totalPages}</span>
+            <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
             {page < totalPages && (
               <Link
                 href={`/dashboard/trip-offers?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
                 className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition"
                 style={{ border: "1px solid var(--divider)" }}
               >
-                التالي
+                {t("common.next")}
               </Link>
             )}
           </div>
