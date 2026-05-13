@@ -128,12 +128,7 @@ export default async function WithdrawalsPage({
             <Link
               key={f.value}
               href={`/dashboard/withdrawals${f.value ? `?status=${f.value}` : ""}`}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all"
-              style={{
-                background: statusFilter === f.value ? "rgba(59,130,246,0.15)" : "var(--surface-glass)",
-                color: statusFilter === f.value ? "#60A5FA" : "var(--text-tertiary)",
-                border: `1px solid ${statusFilter === f.value ? "rgba(59,130,246,0.3)" : "var(--divider)"}`,
-              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all ${statusFilter === f.value ? 'bg-primary-surface text-primary border border-primary/30' : 'bg-surface-glass text-text-tertiary border border-divider hover:bg-surface-elevated'}`}
             >
               {f.label}
               <span className="text-[10px] opacity-70">({f.count})</span>
@@ -145,7 +140,7 @@ export default async function WithdrawalsPage({
         <div className="dash-table-card">
           <div className="dash-section-header justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #E879F9, #A855F7)", boxShadow: "0 0 8px rgba(232,121,249,0.5)" }} />
+              <div className="w-[3px] h-5 rounded-full bg-gradient-to-b from-primary to-primary-dark shadow-[0_0_8px_var(--primary)]" />
               <h3 className="text-[13px] font-bold text-text-primary">{t("withdrawals.title")}</h3>
               <span className="text-text-disabled text-[11px]">({count || 0})</span>
             </div>
@@ -198,8 +193,7 @@ export default async function WithdrawalsPage({
                               <button
                                 type="submit"
                                 id={`approve-withdrawal-${req.id}`}
-                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition-all hover:scale-105"
-                                style={{ background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 8px rgba(16,185,129,0.3)" }}
+                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition-all hover:scale-105 bg-success shadow-sm shadow-success/30"
                               >
                                 {t("common.accept")}
                               </button>
@@ -209,8 +203,7 @@ export default async function WithdrawalsPage({
                               <button
                                 type="submit"
                                 id={`reject-withdrawal-${req.id}`}
-                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-                                style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
+                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-error/15 text-error border border-error/25 hover:bg-error/25"
                               >
                                 {t("common.reject")}
                               </button>
@@ -243,18 +236,18 @@ export default async function WithdrawalsPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
+            <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
               {page > 1 && (
                 <Link href={`/dashboard/withdrawals?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
-                  className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                  {t("common.previous")}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                  <ChevronRight size={14} />
                 </Link>
               )}
-              <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
+              <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
               {page < totalPages && (
                 <Link href={`/dashboard/withdrawals?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
-                  className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                  {t("common.next")}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                  <ChevronLeft size={14} />
                 </Link>
               )}
             </div>

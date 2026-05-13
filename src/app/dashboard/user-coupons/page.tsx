@@ -93,12 +93,7 @@ export default async function UserCouponsPage({
           <Link
             key={f.value}
             href={`/dashboard/user-coupons${f.value ? `?used=${f.value}` : ""}`}
-            className="px-4 py-2 rounded-xl text-[12px] font-semibold transition-all"
-            style={{
-              background: usedFilter === f.value ? "rgba(59,130,246,0.15)" : "var(--surface-glass)",
-              color: usedFilter === f.value ? "#60A5FA" : "var(--text-tertiary)",
-              border: `1px solid ${usedFilter === f.value ? "rgba(59,130,246,0.3)" : "var(--divider)"}`,
-            }}
+            className={`px-4 py-2 rounded-xl text-[12px] font-semibold transition-all ${usedFilter === f.value ? 'bg-primary-surface text-primary border border-primary/30' : 'bg-surface-glass text-text-tertiary border border-divider hover:bg-surface-elevated'}`}
           >
             {f.label} ({f.count})
           </Link>
@@ -109,7 +104,7 @@ export default async function UserCouponsPage({
       <div className="dash-table-card">
         <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #F59E0B, #D97706)", boxShadow: "0 0 8px rgba(245,158,11,0.5)" }} />
+            <div className="w-[3px] h-5 rounded-full bg-gradient-to-b from-primary to-primary-dark shadow-[0_0_8px_var(--primary)]" />
             <h3 className="text-[13px] font-bold text-text-primary">{t("userCoupons.title")}</h3>
           </div>
         </div>
@@ -157,12 +152,7 @@ export default async function UserCouponsPage({
                     </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                        style={{
-                          background: uc.is_used ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
-                          color: uc.is_used ? "#34D399" : "#FBBF24",
-                          border: `1px solid ${uc.is_used ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.25)"}`,
-                        }}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${uc.is_used ? "bg-success/15 text-success border border-success/25" : "bg-warning/15 text-warning border border-warning/25"}`}
                       >
                         {uc.is_used ? <><CheckCircle size={10} /> {t("userCoupons.status.used")}</> : <><Clock size={10} /> {t("userCoupons.status.unused")}</>}
                       </span>
@@ -181,8 +171,8 @@ export default async function UserCouponsPage({
                 <tr>
                   <td colSpan={8} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3 text-text-disabled">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
-                        <Ticket size={24} className="opacity-40" />
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-surface-glass border border-divider">
+                        <Ticket size={28} className="opacity-40 text-text-disabled" />
                       </div>
                       <p className="text-text-secondary font-semibold">{t("userCoupons.noCoupons")}</p>
                     </div>
@@ -195,17 +185,17 @@ export default async function UserCouponsPage({
 
         
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
+          <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
             {page > 1 && (
               <Link href={`/dashboard/user-coupons?page=${page - 1}${usedFilter ? `&used=${usedFilter}` : ""}`}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
                 السابق
               </Link>
             )}
             <span className="text-[12px] text-text-tertiary">صفحة {page} من {totalPages}</span>
             {page < totalPages && (
               <Link href={`/dashboard/user-coupons?page=${page + 1}${usedFilter ? `&used=${usedFilter}` : ""}`}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
                 التالي
               </Link>
             )}

@@ -70,7 +70,12 @@ function useChartSize() {
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const cr = entry.contentRect;
-        setSize({ width: Math.floor(cr.width), height: Math.floor(cr.height) });
+        const newWidth = Math.floor(cr.width);
+        const newHeight = Math.floor(cr.height);
+        setSize(prev => {
+          if (prev.width === newWidth && prev.height === newHeight) return prev;
+          return { width: newWidth, height: newHeight };
+        });
       }
     });
     ro.observe(el);

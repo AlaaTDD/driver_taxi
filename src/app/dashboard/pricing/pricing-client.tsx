@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Plus, Save, X, Trash2, Power, PowerOff, Car, Bike, Truck, Zap, Star } from "lucide-react";
+import { Plus, Save, X, Trash2, Power, PowerOff, Car, Bike, Truck, Zap, Star, Pencil, GripVertical } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 interface VehicleType {
@@ -176,7 +176,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
 
   return (
     <div className="space-y-6">
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -196,11 +196,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
           </div>
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all hover:-translate-y-0.5"
-            style={{
-              background: "linear-gradient(135deg, #10B981, #059669)",
-              boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
-            }}
+            className="btn btn-primary px-4 py-2.5 rounded-xl text-[13px] font-bold flex items-center gap-2 transition-all"
           >
             <Plus size={16} />
             {t("pricing.addType")}
@@ -208,7 +204,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         </div>
       </div>
 
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {configs.map((config) => {
           const IconComponent = getIconComponent(config.icon);
@@ -217,35 +213,19 @@ export default function PricingClient({ configs }: PricingClientProps) {
           return (
             <div
               key={config.id}
-              className={`group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
-                !isActive ? "opacity-60" : ""
-              }`}
-              style={{
-                background: "var(--surface)",
-                border: `1px solid ${isActive ? "rgba(255,255,255,0.08)" : "var(--divider)"}`,
-                boxShadow: "var(--shadow-md)",
-              }}
+              className={`group relative rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 dash-card ${!isActive ? "opacity-60" : ""
+                }`}
             >
-              
-              <div
-                className="absolute top-0 left-0 right-0 h-[2px]"
-                style={{
-                  background: isActive
-                    ? "linear-gradient(to left, transparent, #10B981, transparent)"
-                    : "linear-gradient(to left, transparent, var(--text-disabled), transparent)",
-                  opacity: 0.6,
-                }}
-              />
+              <div className="p-5 flex flex-col h-full">
 
-              <div className="p-5">
-                
-                <div className="flex items-start justify-between mb-4">
+                {/* Header: Icon & Titles */}
+                <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <div
                       className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
-                        background: isActive ? "rgba(16,185,129,0.15)" : "var(--surface-glass)",
-                        border: `1px solid ${isActive ? "rgba(16,185,129,0.3)" : "var(--divider)"}`,
+                        background: isActive ? "rgba(16,185,129,0.12)" : "var(--surface-glass)",
+                        border: `1px solid ${isActive ? "rgba(16,185,129,0.25)" : "var(--divider)"}`,
                       }}
                     >
                       <IconComponent
@@ -254,81 +234,89 @@ export default function PricingClient({ configs }: PricingClientProps) {
                       />
                     </div>
                     <div>
-                      <h3 className="text-[16px] font-bold text-text-primary">{config.display_name}</h3>
+                      <h3 className="text-[17px] font-bold text-text-primary mb-0.5 leading-tight">{config.display_name}</h3>
                       <p className="text-[12px] text-text-tertiary">{config.name}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+
+                  {/* Actions (visible on hover) */}
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                       onClick={() => openEditModal(config)}
-                      className="p-2 rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-text-primary transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-primary/10 text-text-tertiary hover:text-primary transition-colors"
                       title={t("pricing.edit")}
                     >
-                      <Save size={14} />
+                      <Pencil size={14} />
                     </button>
                     <button
                       onClick={() => toggleActive(config.id, config.is_active)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        isActive
-                          ? "hover:bg-success/10 text-success"
-                          : "hover:bg-text-disabled/10 text-text-disabled"
-                      }`}
+                      className={`p-1.5 rounded-lg transition-colors ${isActive
+                          ? "hover:bg-warning/10 text-text-tertiary hover:text-warning"
+                          : "hover:bg-success/10 text-text-disabled hover:text-success"
+                        }`}
                       title={isActive ? t("pricing.disable") : t("pricing.enable")}
                     >
-                      {isActive ? <Power size={14} /> : <PowerOff size={14} />}
+                      {isActive ? <PowerOff size={14} /> : <Power size={14} />}
                     </button>
                     <button
                       onClick={() => deleteType(config.id)}
-                      className="p-2 rounded-lg hover:bg-error/10 text-text-tertiary hover:text-error transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-error/10 text-text-tertiary hover:text-error transition-colors"
                       title={t("pricing.delete")}
                     >
                       <Trash2 size={14} />
                     </button>
                   </div>
+                  
+                  {/* Fallback for touch devices (always visible on small screens) */}
+                  <div className="sm:hidden flex items-center gap-1">
+                     <button onClick={() => openEditModal(config)} className="p-1.5 text-text-tertiary"><Pencil size={14} /></button>
+                  </div>
                 </div>
 
-                
-                <div className="space-y-2">
-                  <div
-                    className="flex items-center justify-between p-3 rounded-xl"
-                    style={{ background: "var(--surface-glass)" }}
-                  >
-                    <span className="text-[12px] text-text-secondary">{t("pricing.baseFare")}</span>
-                    <span className="text-[14px] font-bold text-success">
+                {/* Pricing Stats Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-6 flex-1">
+                  <div className="p-3 rounded-xl" style={{ background: "var(--surface-muted)", border: "1px solid var(--divider)" }}>
+                    <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1">
+                      {t("pricing.baseFare")}
+                    </span>
+                    <span className="block text-[15px] font-black text-text-primary">
                       {formatCurrency(Number(config.base_fare))}
                     </span>
                   </div>
-                  <div
-                    className="flex items-center justify-between p-3 rounded-xl"
-                    style={{ background: "var(--surface-glass)" }}
-                  >
-                    <span className="text-[12px] text-text-secondary">{t("pricing.pricePerKm")}</span>
-                    <span className="text-[14px] font-bold text-success">
+                  <div className="p-3 rounded-xl" style={{ background: "var(--surface-muted)", border: "1px solid var(--divider)" }}>
+                    <span className="block text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-1">
+                      {t("pricing.pricePerKm")}
+                    </span>
+                    <span className="block text-[15px] font-black text-text-primary">
                       {formatCurrency(Number(config.price_per_km))}
                     </span>
                   </div>
                 </div>
 
-                
-                <div className="mt-4 flex items-center gap-2">
-                  <span
-                    className="px-2 py-1 rounded-lg text-[10px] font-bold"
-                    style={{
-                      background: isActive ? "rgba(16,185,129,0.1)" : "rgba(107,114,128,0.1)",
-                      color: isActive ? "#10B981" : "var(--text-disabled)",
-                    }}
-                  >
-                    {isActive ? `✓ ${t("pricing.active")}` : `✗ ${t("pricing.inactive")}`}
-                  </span>
-                  <span className="text-[10px] text-text-disabled">{t("pricing.sortOrder").replace("{order}", String(config.sort_order))}</span>
+                {/* Footer: Status & Sort Order */}
+                <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "var(--divider)" }}>
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-2 w-2 relative">
+                      {isActive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>}
+                      <span className={`relative inline-flex rounded-full h-2 w-2 ${isActive ? 'bg-success' : 'bg-text-disabled'}`}></span>
+                    </span>
+                    <span className={`text-[12px] font-bold ${isActive ? 'text-success' : 'text-text-disabled'}`}>
+                      {isActive ? t("pricing.active") : t("pricing.inactive")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-text-tertiary">
+                    <GripVertical size={12} className="opacity-50" />
+                    {t("pricing.sortOrder").replace("{order}", String(config.sort_order))}
+                  </div>
                 </div>
               </div>
+
             </div>
           );
         })}
       </div>
 
-      
+
       {configs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
@@ -342,21 +330,16 @@ export default function PricingClient({ configs }: PricingClientProps) {
         </div>
       )}
 
-      
+
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
         >
           <div
-            className="relative w-full max-w-md rounded-2xl overflow-hidden"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid rgba(16,185,129,0.2)",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
-            }}
+            className="relative w-full max-w-md rounded-2xl overflow-hidden bg-surface shadow-xl border border-divider"
           >
-            
+
             <div
               className="flex items-center justify-between px-6 py-4"
               style={{ borderBottom: "1px solid var(--divider)" }}
@@ -374,9 +357,9 @@ export default function PricingClient({ configs }: PricingClientProps) {
               </button>
             </div>
 
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              
+
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   {t("pricing.modal.techName")}
@@ -399,7 +382,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 <p className="text-[10px] text-text-disabled mt-1">{t("pricing.modal.techNameDesc")}</p>
               </div>
 
-              
+
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   {t("pricing.modal.displayName")}
@@ -409,17 +392,12 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   value={form.display_name}
                   onChange={(e) => setForm({ ...form, display_name: e.target.value })}
                   placeholder={t("pricing.modal.displayNamePlaceholder")}
-                  className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
-                  style={{
-                    background: "var(--surface-glass)",
-                    border: "1px solid var(--divider)",
-                    color: "var(--text-primary)",
-                  }}
+                  className="input-field w-full px-4 py-3 rounded-xl text-[13px]"
                   required
                 />
               </div>
 
-              
+
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   {t("pricing.modal.icon")}
@@ -449,7 +427,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
               </div>
 
-              
+
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   {t("pricing.modal.color")}
@@ -476,7 +454,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 </div>
               </div>
 
-              
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
@@ -488,12 +466,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     value={form.base_fare}
                     onChange={(e) => setForm({ ...form, base_fare: e.target.value })}
                     placeholder="15.00"
-                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
-                    style={{
-                      background: "var(--surface-glass)",
-                      border: "1px solid var(--divider)",
-                      color: "var(--text-primary)",
-                    }}
+                    className="input-field w-full px-4 py-3 rounded-xl text-[13px]"
                     required
                     dir="ltr"
                   />
@@ -508,19 +481,14 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     value={form.price_per_km}
                     onChange={(e) => setForm({ ...form, price_per_km: e.target.value })}
                     placeholder="5.00"
-                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
-                    style={{
-                      background: "var(--surface-glass)",
-                      border: "1px solid var(--divider)",
-                      color: "var(--text-primary)",
-                    }}
+                    className="input-field w-full px-4 py-3 rounded-xl text-[13px]"
                     required
                     dir="ltr"
                   />
                 </div>
               </div>
 
-              
+
               <div>
                 <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
                   {t("pricing.sortOrder").split(":")[0]}
@@ -529,17 +497,12 @@ export default function PricingClient({ configs }: PricingClientProps) {
                   type="number"
                   value={form.sort_order}
                   onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl text-[13px] outline-none"
-                  style={{
-                    background: "var(--surface-glass)",
-                    border: "1px solid var(--divider)",
-                    color: "var(--text-primary)",
-                  }}
+                  className="input-field w-full px-4 py-3 rounded-xl text-[13px]"
                   dir="ltr"
                 />
               </div>
 
-              
+
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
@@ -552,11 +515,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                  style={{
-                    background: "linear-gradient(135deg, #10B981, #059669)",
-                    boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
-                  }}
+                  className="btn btn-primary flex-1 py-3 rounded-xl text-[13px] font-black flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                 >
                   {loading ? (
                     <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">

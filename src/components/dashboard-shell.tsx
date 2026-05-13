@@ -1,16 +1,12 @@
 "use client";
 
 import Sidebar from "./sidebar";
-import { UnifiedTopBar } from "./unified-topbar";
 import { SidebarProvider } from "./sidebar-context";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="dashboard-shell h-dvh flex flex-col bg-background overflow-hidden">
-        {/* Full-width dashboard chrome: brand, navigation rail, and page controls */}
-        <UnifiedTopBar />
-
         <div className="dashboard-body flex flex-1 min-h-0 overflow-hidden">
           <Sidebar />
 

@@ -1,11 +1,12 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { LocalTimeDisplay } from "@/components/local-time-display";
 import { StatCard } from "@/components/stat-card";
 import { TripsStatusChart, RevenueChart } from "@/components/charts";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { DataTable } from "@/components/data-table";
+
 import {
   Users,
   Car,
@@ -100,15 +101,18 @@ export default async function DashboardPage() {
               {t("dashboard.welcome")}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary">
-              <Activity size={13} />
-              {totalTrips} {t("dashboard.charts.tripsLabel")}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
-              <CheckCircle size={13} />
-              {completionRate}%
-            </span>
+          <div className="flex flex-col sm:items-end gap-2 mt-2 sm:mt-0">
+            <LocalTimeDisplay />
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary">
+                <Activity size={13} />
+                {totalTrips} {t("dashboard.charts.tripsLabel")}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
+                <CheckCircle size={13} />
+                {completionRate}%
+              </span>
+            </div>
           </div>
         </div>
 
@@ -220,107 +224,99 @@ export default async function DashboardPage() {
         </div>
 
         {/* ─── RECENT TRIPS TABLE ──────────────────────────────────── */}
-        <div className="dash-table-card recent-trips-card">
-          <div className="dash-section-header justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                <MapPin size={17} />
+        <div className="rounded-2xl border border-divider bg-surface-elevated shadow-sm flex flex-col">
+          <div className="px-5 py-4 border-b border-divider flex items-center justify-between bg-surface/50">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
+                <MapPin size={16} className="text-primary" />
               </div>
-              <div className="min-w-0">
+              <div>
                 <h3 className="text-[15px] font-black text-text-primary leading-none">{t("dashboard.recentTrips")}</h3>
-                <p className="mt-1 truncate text-[12px] text-text-tertiary">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
+                <p className="mt-1 text-[12px] font-medium text-text-tertiary">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-success/20 bg-success/10 px-2.5 py-1.5 text-[11px] font-black text-success">
-                <CheckCircle size={12} />
-                {recentCompletedTrips}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/10 px-2.5 py-1.5 text-[11px] font-black text-primary">
-                <Activity size={12} />
-                {recentActiveTrips}
-              </span>
+            <div className="flex items-center gap-2">
               <Link
                 href="/dashboard/trips"
-                className="group flex items-center gap-1.5 rounded-lg border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-black text-primary transition-all hover:border-primary/30 hover:bg-primary/15"
+                className="group flex items-center gap-1.5 rounded-lg border border-divider bg-surface px-3 py-1.5 text-[12px] font-bold text-text-secondary transition-all hover:border-accent-border hover:bg-surface-elevated hover:text-text-primary"
               >
                 {t("common.view")}
-                <ArrowUpRight size={13} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                <ArrowUpRight size={13} className="text-text-tertiary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
               </Link>
             </div>
           </div>
 
-          <DataTable
-            headers={[
-              { label: t("trips.from"), key: "from" },
-              { label: t("trips.to"), key: "to" },
-              { label: t("common.status"), key: "status" },
-              { label: t("trips.price"), key: "price" },
-              { label: t("common.date"), key: "date" },
-            ]}
-          >
+          <div className="p-4 flex flex-col gap-3">
             {recentTrips.length > 0 ? (
-              recentTrips.map((trip, idx) => (
-                <tr
+              recentTrips.map((trip) => (
+                <div
                   key={trip.id}
-                  className="group dash-table-row recent-trips-row"
+                  className="group relative flex flex-col sm:flex-row justify-between p-3.5 rounded-xl border border-divider bg-surface transition-all duration-300 hover:border-primary/30 hover:bg-surface-elevated hover:shadow-md"
                 >
-                  <td className="py-4 px-5 text-text-primary min-w-[230px] max-w-[280px]">
-                    <span className="flex items-center gap-3">
-                      <span className="recent-trip-marker flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-black num">
-                        {idx + 1}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-black">{trip.pickup_address || "-"}</span>
-                        <span className="mt-0.5 block text-[11px] font-semibold text-text-tertiary">{t("trips.from")}</span>
-                      </span>
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 text-text-secondary min-w-[230px] max-w-[280px]">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-divider bg-surface-elevated text-text-tertiary">
-                        <MapPin size={14} />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold text-text-secondary">{trip.destination_address || "-"}</span>
-                        <span className="mt-0.5 block text-[11px] font-semibold text-text-tertiary">{t("trips.to")}</span>
-                      </span>
-                    </span>
-                  </td>
-                  <td className="py-4 px-5">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black tracking-wide ${getStatusColor(trip.status)}`}
+                  {/* Left: Route (Primary Focus) */}
+                  <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
+                    <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/10" />
+                      <div className="w-[1.5px] grow bg-gradient-to-b from-[#22C55E]/50 to-[#7C3AED]/50 my-1.5" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] ring-4 ring-[#7C3AED]/10" />
+                    </div>
+                    
+                    <div className="flex flex-col justify-between py-0.5 min-w-0">
+                      <div className="mb-4">
+                        <p className="text-[13px] font-black text-text-primary truncate">{trip.pickup_address || "-"}</p>
+                        <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.from")}</p>
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-black text-text-primary truncate">{trip.destination_address || "-"}</p>
+                        <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.to")}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Data & Actions (Stacked) */}
+                  <div className="flex flex-col items-end justify-between shrink-0 pl-4 mt-3 sm:mt-0 sm:border-l border-divider gap-3">
+                    <div className="flex flex-col items-end gap-1.5 w-full">
+                      <div className="flex items-center gap-2 justify-end w-full">
+                        <span className="text-[15px] font-black num tracking-tight text-text-primary">
+                          {formatCurrency(Number(trip.price))}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            trip.status === "completed"
+                              ? "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20"
+                              : trip.status === "cancelled"
+                              ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                              : "bg-[#7C3AED]/10 text-[#7C3AED] border border-[#7C3AED]/20"
+                          }`}
+                        >
+                          {getStatusLabel(trip.status)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-text-tertiary group-hover:text-text-secondary transition-colors">
+                        <Clock size={12} />
+                        <span className="text-[11px] font-bold">{formatDate(trip.created_at)}</span>
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/dashboard/trips/${trip.id}`}
+                      className="mt-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-[#3B1E71] bg-[#2A1155] text-[#D4B3FF] text-[11px] font-bold transition-all hover:bg-[#3B1E71] hover:text-white hover:shadow-[0_0_12px_rgba(124,58,237,0.2)]"
                     >
-                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {getStatusLabel(trip.status)}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5">
-                    <span className="inline-flex items-center rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-sm font-black num text-primary">
-                      {formatCurrency(Number(trip.price))}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 text-text-tertiary text-xs font-bold whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock size={13} className="text-text-disabled" />
-                      {formatDate(trip.created_at)}
-                    </span>
-                  </td>
-                </tr>
+                      {t("common.view")}
+                      <ArrowUpRight size={13} />
+                    </Link>
+                  </div>
+                </div>
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="py-20 text-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-elevated border border-divider">
-                      <MapPin size={22} className="text-text-disabled" />
-                    </div>
-                    <p className="text-sm text-text-disabled font-medium">{t("common.noData")}</p>
-                  </div>
-                </td>
-              </tr>
+              <div className="py-16 text-center flex flex-col items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated border border-divider shadow-sm">
+                  <MapPin size={24} className="text-text-disabled" />
+                </div>
+                <p className="text-sm font-bold text-text-disabled">{t("common.noData")}</p>
+              </div>
             )}
-          </DataTable>
+          </div>
         </div>
 
       </div>

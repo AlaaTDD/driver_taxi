@@ -211,7 +211,7 @@ export default async function MessagesPage({
                 className="flex-1 max-w-xs px-4 py-2.5 rounded-xl text-[13px] outline-none"
                 style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}
               />
-              <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>{t("messages.trip.search")}</button>
+              <button type="submit" className="btn btn-primary px-4 py-2.5 rounded-xl text-[13px] font-medium">{t("messages.trip.search")}</button>
               {tripIdFilter && (
                 <Link href="/dashboard/messages?tab=trip" className="px-3 py-2.5 rounded-xl text-[12px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>
                   {t("messages.trip.clear")}

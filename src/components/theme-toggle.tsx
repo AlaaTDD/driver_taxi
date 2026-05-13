@@ -74,13 +74,10 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
 
   /* ━━ EXPANDED: two-button toggle matching the design ━━━━━━━━━━━━━ */
   return (
-    <div className="flex items-center gap-2 w-full" style={{ padding: "4px 6px" }}>
-      <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "var(--sb-footer-text)" }}>
-        {t("theme")}
-      </span>
+    <div className="flex items-center justify-end w-full" style={{ padding: "4px 6px" }}>
       <div
         ref={pillRef}
-        className="relative flex items-center rounded-lg overflow-hidden ms-auto"
+        className="relative flex items-center rounded-lg overflow-hidden"
         style={{
           background: "var(--sb-icon-bg)",
           border: "1px solid var(--sb-nav-hover-border)",

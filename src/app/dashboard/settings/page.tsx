@@ -1,6 +1,8 @@
 import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
-import { Settings, Shield } from "lucide-react";
+import { Settings, Shield, Globe, Palette } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function SettingsPage() {
   const t = await getTranslations();
@@ -29,20 +31,39 @@ export default async function SettingsPage() {
           </div>
         </div>
 
-        {/* Settings content placeholder */}
-        <div
-          className="dash-card p-8 flex flex-col items-center justify-center gap-4"
-        >
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
-          >
-            <Settings size={28} className="text-text-disabled opacity-40" />
+        {/* Settings options */}
+        <div className="dash-card p-6 flex flex-col gap-6">
+          
+          <div className="flex items-center justify-between pb-6 border-b border-divider">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-surface-elevated border border-divider flex items-center justify-center flex-shrink-0 text-text-secondary">
+                <Palette size={20} />
+              </div>
+              <div>
+                <h3 className="text-[15px] font-bold text-text-primary">المظهر</h3>
+                <p className="text-[12px] text-text-tertiary mt-0.5">تغيير مظهر لوحة التحكم (فاتح / داكن)</p>
+              </div>
+            </div>
+            <div className="w-[140px]">
+              <ThemeToggle />
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-text-secondary font-semibold">صفحة الإعدادات</p>
-            <p className="text-text-tertiary text-sm mt-1">سيتم إضافة خيارات الإعدادات قريباً</p>
+
+          <div className="flex items-center justify-between pb-2">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-surface-elevated border border-divider flex items-center justify-center flex-shrink-0 text-text-secondary">
+                <Globe size={20} />
+              </div>
+              <div>
+                <h3 className="text-[15px] font-bold text-text-primary">اللغة</h3>
+                <p className="text-[12px] text-text-tertiary mt-0.5">تغيير لغة لوحة التحكم</p>
+              </div>
+            </div>
+            <div className="w-[140px]">
+              <LanguageSwitcher />
+            </div>
           </div>
+
         </div>
       </div>
     </DashboardShell>

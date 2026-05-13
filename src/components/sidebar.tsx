@@ -10,6 +10,7 @@ import {
   Bell, MessageSquare, MessageSquareWarning, LogOut, Menu,
   X, Star, Shield, Truck, ArrowLeftRight, Ticket,
   Navigation, Wallet, Banknote, PanelRightClose, PanelRightOpen,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar, SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./sidebar-context";
@@ -22,7 +23,6 @@ type NavItem = {
   href:   string;
   label:  string;
   icon:   LucideIcon;
-  /** "r,g,b" — الآن موحد على لون الـ Primary فقط */
   rgb:    string;
   badge?: number;
 };
@@ -86,7 +86,7 @@ const getNavGroups = (t: any): NavGroup[] => [
     id: "settings",
     label: t("sidebar.sections.settings"),
     items: [
-      { href: "/dashboard/settings",         label: t("common.settings"),    icon: Shield,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/settings",         label: t("common.settings"),    icon: Settings,             rgb: PRIMARY_RGB },
     ],
   },
 ];
@@ -96,8 +96,6 @@ const COLLAPSED_W = SIDEBAR_COLLAPSED_W;
 
 /* ─────────────────────────────────────────────────────────────────────────────
    FLOATING TOOLTIP
-   Fixed positioning so it never clips on overflow:hidden sidebar.
-   Fully theme-aware via CSS variables.
 ───────────────────────────────────────────────────────────────────────────── */
 
 type TooltipState = { label: string; y: number } | null;
@@ -131,7 +129,7 @@ function FloatingTooltip({ tip }: { tip: TooltipState }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   NAV LINK — theme-aware active/hover states (الآن كل الألوان موحدة)
+   NAV LINK
 ───────────────────────────────────────────────────────────────────────────── */
 
 function NavLink({
@@ -149,7 +147,7 @@ function NavLink({
   onClose?:  () => void;
   onTooltip: (tip: TooltipState) => void;
 }) {
-  const { rgb } = item; // الآن دائماً سيأخذ PRIMARY_RGB
+  const { rgb } = item;
   const ref = useRef<HTMLAnchorElement>(null);
 
   const showTip = useCallback(() => {
@@ -170,8 +168,8 @@ function NavLink({
       onMouseEnter={showTip}
       onMouseLeave={hideTip}
       className={cn(
-        "sidebar-nav-link group relative flex items-center rounded-xl text-[13px] font-semibold",
-        "transition-all duration-200 overflow-hidden animate-fade-in",
+        "sidebar-nav-link group relative flex items-center rounded-xl text-[13px] font-bold",
+        "transition-all duration-300 overflow-hidden animate-fade-in",
         collapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5",
         isActive ? "sidebar-nav-active" : "sidebar-nav-inactive"
       )}
@@ -184,10 +182,11 @@ function NavLink({
       {isActive && (
         <>
           <div
-            className="absolute inset-0 rounded-xl"
+            className="absolute inset-0 rounded-xl backdrop-blur-md"
             style={{
-              background: `rgba(${rgb}, 0.12)`,
-              border:     `1px solid rgba(${rgb}, 0.22)`,
+              background: `rgba(${rgb}, 0.15)`,
+              border:     `1px solid rgba(${rgb}, 0.3)`,
+              boxShadow:  "inset 0 1px 1px rgba(255,255,255,0.05)",
             }}
           />
           {/* top specular glint */}
@@ -207,14 +206,14 @@ function NavLink({
         />
       )}
 
-      {/* right accent bar — بنفس اللون الموحد */}
+      {/* right accent bar */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 rounded-l-full"
         style={{
-          width:      "2.5px",
-          height:     isActive ? "22px" : "0px",
-          background: `linear-gradient(to bottom, rgba(${rgb},0.95), rgba(${rgb},0.35))`,
-          boxShadow:  isActive ? `0 0 12px rgba(${rgb},0.6), 0 0 4px rgba(${rgb},0.9)` : "none",
+          width:      "3px",
+          height:     isActive ? "24px" : "0px",
+          background: `linear-gradient(to bottom, rgba(${rgb},1), rgba(${rgb},0.4))`,
+          boxShadow:  isActive ? `0 0 16px rgba(${rgb},0.8), 0 0 6px rgba(${rgb},1)` : "none",
           transition: "height 250ms cubic-bezier(0.16,1,0.3,1), box-shadow 250ms ease",
         }}
       />
@@ -280,7 +279,7 @@ function NavLink({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SIDEBAR CONTENT (بدون تعديلات كبيرة، بس الألوان موحدة دلوقتي)
+   SIDEBAR CONTENT
 ───────────────────────────────────────────────────────────────────────────── */
 
 function SidebarContent({
@@ -316,15 +315,70 @@ function SidebarContent({
       {/* ── top ambient glow ─────────────────────────────────────────────── */}
       <div className="pointer-events-none absolute top-0 inset-x-0 h-36 z-0 sidebar-top-glow" />
 
+      {/* ══ BRAND HEADER ══════════════════════════════════════════════════ */}
+      <div
+        className="relative z-10 flex-shrink-0 overflow-hidden"
+        style={{
+          padding: collapsed ? "20px 8px 16px" : "22px 20px 16px",
+        }}
+      >
+        <div
+          className="flex items-center"
+          style={{
+            justifyContent: collapsed ? "center" : "flex-start",
+            gap: collapsed ? 0 : "14px",
+          }}
+        >
+          {/* Logo */}
+          <div
+            className="sidebar-brand-logo-wrap flex-shrink-0 flex items-center justify-center rounded-2xl border sidebar-logo transition-all duration-300"
+            style={{
+              width: collapsed ? 42 : 44,
+              height: collapsed ? 42 : 44,
+              boxShadow: "var(--sb-logo-shadow), inset 0 1px 0 rgba(255,255,255,0.18)",
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-50 rounded-2xl pointer-events-none" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 22, height: 22 }}>
+              <path d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" fill="var(--primary)" />
+              <path d="M5.5 14l2-5h9l2 5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(124,58,237,0.15)" />
+              <rect x="9" y="6" width="6" height="3" rx="1" fill="var(--primary-dark)" />
+              <circle cx="7" cy="18" r="1.5" fill="#fff" />
+              <circle cx="17" cy="18" r="1.5" fill="#fff" />
+            </svg>
+          </div>
+
+          {/* Brand text */}
+          <div
+            className="flex flex-col gap-1 overflow-hidden"
+            style={{
+              opacity: collapsed ? 0 : 1,
+              width: collapsed ? 0 : "auto",
+              transition: "opacity 180ms ease, width 280ms cubic-bezier(0.16,1,0.3,1)",
+            }}
+          >
+            <span className="sidebar-brand-name text-[18px] font-black leading-none tracking-tight whitespace-nowrap select-none">
+              Taxi
+            </span>
+            <span className="sidebar-brand-sub text-[10px] font-bold tracking-[0.14em] uppercase whitespace-nowrap select-none">
+              {t("common.dashboard")}
+            </span>
+          </div>
+        </div>
+
+        {/* Brand divider */}
+        <div
+          className="mt-4 h-px sidebar-divider"
+          style={{ marginInline: collapsed ? 0 : "4px" }}
+        />
+      </div>
+
+      {/* ══ NAVIGATION ════════════════════════════════════════════════════ */}
       <nav
         className={cn(
-          "relative z-10 flex-1 overflow-y-auto pt-3 pb-3 hide-scrollbar",
+          "relative z-10 flex-1 overflow-y-auto pb-3 hide-scrollbar",
           collapsed ? "px-2 space-y-0.5" : "px-3 space-y-0.5"
         )}
-        style={{
-          maskImage:       "linear-gradient(to bottom, black 86%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 86%, transparent 100%)",
-        }}
       >
         {navGroups.map((group, gi) => (
           <div key={group.id} className={cn(gi > 0 && "pt-4")}>
@@ -365,9 +419,11 @@ function SidebarContent({
         ))}
       </nav>
 
+      {/* ══ FOOTER ════════════════════════════════════════════════════════ */}
       <div className={cn("relative z-10 flex-shrink-0 pb-4", collapsed ? "px-2" : "px-3")}>
         <div className={cn("mb-3 h-px sidebar-divider", collapsed ? "mx-0" : "mx-1")} />
 
+        {/* Logout */}
         <form action="/api/auth/logout" method="POST">
           <button
             type="submit"
@@ -401,6 +457,7 @@ function SidebarContent({
           </button>
         </form>
 
+        {/* Collapse toggle */}
         <button
           onClick={onToggleCollapse}
           onMouseEnter={(e) => {
@@ -432,11 +489,6 @@ function SidebarContent({
           )}
         </button>
 
-        {!collapsed && (
-          <p className="sidebar-version text-center text-[9px] font-bold tracking-[0.15em] uppercase mt-3">
-            v2.0 · {t("metadata.title")}
-          </p>
-        )}
       </div>
 
       <FloatingTooltip tip={tooltip} />
@@ -445,7 +497,7 @@ function SidebarContent({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MAIN EXPORT (بدون تغيير)
+   MAIN EXPORT
 ───────────────────────────────────────────────────────────────────────────── */
 
 export default function Sidebar() {

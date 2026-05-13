@@ -166,12 +166,10 @@ export default async function WalletsPage({
             >
               {t.label}
               {t.count > 0 && (
-                <span
-                  className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
+              <span
+                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5 ${tab === t.key ? "text-white" : "bg-surface-glass text-text-tertiary border border-divider"}`}
                   style={{
-                    background: tab === t.key ? t.color : "var(--surface-glass)",
-                    color: tab === t.key ? "white" : "var(--text-tertiary)",
-                    border: tab === t.key ? "none" : "1px solid var(--divider)",
+                    background: tab === t.key ? t.color : undefined,
                   }}
                 >
                   {t.count}
@@ -281,15 +279,15 @@ export default async function WalletsPage({
           <>
             {/* Filters */}
             <div className="flex items-center gap-3 flex-wrap">
-              <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.all")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.drivers")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-surface-glass border border-divider text-text-tertiary'}`}>{t("common.users")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary-surface text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.all")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.drivers")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.users")}</Link>
             </div>
 
             <div className="dash-table-card">
               <div className="dash-section-header justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #3B82F6, #1D4ED8)", boxShadow: "0 0 8px rgba(59,130,246,0.5)" }} />
+                  <div className="w-[3px] h-5 rounded-full bg-gradient-to-b from-primary to-primary-dark shadow-[0_0_8px_var(--primary)]" />
                   <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.txHistory")}</h3>
                   <span className="text-text-disabled text-[11px]">({txCount})</span>
                 </div>
@@ -346,18 +344,18 @@ export default async function WalletsPage({
 
               {/* Pagination */}
               {txTotalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
+                <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
                   {page > 1 && (
                     <Link href={`/dashboard/wallets?tab=transactions&page=${page - 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                      {t("common.previous")}
+                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                      <ChevronRight size={14} />
                     </Link>
                   )}
-                  <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {txTotalPages}</span>
+                  <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {txTotalPages}</span>
                   {page < txTotalPages && (
                     <Link href={`/dashboard/wallets?tab=transactions&page=${page + 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition" style={{ border: "1px solid var(--divider)" }}>
-                      {t("common.next")}
+                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                      <ChevronLeft size={14} />
                     </Link>
                   )}
                 </div>

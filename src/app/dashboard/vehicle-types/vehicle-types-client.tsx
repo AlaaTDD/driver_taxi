@@ -124,8 +124,7 @@ export default function VehicleTypesClient({
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all hover:opacity-80"
-          style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6)", color: "#fff", boxShadow: "0 4px 16px rgba(59,130,246,0.3)" }}
+          className="btn btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all"
         >
           <Plus size={14} />
           {t("vehicleTypes.addType")}
@@ -153,8 +152,7 @@ export default function VehicleTypesClient({
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 disabled={!!editId}
                 placeholder="مثال: car, truck"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px] disabled:opacity-50"
               />
             </div>
             <div className="space-y-1.5">
@@ -165,8 +163,7 @@ export default function VehicleTypesClient({
                 value={form.display_name}
                 onChange={(e) => setForm({ ...form, display_name: e.target.value })}
                 placeholder="مثال: سيارة"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px]"
               />
             </div>
             <div className="space-y-1.5">
@@ -177,8 +174,7 @@ export default function VehicleTypesClient({
                 value={form.icon}
                 onChange={(e) => setForm({ ...form, icon: e.target.value })}
                 placeholder="directions_car"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px]"
               />
             </div>
             <div className="space-y-1.5">
@@ -190,8 +186,7 @@ export default function VehicleTypesClient({
                 value={form.base_fare}
                 onChange={(e) => setForm({ ...form, base_fare: e.target.value })}
                 placeholder="10.00"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px]"
               />
             </div>
             <div className="space-y-1.5">
@@ -203,8 +198,7 @@ export default function VehicleTypesClient({
                 value={form.price_per_km}
                 onChange={(e) => setForm({ ...form, price_per_km: e.target.value })}
                 placeholder="3.50"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px]"
               />
             </div>
             <div className="space-y-1.5">
@@ -215,8 +209,7 @@ export default function VehicleTypesClient({
                 value={form.sort_order}
                 onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
                 placeholder="0"
-                className="w-full px-4 py-2.5 rounded-xl text-[13px] text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-primary/30"
-                style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
+                className="input-field w-full px-4 py-2.5 rounded-xl text-[13px]"
               />
             </div>
             <div className="sm:col-span-2 lg:col-span-3 flex justify-end gap-3 pt-2">
@@ -226,8 +219,7 @@ export default function VehicleTypesClient({
               <button
                 type="submit"
                 disabled={loading === "submit"}
-                className="inline-flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-bold text-white transition-all hover:opacity-80 disabled:opacity-50"
-                style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}
+                className="btn btn-primary inline-flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-bold disabled:opacity-50"
               >
                 <Save size={13} />
                 {loading === "submit" ? t("vehicleTypes.form.saving") : editId ? t("vehicleTypes.form.update") : t("vehicleTypes.form.add")}
@@ -296,26 +288,23 @@ export default function VehicleTypesClient({
                 <button
                   onClick={() => handleToggle(vt.id, vt.is_active)}
                   disabled={loading === vt.id}
-                  className="p-2.5 rounded-xl transition-all hover:bg-white/5 disabled:opacity-50"
+                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-surface-elevated disabled:opacity-50"
                   title={vt.is_active ? "تعطيل" : "تفعيل"}
-                  style={{ border: "1px solid var(--divider)" }}
                 >
                   {vt.is_active ? <ToggleRight size={16} className="text-emerald-400" /> : <ToggleLeft size={16} className="text-text-tertiary" />}
                 </button>
                 <button
                   onClick={() => startEdit(vt)}
-                  className="p-2.5 rounded-xl transition-all hover:bg-white/5"
+                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-surface-elevated"
                   title="تعديل"
-                  style={{ border: "1px solid var(--divider)" }}
                 >
                   <Pencil size={14} className="text-blue-400" />
                 </button>
                 <button
                   onClick={() => handleDelete(vt.id, vt.display_name)}
                   disabled={loading === vt.id}
-                  className="p-2.5 rounded-xl transition-all hover:bg-red-500/10 disabled:opacity-50"
+                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-error/10 disabled:opacity-50"
                   title="حذف"
-                  style={{ border: "1px solid var(--divider)" }}
                 >
                   <Trash2 size={14} className="text-red-400" />
                 </button>

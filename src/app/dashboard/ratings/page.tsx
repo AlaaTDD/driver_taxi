@@ -218,7 +218,7 @@ export default async function RatingsPage({
               <option value="3">{t("ratings.filters.threePlus")}</option>
               <option value="1">{t("ratings.filters.oneTwo")}</option>
             </select>
-            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#3B82F6" }}>{t("ratings.filters.apply")}</button>
+            <button type="submit" className="btn btn-primary px-4 py-2.5 rounded-xl text-[13px] font-medium">{t("ratings.filters.apply")}</button>
             {(driverFilter || minRating > 0) && (
               <Link href="/dashboard/ratings?tab=driver_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>{t("ratings.filters.reset")}</Link>
             )}
@@ -235,7 +235,7 @@ export default async function RatingsPage({
               <option value="3">{t("ratings.filters.threePlus")}</option>
               <option value="1">{t("ratings.filters.oneTwo")}</option>
             </select>
-            <button type="submit" className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white" style={{ background: "#8B5CF6" }}>{t("ratings.filters.apply")}</button>
+            <button type="submit" className="btn btn-primary px-4 py-2.5 rounded-xl text-[13px] font-medium">{t("ratings.filters.apply")}</button>
             {minRating > 0 && (
               <Link href="/dashboard/ratings?tab=user_ratings" className="px-4 py-2.5 rounded-xl text-[13px] text-text-tertiary hover:text-text-secondary" style={{ border: "1px solid var(--divider)" }}>{t("ratings.filters.reset")}</Link>
             )}

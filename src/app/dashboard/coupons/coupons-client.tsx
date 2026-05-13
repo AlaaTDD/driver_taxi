@@ -58,13 +58,7 @@ export default function CouponsClient() {
       <button
         id="add-coupon-btn"
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 hover:-translate-y-0.5"
-        style={{
-          background: "linear-gradient(135deg, #F59E0B, #D97706)",
-          color: "white",
-          boxShadow: "0 4px 14px rgba(245,158,11,0.35)",
-          border: "1px solid rgba(245,158,11,0.3)",
-        }}
+        className="btn btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
       >
         <Plus size={15} />
         {t("coupons.newCoupon")}
@@ -76,16 +70,11 @@ export default function CouponsClient() {
           style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
         >
           <div
-            className="relative w-full max-w-md rounded-2xl overflow-hidden"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid rgba(245,158,11,0.2)",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
-            }}
+            className="relative w-full max-w-md rounded-2xl overflow-hidden bg-surface shadow-xl border border-divider"
           >
             
             <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: "linear-gradient(to left, transparent, #F59E0B, transparent)" }} />
+              style={{ background: "linear-gradient(to left, transparent, var(--primary), transparent)" }} />
 
             
             <div className="fixed inset-0 -z-10" onClick={() => setIsOpen(false)} />
@@ -94,9 +83,8 @@ export default function CouponsClient() {
               
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                    style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.25)" }}>
-                    <Tag size={16} className="text-amber-400" />
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary-surface border border-primary-surface-strong">
+                    <Tag size={16} className="text-primary" />
                   </div>
                   <div>
                     <h3 className="text-[15px] font-black text-text-primary">{t("coupons.newCoupon")}</h3>
@@ -123,8 +111,7 @@ export default function CouponsClient() {
                     required
                     placeholder="SAVE20"
                     maxLength={30}
-                    className="w-full px-4 py-3 rounded-xl text-[14px] font-bold outline-none transition-all uppercase mono"
-                    style={inputStyle}
+                    className="input-field w-full px-4 py-3 rounded-xl text-[14px] font-bold transition-all uppercase mono"
                   />
                 </div>
 
@@ -135,8 +122,7 @@ export default function CouponsClient() {
                     <select
                       value={form.discount_type}
                       onChange={(e) => setForm({ ...form, discount_type: e.target.value })}
-                      className="w-full px-3 py-3 rounded-xl text-[13px] outline-none cursor-pointer"
-                      style={inputStyle}
+                      className="input-field w-full px-3 py-3 rounded-xl text-[13px] cursor-pointer"
                     >
                       <option value="percentage">{t("coupons.types.percentage")}</option>
                       <option value="fixed">{t("coupons.types.fixed")}</option>
@@ -152,8 +138,7 @@ export default function CouponsClient() {
                       onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
                       required min="0" step="0.01"
                       placeholder={form.discount_type === "percentage" ? "20" : "10"}
-                      className="w-full px-3 py-3 rounded-xl text-[13px] num font-bold outline-none"
-                      style={inputStyle}
+                      className="input-field w-full px-3 py-3 rounded-xl text-[13px] num font-bold"
                     />
                   </div>
                 </div>
@@ -166,8 +151,7 @@ export default function CouponsClient() {
                       type="number" value={form.min_trip_price}
                       onChange={(e) => setForm({ ...form, min_trip_price: e.target.value })}
                       min="0" step="0.01" placeholder={`50 (${t("common.optional")})`}
-                      className="w-full px-3 py-3 rounded-xl text-[13px] outline-none num"
-                      style={inputStyle}
+                      className="input-field w-full px-3 py-3 rounded-xl text-[13px] num"
                     />
                   </div>
                   <div>
@@ -176,8 +160,7 @@ export default function CouponsClient() {
                       type="number" value={form.max_uses}
                       onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
                       min="1" placeholder={`∞ (${t("common.optional")})`}
-                      className="w-full px-3 py-3 rounded-xl text-[13px] outline-none num"
-                      style={inputStyle}
+                      className="input-field w-full px-3 py-3 rounded-xl text-[13px] num"
                     />
                   </div>
                 </div>
@@ -189,8 +172,7 @@ export default function CouponsClient() {
                     type="datetime-local"
                     value={form.expires_at}
                     onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none transition-all"
-                    style={inputStyle}
+                    className="input-field w-full px-4 py-3 rounded-xl text-[13px] transition-all"
                   />
                 </div>
 
@@ -208,13 +190,7 @@ export default function CouponsClient() {
                     type="submit"
                     disabled={loading}
                     id="submit-coupon"
-                    className="flex-1 py-3 rounded-xl text-[13px] font-black text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                    style={{
-                      background: saved
-                        ? "linear-gradient(135deg, #10B981, #059669)"
-                        : "linear-gradient(135deg, #F59E0B, #D97706)",
-                      boxShadow: "0 4px 14px rgba(245,158,11,0.35)",
-                    }}
+                    className={`flex-1 py-3 rounded-xl text-[13px] font-black flex items-center justify-center gap-2 transition-all disabled:opacity-50 ${saved ? "btn-solid border-success shadow-success/20 text-success" : "btn btn-primary"}`}
                   >
                     {loading ? (
                       <><svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>{t("common.saving")}</>

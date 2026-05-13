@@ -21,7 +21,7 @@ export function DataTable({ headers, children, emptyMessage = "لا توجد ب�
             {headers.map((h) => (
               <th
                 key={h.key}
-                className="text-right py-3 px-4 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-text-tertiary"
+                className="text-right py-3.5 px-4 text-[11px] font-bold uppercase tracking-widest whitespace-nowrap text-text-tertiary"
               >
                 {h.label}
               </th>
@@ -31,15 +31,16 @@ export function DataTable({ headers, children, emptyMessage = "لا توجد ب�
         <tbody>{children}</tbody>
       </table>
       {!hasRows && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "var(--bg-secondary)" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary">
+        <div className="flex flex-col items-center justify-center py-16 gap-4">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-surface-glass border border-divider">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-disabled opacity-40">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <p className="text-sm font-medium" style={{ color: "var(--text-tertiary)" }}>
-            {emptyMessage}
-          </p>
+          <div className="text-center">
+            <p className="text-text-secondary font-semibold">{emptyMessage}</p>
+            <p className="text-text-tertiary text-sm mt-1">لا توجد بيانات للعرض حالياً</p>
+          </div>
         </div>
       )}
     </div>
@@ -69,17 +70,17 @@ export function Pagination({
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-4">
+    <div className="flex items-center justify-center gap-2 mt-6">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="p-2 rounded-lg bg-surface/80 border border-divider/60 disabled:opacity-30 hover:border-primary/40 transition-colors"
+        className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary disabled:opacity-30 hover:bg-surface-elevated hover:text-text-primary transition-all"
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={14} />
       </button>
       {pages.map((page, i) => (
         page === "..." ? (
-          <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-sm text-text-disabled">
+          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-sm text-text-disabled">
             ...
           </span>
         ) : (
@@ -87,10 +88,10 @@ export function Pagination({
             key={page}
             onClick={() => onPageChange(page as number)}
             className={cn(
-              "w-8 h-8 rounded-lg text-sm transition-colors",
+              "w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all",
               page === currentPage
-                ? "bg-primary text-white shadow-sm shadow-primary/25"
-                : "bg-surface/80 border border-divider/60 text-text-secondary hover:border-primary/30"
+                ? "btn-primary"
+                : "bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary"
             )}
           >
             {page}
@@ -100,9 +101,9 @@ export function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="p-2 rounded-lg bg-surface/80 border border-divider/60 disabled:opacity-30 hover:border-primary/40 transition-colors"
+        className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary disabled:opacity-30 hover:bg-surface-elevated hover:text-text-primary transition-all"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={14} />
       </button>
     </div>
   );
