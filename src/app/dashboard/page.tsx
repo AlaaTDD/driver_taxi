@@ -256,9 +256,9 @@ export default async function DashboardPage() {
                   {/* Left: Route (Primary Focus) */}
                   <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
                     <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/10" />
-                      <div className="w-[1.5px] grow bg-gradient-to-b from-[#22C55E]/50 to-[#7C3AED]/50 my-1.5" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] ring-4 ring-[#7C3AED]/10" />
+                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--success)", boxShadow: `0 0 0 4px var(--success-surface)` }} />
+                      <div className="w-[1.5px] grow my-1.5" style={{ background: `linear-gradient(to bottom, var(--success-surface), var(--accent-surface))` }} />
+                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--primary)", boxShadow: `0 0 0 4px var(--primary-surface)` }} />
                     </div>
                     
                     <div className="flex flex-col justify-between py-0.5 min-w-0">
@@ -281,13 +281,20 @@ export default async function DashboardPage() {
                           {formatCurrency(Number(trip.price))}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            trip.status === "completed"
-                              ? "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20"
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider`}
+                          style={{
+                            background: trip.status === "completed"
+                              ? "var(--success-surface)"
                               : trip.status === "cancelled"
-                              ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                              : "bg-[#7C3AED]/10 text-[#7C3AED] border border-[#7C3AED]/20"
-                          }`}
+                              ? "var(--error-surface)"
+                              : "var(--accent-surface)",
+                            color: trip.status === "completed"
+                              ? "var(--success)"
+                              : trip.status === "cancelled"
+                              ? "var(--error)"
+                              : "var(--primary)",
+                            border: `1px solid ${trip.status === "completed" ? "var(--success-border)" : trip.status === "cancelled" ? "var(--error-border)" : "var(--accent-border)"}`,
+                          }}
                         >
                           {getStatusLabel(trip.status)}
                         </span>
@@ -300,7 +307,7 @@ export default async function DashboardPage() {
 
                     <Link
                       href={`/dashboard/trips/${trip.id}`}
-                      className="mt-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-[#3B1E71] bg-[#2A1155] text-[#D4B3FF] text-[11px] font-bold transition-all hover:bg-[#3B1E71] hover:text-white hover:shadow-[0_0_12px_rgba(124,58,237,0.2)]"
+                      className="mt-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border transition-all hover:shadow-sm table-action"
                     >
                       {t("common.view")}
                       <ArrowUpRight size={13} />

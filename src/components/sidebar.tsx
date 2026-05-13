@@ -332,20 +332,18 @@ function SidebarContent({
         >
           {/* Logo */}
           <div
-            className="sidebar-brand-logo-wrap flex-shrink-0 flex items-center justify-center rounded-2xl border sidebar-logo transition-all duration-300"
+            className="sidebar-brand-logo-wrap flex-shrink-0 flex items-center justify-center transition-all duration-300"
             style={{
               width: collapsed ? 42 : 44,
               height: collapsed ? 42 : 44,
-              boxShadow: "var(--sb-logo-shadow), inset 0 1px 0 rgba(255,255,255,0.18)",
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-50 rounded-2xl pointer-events-none" />
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 22, height: 22 }}>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 28 }}>
               <path d="M3 14h18v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" fill="var(--primary)" />
-              <path d="M5.5 14l2-5h9l2 5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(124,58,237,0.15)" />
+              <path d="M5.5 14l2-5h9l2 5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="var(--primary-surface)" />
               <rect x="9" y="6" width="6" height="3" rx="1" fill="var(--primary-dark)" />
-              <circle cx="7" cy="18" r="1.5" fill="#fff" />
-              <circle cx="17" cy="18" r="1.5" fill="#fff" />
+              <circle cx="7" cy="18" r="1.5" fill="var(--primary)" />
+              <circle cx="17" cy="18" r="1.5" fill="var(--primary)" />
             </svg>
           </div>
 

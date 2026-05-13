@@ -113,9 +113,9 @@ export default async function TripsPage({
                   <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
                     {/* Visual path */}
                     <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/10" />
-                      <div className="w-[1.5px] grow bg-gradient-to-b from-[#22C55E]/40 to-[#7C3AED]/40 my-1.5" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] ring-4 ring-[#7C3AED]/10" />
+                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--success)", boxShadow: `0 0 0 4px var(--success-surface)` }} />
+                      <div className="w-[1.5px] grow my-1.5" style={{ background: `linear-gradient(to bottom, var(--success-surface), var(--accent-surface))` }} />
+                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--primary)", boxShadow: `0 0 0 4px var(--primary-surface)` }} />
                     </div>
 
                     {/* Addresses */}

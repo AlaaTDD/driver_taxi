@@ -49,10 +49,10 @@ export default async function ComplaintsPage({
   ]);
 
   const stats = [
-    { label: t("complaints.statuses.open"), value: openRes.count || 0, icon: <Clock size={18} />, color: "#F59E0B" },
-    { label: t("complaints.statuses.in_progress"), value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "#3B82F6" },
-    { label: t("complaints.statuses.resolved"), value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "#10B981" },
-    { label: t("complaints.priority.urgent"), value: urgentRes.count || 0, icon: <Zap size={18} />, color: "#EF4444" },
+    { label: t("complaints.statuses.open"), value: openRes.count || 0, icon: <Clock size={18} />, color: "var(--warning)", colorRaw: "217,119,6" },
+    { label: t("complaints.statuses.in_progress"), value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "var(--info)", colorRaw: "37,99,235" },
+    { label: t("complaints.statuses.resolved"), value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "var(--success)", colorRaw: "16,185,129" },
+    { label: t("complaints.priority.urgent"), value: urgentRes.count || 0, icon: <Zap size={18} />, color: "var(--error)", colorRaw: "220,38,38" },
   ];
 
   const statusVariant = (s: string) => {
@@ -73,10 +73,10 @@ export default async function ComplaintsPage({
   };
 
   const priorityColor = (p: string) => {
-    if (p === "urgent") return "#EF4444";
-    if (p === "high") return "#F59E0B";
-    if (p === "normal") return "#3B82F6";
-    return "#64748B";
+    if (p === "urgent") return "var(--error)";
+    if (p === "high") return "var(--warning)";
+    if (p === "normal") return "var(--info)";
+    return "var(--text-disabled)";
   };
 
   return (
@@ -94,7 +94,7 @@ export default async function ComplaintsPage({
           <div key={i} className="group relative dash-stat overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}25`, color: stat.color }}>
+                style={{ background: `rgba(${stat.colorRaw},0.10)`, border: `1px solid rgba(${stat.colorRaw},0.22)`, color: stat.color }}>
                 {stat.icon}
               </div>
               <span className="text-2xl font-black num" style={{ color: stat.color }}>{stat.value}</span>
@@ -110,7 +110,7 @@ export default async function ComplaintsPage({
         <div className="dash-section-header justify-between">
           <div className="flex items-center gap-2.5 flex-1">
             <div className="w-[3px] h-5 rounded-full"
-              style={{ background: "linear-gradient(to bottom, #EF4444, #DC2626)", boxShadow: "0 0 8px rgba(239,68,68,0.5)" }} />
+              style={{ background: "linear-gradient(to bottom, var(--error), var(--error-light))", boxShadow: "0 0 8px var(--error-surface)" }} />
             <h3 className="text-[13px] font-bold text-text-primary">{t("complaints.complaintList")}</h3>
             <span className="text-text-disabled text-[11px]">({count || 0})</span>
           </div>
@@ -148,7 +148,7 @@ export default async function ComplaintsPage({
                     </td>
                     <td className="py-3 px-4">
                       <span className="px-2 py-1 rounded-lg text-[11px] font-bold"
-                        style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+                        style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-surface)" }}>
                         {categoryLabel(complaint.category)}
                       </span>
                     </td>
@@ -222,7 +222,7 @@ function ComplaintReplyButton({ complaint, label }: { complaint: { id: string; t
     <a href={`/dashboard/complaints/${complaint.id}`}
       id={`reply-complaint-${complaint.id}`}
       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-      style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+      style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--accent-border)" }}>
       <MessageSquareWarning size={11} /> {label}
     </a>
   );

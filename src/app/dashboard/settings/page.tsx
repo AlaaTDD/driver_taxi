@@ -19,7 +19,7 @@ export default async function SettingsPage() {
               border: "1px solid rgba(59,130,246,0.2)",
             }}
           >
-            <Shield size={18} style={{ color: "#3B82F6" }} />
+            <Shield size={18} style={{ color: "var(--info)" }} />
           </div>
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">

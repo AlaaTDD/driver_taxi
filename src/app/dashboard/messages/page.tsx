@@ -28,8 +28,8 @@ export default async function MessagesPage({
   ]);
 
   const tabs = [
-    { key: "support", label: t("messages.tabs.support"), count: supportCountRes.count || 0, icon: Headphones, color: "#06B6D4" },
-    { key: "trip", label: t("messages.tabs.trip"), count: tripMsgCountRes.count || 0, icon: MapPin, color: "#8B5CF6" },
+    { key: "support", label: t("messages.tabs.support"), count: supportCountRes.count || 0, icon: Headphones, color: "var(--info)", colorRaw: "37,99,235" },
+    { key: "trip", label: t("messages.tabs.trip"), count: tripMsgCountRes.count || 0, icon: MapPin, color: "var(--primary)", colorRaw: "217,119,6" },
   ];
 
   /* ── Support Messages ── */
@@ -85,11 +85,11 @@ export default async function MessagesPage({
   const totalPages = tab === "support" ? supportTotalPages : tripMsgTotalPages;
 
   const AVATAR_COLORS = [
-    "linear-gradient(135deg, #3B82F6, #6366F1)",
-    "linear-gradient(135deg, #8B5CF6, #EC4899)",
-    "linear-gradient(135deg, #06B6D4, #3B82F6)",
-    "linear-gradient(135deg, #10B981, #06B6D4)",
-    "linear-gradient(135deg, #F59E0B, #EF4444)",
+    "linear-gradient(135deg, var(--info), var(--primary))",
+    "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+    "linear-gradient(135deg, var(--success), var(--info))",
+    "linear-gradient(135deg, var(--success), var(--success-light))",
+    "linear-gradient(135deg, var(--warning), var(--error))",
   ];
 
   return (
@@ -121,7 +121,7 @@ export default async function MessagesPage({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
               style={
                 tab === t.key
-                  ? { background: `${t.color}25`, border: `1px solid ${t.color}35`, color: t.color, boxShadow: `0 4px 12px ${t.color}15` }
+                  ? { background: `rgba(${t.colorRaw},0.12)`, border: `1px solid rgba(${t.colorRaw},0.26)`, color: t.color, boxShadow: `0 4px 12px rgba(${t.colorRaw},0.12)` }
                   : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }
               }
             >
@@ -131,9 +131,9 @@ export default async function MessagesPage({
                 <span
                   className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
                   style={{
-                    background: tab === t.key ? t.color : "var(--surface-glass)",
-                    color: tab === t.key ? "white" : "var(--text-tertiary)",
-                    border: tab === t.key ? "none" : "1px solid var(--divider)",
+                    background: tab === t.key ? `rgba(${t.colorRaw},0.20)` : "var(--surface-glass)",
+                    color: tab === t.key ? t.color : "var(--text-tertiary)",
+                    border: tab === t.key ? `1px solid rgba(${t.colorRaw},0.28)` : "1px solid var(--divider)",
                   }}
                 >
                   {t.count}
@@ -221,7 +221,7 @@ export default async function MessagesPage({
             <div className="dash-table-card">
               <div className="dash-section-header justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #8B5CF6, #6D28D9)", boxShadow: "0 0 8px rgba(139,92,246,0.5)" }} />
+                  <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--primary-light), var(--primary))", boxShadow: "0 0 8px var(--primary-surface)" }} />
                   <h3 className="text-[13px] font-bold text-text-primary">{t("messages.trip.title")}</h3>
                   <span className="text-text-disabled text-[11px]">({tripMsgCount})</span>
                 </div>
@@ -248,7 +248,7 @@ export default async function MessagesPage({
                         <tr key={msg.id} className="group/row dash-table-row">
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold" style={{ background: sender?.role === "driver" ? "rgba(52,211,153,0.15)" : "rgba(96,165,250,0.15)", color: sender?.role === "driver" ? "#34D399" : "#60A5FA" }}>
+                              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold" style={{ background: sender?.role === "driver" ? "var(--success-surface)" : "var(--info-surface)", color: sender?.role === "driver" ? "var(--success)" : "var(--info)" }}>
                                 {(sender?.name || "?")[0]}
                               </div>
                               <div>
@@ -259,7 +259,7 @@ export default async function MessagesPage({
                           </td>
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold" style={{ background: receiver?.role === "driver" ? "rgba(52,211,153,0.15)" : "rgba(96,165,250,0.15)", color: receiver?.role === "driver" ? "#34D399" : "#60A5FA" }}>
+                              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold" style={{ background: receiver?.role === "driver" ? "var(--success-surface)" : "var(--info-surface)", color: receiver?.role === "driver" ? "var(--success)" : "var(--info)" }}>
                                 {(receiver?.name || "?")[0]}
                               </div>
                               <p className="text-[12px] text-text-secondary">{receiver?.name || "—"}</p>
@@ -272,14 +272,14 @@ export default async function MessagesPage({
                             <Link
                               href={`/dashboard/trips/${msg.trip_id}`}
                               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold font-mono transition-all hover:opacity-80"
-                              style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.2)" }}
+                              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
                             >
                               <MapPin size={9} />
                               {msg.trip_id?.substring(0, 8)}...
                             </Link>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: msg.is_read ? "#34D399" : "#F87171", boxShadow: msg.is_read ? "0 0 6px rgba(52,211,153,0.4)" : "0 0 6px rgba(248,113,113,0.4)" }} />
+                            <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: msg.is_read ? "var(--success)" : "var(--error)", boxShadow: msg.is_read ? "0 0 6px var(--success-surface)" : "0 0 6px var(--error-surface)" }} />
                           </td>
                           <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{formatDate(msg.created_at)}</td>
                         </tr>
@@ -319,7 +319,7 @@ export default async function MessagesPage({
                 className="w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all"
                 style={
                   p === page
-                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: `0 4px 12px rgba(var(--primary-rgb),0.28)`, border: "1px solid var(--primary)" }
                     : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
                 }
               >

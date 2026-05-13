@@ -98,7 +98,7 @@ export default function NotificationsClient({
           onClick={() => setShowSendModal(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 hover:-translate-y-0.5 mr-auto"
           style={{
-            background: "linear-gradient(135deg, #3B82F6, #6366F1)",
+            background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
             color: "white",
             boxShadow: "0 4px 14px rgba(59,130,246,0.35)",
             border: "1px solid rgba(59,130,246,0.3)",
@@ -240,8 +240,8 @@ export default function NotificationsClient({
                   className="flex-1 py-3 rounded-xl text-[13px] font-black text-white flex items-center justify-center gap-2 transition-all"
                   style={{
                     background: sendSuccess
-                      ? "linear-gradient(135deg, #10B981, #059669)"
-                      : "linear-gradient(135deg, #3B82F6, #6366F1)",
+                      ? "linear-gradient(135deg, var(--success), var(--success-light))"
+                      : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
                     opacity: (!form.title || !form.message || sending) ? 0.6 : 1,
                     boxShadow: "0 4px 14px rgba(59,130,246,0.35)",
                   }}

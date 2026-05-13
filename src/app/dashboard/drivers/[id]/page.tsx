@@ -55,7 +55,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
             <Link
               href={`/dashboard/messages?user_id=${user.id}`}
               className="px-4 py-2 rounded-xl text-[12px] font-bold flex items-center gap-2 transition-opacity hover:opacity-80"
-              style={{ background: "rgba(56,189,248,0.1)", color: "#7DD3FC", border: "1px solid rgba(56,189,248,0.2)" }}
+              style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-surface)" }}
             >
               <MessageSquare size={14} />
               مراسلة
@@ -64,7 +64,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
             <Link
               href={`/dashboard/drivers/revision?driver_id=${driver.id}&name=${encodeURIComponent(user.name)}`}
               className="px-4 py-2 rounded-xl text-[12px] font-bold flex items-center gap-2 transition-opacity hover:opacity-80"
-              style={{ background: "rgba(139,92,246,0.1)", color: "#C4B5FD", border: "1px solid rgba(139,92,246,0.2)" }}
+              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
             >
               <AlertCircle size={14} />
               طلب مراجعة
@@ -77,9 +77,9 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
                 type="submit"
                 className="px-4 py-2 rounded-xl text-[12px] font-bold flex items-center gap-2 transition-opacity hover:opacity-80"
                 style={{
-                  background: user.is_blocked ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-                  color: user.is_blocked ? "#34D399" : "#F87171",
-                  border: `1px solid ${user.is_blocked ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)"}`
+                  background: user.is_blocked ? "var(--success-surface)" : "var(--error-surface)",
+                  color: user.is_blocked ? "var(--success)" : "var(--error)",
+                  border: `1px solid ${user.is_blocked ? "var(--success-border)" : "var(--error-border)"}`
                 }}
               >
                 <ShieldBan size={14} />
@@ -92,7 +92,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
                 <input type="hidden" name="driver_id" value={driver.id} />
                 <button type="submit"
                   className="px-4 py-2 rounded-xl text-[12px] font-bold text-white flex items-center gap-2 transition-opacity hover:opacity-80"
-                  style={{ background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 8px rgba(16,185,129,0.3)" }}>
+                  style={{ background: "linear-gradient(135deg, var(--success), var(--success-light))", boxShadow: "0 3px 8px var(--success-surface)" }}>
                   <CheckCircle size={14} />
                   اعتماد كـ سائق
                 </button>
@@ -180,13 +180,13 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
             </div>
             <div className="p-4 rounded-xl text-center" style={{ background: "var(--surface-glass)" }}>
               <p className="text-text-disabled text-sm mb-1">حالة التوفر</p>
-              <p className="text-lg font-bold mt-2" style={{ color: driver.is_available ? "#34D399" : "#64748B" }}>
+              <p className="text-lg font-bold mt-2" style={{ color: driver.is_available ? "var(--success)" : "var(--text-disabled)" }}>
                 {driver.is_available ? "متاح للطلبات" : "غير متاح"}
               </p>
             </div>
             <div className="p-4 rounded-xl text-center" style={{ background: "var(--surface-glass)" }}>
               <p className="text-text-disabled text-sm mb-1">نشاط التطبيق</p>
-              <p className="text-lg font-bold mt-2" style={{ color: user.is_active ? "#10B981" : "#F87171" }}>
+              <p className="text-lg font-bold mt-2" style={{ color: user.is_active ? "var(--success)" : "var(--error)" }}>
                 {user.is_active ? "نشط" : "غير نشط"}
               </p>
             </div>

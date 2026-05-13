@@ -72,7 +72,7 @@ export default async function NotificationsPage({
           {unreadCount > 0 && (
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-              style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#F87171" }}
+              style={{ background: "var(--error-surface)", border: "1px solid var(--error-border)", color: "var(--error)" }}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full bg-error"
@@ -83,7 +83,7 @@ export default async function NotificationsPage({
           )}
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-            style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)", color: "#93C5FD" }}
+            style={{ background: "var(--info-surface)", border: "1px solid var(--info-surface)", color: "var(--info)" }}
           >
             <Bell size={11} />
             {count || 0} {t("notifications.total")}
@@ -125,7 +125,7 @@ export default async function NotificationsPage({
                 <div
                   className="absolute right-0 top-0 bottom-0 w-[3px] rounded-l-full"
                   style={{
-                    background: "linear-gradient(to bottom, #3B82F6, #8B5CF6)",
+                    background: "linear-gradient(to bottom, var(--primary), var(--info))",
                     boxShadow: "0 0 8px rgba(59,130,246,0.5)",
                   }}
                 />
@@ -149,7 +149,7 @@ export default async function NotificationsPage({
                   >
                     <Bell
                       size={16}
-                      style={{ color: isUnread ? "#60A5FA" : "var(--text-tertiary)" }}
+                      style={{ color: isUnread ? "var(--info)" : "var(--text-tertiary)" }}
                     />
                   </div>
 
@@ -162,7 +162,7 @@ export default async function NotificationsPage({
                       {isUnread && (
                         <span
                           className="relative w-2 h-2 rounded-full"
-                          style={{ background: "#3B82F6", boxShadow: "0 0 6px rgba(59,130,246,0.6)" }}
+                          style={{ background: "var(--info)", boxShadow: "0 0 6px var(--info-surface)" }}
                         >
                           <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-50" />
                         </span>

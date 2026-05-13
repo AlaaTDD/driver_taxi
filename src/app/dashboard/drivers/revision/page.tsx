@@ -84,14 +84,14 @@ function DriverRevisionForm() {
         <form
           onSubmit={handleSubmit}
           className="dash-card overflow-hidden"
-          style={{ border: "1px solid rgba(139,92,246,0.2)" }}
+          style={{ border: "1px solid var(--accent-border)" }}
         >
           <div className="dash-section-header">
             <div
               className="w-[3px] h-5 rounded-full"
               style={{
-                background: "linear-gradient(to bottom, #8B5CF6, #6366F1)",
-                boxShadow: "0 0 8px rgba(139,92,246,0.5)",
+                background: "linear-gradient(to bottom, var(--primary-light), var(--primary))",
+                boxShadow: "0 0 8px var(--primary-surface)",
               }}
             />
             <h3 className="text-[13px] font-bold text-text-primary">بيانات الطلب</h3>
@@ -113,10 +113,10 @@ function DriverRevisionForm() {
                       onClick={() => toggleField(opt.key)}
                       className="px-3 py-2 rounded-xl text-[12px] font-bold transition-all"
                       style={{
-                        background: active ? "rgba(139,92,246,0.15)" : "var(--surface-glass)",
-                        border: active ? "1px solid rgba(139,92,246,0.4)" : "1px solid var(--divider)",
-                        color: active ? "#C4B5FD" : "var(--text-secondary)",
-                        boxShadow: active ? "0 0 12px rgba(139,92,246,0.1)" : "none",
+                        background: active ? "var(--accent-surface)" : "var(--surface-glass)",
+                        border: active ? "1px solid var(--accent-border)" : "1px solid var(--divider)",
+                        color: active ? "var(--primary)" : "var(--text-secondary)",
+                        boxShadow: active ? `0 0 12px var(--accent-shadow)` : "none",
                       }}
                     >
                       {active && <Check size={10} className="inline ml-1" />}
@@ -157,9 +157,9 @@ function DriverRevisionForm() {
               className="w-full py-3.5 rounded-xl text-[14px] font-black text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               style={{
                 background: saved
-                  ? "linear-gradient(135deg, #10B981, #059669)"
-                  : "linear-gradient(135deg, #8B5CF6, #6366F1)",
-                boxShadow: "0 6px 20px rgba(139,92,246,0.3)",
+                  ? "linear-gradient(135deg, var(--success), var(--success-light))"
+                  : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+                boxShadow: `0 6px 20px var(--accent-shadow)`,
               }}
             >
               {loading ? (

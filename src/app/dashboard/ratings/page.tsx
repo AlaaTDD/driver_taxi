@@ -29,8 +29,8 @@ export default async function RatingsPage({
   ]);
 
   const tabs = [
-    { key: "driver_ratings", label: t("ratings.tabs.driverRatings"), count: driverRatingsCountRes.count || 0, icon: Car, color: "#F59E0B" },
-    { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "#8B5CF6" },
+    { key: "driver_ratings", label: t("ratings.tabs.driverRatings"), count: driverRatingsCountRes.count || 0, icon: Car, color: "var(--warning)", colorRaw: "217,119,6" },
+    { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "var(--primary)", colorRaw: "245,158,11" },
   ];
 
   // Driver list for filter
@@ -132,14 +132,14 @@ export default async function RatingsPage({
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: t("ratings.stats.total"), value: currentTotal, icon: MessageSquare, color: "#3B82F6" },
-              { label: t("ratings.stats.average"), value: currentAvg, icon: Star, color: "#F59E0B" },
-              { label: t("ratings.stats.fiveStars"), value: currentCounts[5], icon: Star, color: "#10B981" },
-              { label: t("ratings.stats.oneTwoStars"), value: currentCounts[1] + currentCounts[2], icon: Star, color: "#EF4444" },
+              { label: t("ratings.stats.total"), value: currentTotal, icon: MessageSquare, color: "var(--info)", colorRaw: "37,99,235" },
+              { label: t("ratings.stats.average"), value: currentAvg, icon: Star, color: "var(--warning)", colorRaw: "217,119,6" },
+              { label: t("ratings.stats.fiveStars"), value: currentCounts[5], icon: Star, color: "var(--success)", colorRaw: "16,185,129" },
+              { label: t("ratings.stats.oneTwoStars"), value: currentCounts[1] + currentCounts[2], icon: Star, color: "var(--error)", colorRaw: "239,68,68" },
             ].map((stat) => (
               <div key={stat.label} className="dash-card p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `rgba(${(stat as any).colorRaw},0.10)`, border: `1px solid rgba(${(stat as any).colorRaw},0.22)` }}>
                     <stat.icon size={18} style={{ color: stat.color }} />
                   </div>
                   <div>
@@ -162,14 +162,14 @@ export default async function RatingsPage({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
               style={
                 tab === t.key
-                  ? { background: `${t.color}25`, border: `1px solid ${t.color}35`, color: t.color, boxShadow: `0 4px 12px ${t.color}15` }
+                  ? { background: `rgba(${t.colorRaw},0.12)`, border: `1px solid rgba(${t.colorRaw},0.26)`, color: t.color, boxShadow: `0 4px 12px rgba(${t.colorRaw},0.12)` }
                   : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }
               }
             >
               <t.icon size={14} />
               {t.label}
               {t.count > 0 && (
-                <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5" style={{ background: tab === t.key ? t.color : "var(--surface-glass)", color: tab === t.key ? "white" : "var(--text-tertiary)", border: tab === t.key ? "none" : "1px solid var(--divider)" }}>
+                <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5" style={{ background: tab === t.key ? `rgba(${t.colorRaw},0.20)` : "var(--surface-glass)", color: tab === t.key ? t.color : "var(--text-tertiary)", border: tab === t.key ? `1px solid rgba(${t.colorRaw},0.30)` : "1px solid var(--divider)" }}>
                   {t.count}
                 </span>
               )}
@@ -185,7 +185,7 @@ export default async function RatingsPage({
               const count = currentCounts[stars as keyof typeof currentCounts];
               const total = tab === "driver_ratings" ? (ratings?.length || 1) : (userRatings?.length || 1);
               const percentage = total > 0 ? (count / total) * 100 : 0;
-              const colors = { 5: "#10B981", 4: "#8B5CF6", 3: "#3B82F6", 2: "#F59E0B", 1: "#EF4444" };
+              const colors = { 5: "var(--success)", 4: "var(--primary)", 3: "var(--info)", 2: "var(--warning)", 1: "var(--error)" };
               return (
                 <div key={stars} className="flex items-center gap-3">
                   <div className="flex items-center gap-1 w-16">
@@ -253,7 +253,7 @@ export default async function RatingsPage({
                 <div key={rating.id} className="dash-card p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "rgba(59,130,246,0.15)", color: "#60A5FA" }}>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "var(--info-surface)", color: "var(--info)" }}>
                         {(user?.name || "?")[0]}
                       </div>
                       <div>
@@ -261,7 +261,7 @@ export default async function RatingsPage({
                           <span className="font-bold text-text-primary">{user?.name || t("common.user")}</span>
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
-                              <Star key={i} size={14} fill={i < stars ? "#F59E0B" : "transparent"} style={{ color: i < stars ? "#F59E0B" : "var(--text-disabled)" }} />
+                              <Star key={i} size={14} fill={i < stars ? "var(--warning)" : "transparent"} style={{ color: i < stars ? "var(--warning)" : "var(--text-disabled)" }} />
                             ))}
                           </div>
                           <span className="text-[12px] text-text-tertiary">{rating.rating}/5</span>
@@ -301,7 +301,7 @@ export default async function RatingsPage({
               return (
                 <div key={rating.id} className="dash-card p-5">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "#A78BFA" }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-bold" style={{ background: "var(--accent-surface)", color: "var(--primary)" }}>
                       {(driver?.name || "?")[0]}
                     </div>
                     <div className="flex-1">
@@ -317,7 +317,7 @@ export default async function RatingsPage({
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={14} fill={i < stars ? "#8B5CF6" : "transparent"} style={{ color: i < stars ? "#8B5CF6" : "var(--text-disabled)" }} />
+                            <Star key={i} size={14} fill={i < stars ? "var(--primary)" : "transparent"} style={{ color: i < stars ? "var(--primary)" : "var(--text-disabled)" }} />
                           ))}
                         </div>
                         <span className="text-[12px] text-text-tertiary">{rating.rating}/5</span>

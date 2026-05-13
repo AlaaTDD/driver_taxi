@@ -56,8 +56,8 @@ export default async function CouponsPage({
             <div
               className="w-[3px] h-5 rounded-full"
               style={{
-                background: "linear-gradient(to bottom, #F59E0B, #D97706)",
-                boxShadow: "0 0 8px rgba(245,158,11,0.5)",
+                background: "linear-gradient(to bottom, var(--primary), var(--primary-dark))",
+                boxShadow: "0 0 8px var(--primary-surface)",
               }}
             />
             <div>
@@ -95,10 +95,10 @@ export default async function CouponsPage({
                       <div
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-[12px] mono"
                         style={{
-                          background: "rgba(245,158,11,0.1)",
-                          color: "#FCD34D",
-                          border: "1px solid rgba(245,158,11,0.25)",
-                          boxShadow: "0 2px 8px rgba(245,158,11,0.1)",
+                          background: "var(--accent-surface)",
+                          color: "var(--primary)",
+                          border: "1px solid var(--accent-border)",
+                          boxShadow: "0 2px 8px var(--accent-shadow)",
                         }}
                       >
                         <Tag size={11} />
@@ -123,7 +123,7 @@ export default async function CouponsPage({
                     
                     <td className="py-3.5 px-4">
                       <span className="text-[14px] font-black num"
-                        style={{ color: "#34D399" }}>
+                        style={{ color: "var(--success)" }}>
                         {coupon.discount_type === "percentage"
                           ? `${coupon.discount_value}٪`
                           : formatCurrency(Number(coupon.discount_value))}
@@ -233,7 +233,7 @@ export default async function CouponsPage({
               className="w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all"
               style={
                 p === page
-                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px var(--accent-shadow)", border: "1px solid var(--accent-border)" }
                   : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
               }
             >

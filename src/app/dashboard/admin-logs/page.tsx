@@ -42,14 +42,14 @@ export default async function AdminLogsPage({
   const totalPages = Math.ceil((count || 0) / pageSize);
 
   const actionLabels: Record<string, { label: string; color: string; bg: string }> = {
-    create: { label: t("adminLogs.actions.create"), color: "#10B981", bg: "rgba(16,185,129,0.1)" },
-    update: { label: t("adminLogs.actions.update"), color: "#3B82F6", bg: "rgba(59,130,246,0.1)" },
-    delete: { label: t("adminLogs.actions.delete"), color: "#EF4444", bg: "rgba(239,68,68,0.1)" },
-    verify: { label: t("adminLogs.actions.verify"), color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
-    revoke: { label: t("adminLogs.actions.revoke"), color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
-    block: { label: t("adminLogs.actions.block"), color: "#EC4899", bg: "rgba(236,72,153,0.1)" },
-    unblock: { label: t("adminLogs.actions.unblock"), color: "#06B6D4", bg: "rgba(6,182,212,0.1)" },
-    send_notification: { label: t("adminLogs.actions.sendNotification"), color: "#6366F1", bg: "rgba(99,102,241,0.1)" },
+    create: { label: t("adminLogs.actions.create"), color: "var(--success)", bg: "var(--success-surface)" },
+    update: { label: t("adminLogs.actions.update"), color: "var(--info)", bg: "var(--info-surface)" },
+    delete: { label: t("adminLogs.actions.delete"), color: "var(--error)", bg: "var(--error-surface)" },
+    verify: { label: t("adminLogs.actions.verify"), color: "var(--primary)", bg: "var(--accent-surface)" },
+    revoke: { label: t("adminLogs.actions.revoke"), color: "var(--warning)", bg: "var(--warning-surface)" },
+    block: { label: t("adminLogs.actions.block"), color: "var(--error)", bg: "var(--error-surface)" },
+    unblock: { label: t("adminLogs.actions.unblock"), color: "var(--success)", bg: "var(--success-surface)" },
+    send_notification: { label: t("adminLogs.actions.sendNotification"), color: "var(--info)", bg: "var(--info-surface)" },
   };
 
   const tableLabels: Record<string, string> = {
@@ -76,8 +76,8 @@ export default async function AdminLogsPage({
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: t("adminLogs.stats.total"), value: count || 0, icon: FileText, color: "#3B82F6" },
-          { label: t("adminLogs.stats.activeAdmins"), value: (admins || []).length, icon: User, color: "#10B981" },
+          { label: t("adminLogs.stats.total"), value: count || 0, icon: FileText, color: "var(--info)", colorRaw: "37,99,235" },
+          { label: t("adminLogs.stats.activeAdmins"), value: (admins || []).length, icon: User, color: "var(--success)", colorRaw: "16,185,129" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -86,7 +86,7 @@ export default async function AdminLogsPage({
             <div className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}
+                style={{ background: `rgba(${stat.colorRaw},0.10)`, border: `1px solid rgba(${stat.colorRaw},0.20)` }}
               >
                 <stat.icon size={18} style={{ color: stat.color }} />
               </div>
@@ -140,7 +140,7 @@ export default async function AdminLogsPage({
         <button
           type="submit"
           className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white"
-          style={{ background: "#3B82F6" }}
+          style={{ background: "var(--primary)" }}
         >
           {t("adminLogs.filters.apply")}
         </button>
@@ -215,7 +215,7 @@ export default async function AdminLogsPage({
                       <div className="flex items-center gap-2">
                         <div
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold"
-                          style={{ background: "rgba(139,92,246,0.15)", color: "#8B5CF6" }}
+                          style={{ background: "var(--accent-surface)", color: "var(--primary)" }}
                         >
                           {(admin?.name || "?")[0]}
                         </div>

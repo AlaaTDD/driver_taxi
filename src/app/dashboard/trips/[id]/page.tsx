@@ -101,10 +101,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           </h3>
           
           <div className="relative pl-6 space-y-8">
-            <div className="absolute top-1 bottom-1 left-2 w-[2px]" style={{ background: "linear-gradient(to bottom, #10B981, #3B82F6)", opacity: 0.5 }} />
+            <div className="absolute top-1 bottom-1 left-2 w-[2px]" style={{ background: "linear-gradient(to bottom, var(--success), var(--info))", opacity: 0.5 }} />
             
             <div className="relative">
-              <div className="absolute -left-8 top-0.5 w-4 h-4 rounded-full flex items-center justify-center bg-background" style={{ border: "2px solid #10B981" }}>
+              <div className="absolute -left-8 top-0.5 w-4 h-4 rounded-full flex items-center justify-center bg-background" style={{ border: "2px solid var(--success)" }}>
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               </div>
               <p className="text-text-tertiary text-[11px] font-bold uppercase tracking-wider mb-1">نقطة الانطلاق</p>
@@ -112,7 +112,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             </div>
 
             <div className="relative">
-              <div className="absolute -left-8 top-0.5 w-4 h-4 rounded-full flex items-center justify-center bg-background" style={{ border: "2px solid #3B82F6" }}>
+              <div className="absolute -left-8 top-0.5 w-4 h-4 rounded-full flex items-center justify-center bg-background" style={{ border: "2px solid var(--info)" }}>
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               </div>
               <p className="text-text-tertiary text-[11px] font-bold uppercase tracking-wider mb-1">الوجهة</p>
@@ -169,7 +169,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           
           {user ? (
             <div className="flex gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-[18px]" style={{ background: "rgba(59,130,246,0.15)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-[18px]" style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-surface)" }}>
                 {user.name?.charAt(0)?.toUpperCase()}
               </div>
               <div className="space-y-1">
@@ -198,7 +198,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           
           {driver ? (
             <div className="flex gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-[18px]" style={{ background: "rgba(16,185,129,0.15)", color: "#6EE7B7", border: "1px solid rgba(16,185,129,0.2)" }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-[18px]" style={{ background: "var(--success-surface)", color: "var(--success)", border: "1px solid var(--success-border)" }}>
                 {driver.name?.charAt(0)?.toUpperCase()}
               </div>
               <div className="space-y-1 flex-1">

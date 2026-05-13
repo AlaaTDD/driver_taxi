@@ -39,11 +39,11 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
   return (
     <form onSubmit={handleSubmit} className="dash-card overflow-hidden"
       style={{
-        border: "1px solid rgba(59,130,246,0.15)",
+        border: "1px solid var(--accent-border)",
       }}>
       <div className="dash-section-header">
         <div className="w-[3px] h-5 rounded-full"
-          style={{ background: "linear-gradient(to bottom, #3B82F6, #6366F1)", boxShadow: "0 0 8px rgba(59,130,246,0.5)" }} />
+          style={{ background: "linear-gradient(to bottom, var(--primary-light), var(--primary))", boxShadow: "0 0 8px var(--primary-surface)" }} />
         <h3 className="text-[13px] font-bold text-text-primary">الرد على الشكوى</h3>
       </div>
 
@@ -53,9 +53,9 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">تغيير الحالة</label>
           <div className="flex gap-2 flex-wrap">
             {[
-              { value: "in_progress", label: "قيد المعالجة", color: "#3B82F6" },
-              { value: "resolved", label: "محلول", color: "#10B981" },
-              { value: "closed", label: "مغلق", color: "#64748B" },
+              { value: "in_progress", label: "قيد المعالجة", color: "var(--info)", colorRaw: "37,99,235" },
+              { value: "resolved", label: "محلول", color: "var(--success)", colorRaw: "16,185,129" },
+              { value: "closed", label: "مغلق", color: "var(--text-disabled)", colorRaw: "113,113,122" },
             ].map((opt) => (
               <button
                 key={opt.value}
@@ -63,10 +63,10 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
                 onClick={() => setStatus(opt.value)}
                 className="px-3 py-2 rounded-xl text-[12px] font-bold transition-all"
                 style={status === opt.value ? {
-                  background: `${opt.color}22`,
+                  background: `rgba(${(opt as any).colorRaw},0.12)`,
                   color: opt.color,
-                  border: `1px solid ${opt.color}40`,
-                  boxShadow: `0 0 12px ${opt.color}15`,
+                  border: `1px solid rgba(${(opt as any).colorRaw},0.28)`,
+                  boxShadow: `0 0 12px rgba(${(opt as any).colorRaw},0.12)`,
                 } : {
                   background: "var(--surface-glass)",
                   border: "1px solid var(--divider)",
@@ -105,9 +105,9 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           className="w-full py-3.5 rounded-xl text-[14px] font-black text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
           style={{
             background: saved
-              ? "linear-gradient(135deg, #10B981, #059669)"
-              : "linear-gradient(135deg, #3B82F6, #6366F1)",
-            boxShadow: "0 6px 20px rgba(59,130,246,0.3)",
+              ? "linear-gradient(135deg, var(--success), var(--success-light))"
+              : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+            boxShadow: `0 6px 20px var(--accent-shadow)`,
           }}>
           {loading ? (
             <><svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">

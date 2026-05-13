@@ -51,16 +51,16 @@ export default async function WalletsPage({
   const totalUserBalance = userWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
 
   const statCards = [
-    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), color: "#34D399", icon: Car },
-    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), color: "#60A5FA", icon: TrendingUp },
-    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), color: "#F87171", icon: TrendingDown },
-    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), color: "#A78BFA", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), color: "var(--success)", colorRaw: "16,185,129", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), color: "var(--info)", colorRaw: "37,99,235", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), color: "var(--error)", colorRaw: "220,38,38", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), color: "var(--primary)", colorRaw: "217,119,6", icon: User },
   ];
 
   const tabs = [
-    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, color: "#34D399" },
-    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, color: "#A78BFA" },
-    { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, color: "#60A5FA" },
+    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, color: "var(--success)", colorRaw: "16,185,129" },
+    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, color: "var(--primary)", colorRaw: "217,119,6" },
+    { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, color: "var(--info)", colorRaw: "37,99,235" },
   ];
 
   /* ── Driver wallets with user info ── */
@@ -117,16 +117,16 @@ export default async function WalletsPage({
     }
   }
 
-  const txTypeLabels: Record<string, { label: string; color: string }> = {
-    trip_earning: { label: t("wallets.txTypes.trip_earning"), color: "#34D399" },
-    trip_payment: { label: t("wallets.txTypes.trip_payment"), color: "#60A5FA" },
-    withdrawal: { label: t("wallets.txTypes.withdrawal"), color: "#F87171" },
-    withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), color: "#FBBF24" },
-    top_up: { label: t("wallets.txTypes.top_up"), color: "#A78BFA" },
-    refund: { label: t("wallets.txTypes.refund"), color: "#06B6D4" },
-    bonus: { label: t("wallets.txTypes.bonus"), color: "#10B981" },
-    penalty: { label: t("wallets.txTypes.penalty"), color: "#EF4444" },
-    adjustment: { label: t("wallets.txTypes.adjustment"), color: "#8B5CF6" },
+  const txTypeLabels: Record<string, { label: string; color: string; colorRaw: string }> = {
+    trip_earning: { label: t("wallets.txTypes.trip_earning"), color: "var(--success)", colorRaw: "16,185,129" },
+    trip_payment: { label: t("wallets.txTypes.trip_payment"), color: "var(--info)", colorRaw: "37,99,235" },
+    withdrawal: { label: t("wallets.txTypes.withdrawal"), color: "var(--error)", colorRaw: "220,38,38" },
+    withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), color: "var(--warning)", colorRaw: "217,119,6" },
+    top_up: { label: t("wallets.txTypes.top_up"), color: "var(--primary)", colorRaw: "217,119,6" },
+    refund: { label: t("wallets.txTypes.refund"), color: "var(--info)", colorRaw: "37,99,235" },
+    bonus: { label: t("wallets.txTypes.bonus"), color: "var(--success)", colorRaw: "16,185,129" },
+    penalty: { label: t("wallets.txTypes.penalty"), color: "var(--error)", colorRaw: "220,38,38" },
+    adjustment: { label: t("wallets.txTypes.adjustment"), color: "var(--warning)", colorRaw: "217,119,6" },
   };
 
   return (
@@ -145,7 +145,7 @@ export default async function WalletsPage({
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: `${s.color}15`, border: `1px solid ${s.color}25`, color: s.color }}
+                  style={{ background: `rgba(${s.colorRaw},0.12)`, border: `1px solid rgba(${s.colorRaw},0.24)`, color: s.color }}
                 >
                   <s.icon size={16} />
                 </div>
@@ -166,16 +166,18 @@ export default async function WalletsPage({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
               style={
                 tab === t.key
-                  ? { background: `${t.color}25`, border: `1px solid ${t.color}35`, color: t.color, boxShadow: `0 4px 12px ${t.color}15` }
+                  ? { background: `rgba(${t.colorRaw},0.12)`, border: `1px solid rgba(${t.colorRaw},0.28)`, color: t.color, boxShadow: `0 4px 12px rgba(${t.colorRaw},0.12)` }
                   : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }
               }
             >
               {t.label}
               {t.count > 0 && (
                 <span
-                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5 ${tab === t.key ? "text-white" : "bg-surface-glass text-text-tertiary border border-divider"}`}
+                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5`}
                   style={{
-                    background: tab === t.key ? t.color : undefined,
+                    background: tab === t.key ? `rgba(${t.colorRaw},0.20)` : "var(--surface-elevated)",
+                    color: tab === t.key ? t.color : "var(--text-tertiary)",
+                    border: "1px solid var(--divider)",
                   }}
                 >
                   {t.count}
@@ -189,7 +191,7 @@ export default async function WalletsPage({
         {tab === "driver_wallets" && (
           <div className="dash-table-card">
             <div className="dash-section-header">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #34D399, #059669)", boxShadow: "0 0 8px rgba(52,211,153,0.5)" }} />
+              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--success), var(--success-light))", boxShadow: "0 0 8px var(--success-surface)" }} />
               <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.driverWallets")}</h3>
               <span className="text-text-disabled text-[11px]">({driverWalletsCount})</span>
             </div>
@@ -207,17 +209,17 @@ export default async function WalletsPage({
                     <tr key={w.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "var(--success-surface)", color: "var(--success)" }}>
                             {(w.user?.name || "?")[0]}
                           </div>
                           <span className="text-[13px] font-bold text-text-primary">{w.user?.name || "—"}</span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num text-emerald-400">{formatCurrency(Number(w.balance))}</td>
-                      <td className="py-3.5 px-4 text-[13px] font-bold num text-blue-400">{formatCurrency(Number(w.total_earned))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num text-red-400">{formatCurrency(Number(w.total_withdrawn))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num text-amber-400">{formatCurrency(Number(w.pending_withdrawal))}</td>
+                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.balance))}</td>
+                      <td className="py-3.5 px-4 text-[13px] font-bold num" style={{ color: "var(--info)" }}>{formatCurrency(Number(w.total_earned))}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_withdrawn))}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--warning)" }}>{formatCurrency(Number(w.pending_withdrawal))}</td>
                       <td className="py-3.5 px-4 text-[13px] num text-text-secondary">{(Number(w.commission_rate) * 100).toFixed(0)}%</td>
                     </tr>
                   ))}
@@ -237,7 +239,7 @@ export default async function WalletsPage({
         {tab === "user_wallets" && (
           <div className="dash-table-card">
             <div className="dash-section-header">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #A78BFA, #7C3AED)", boxShadow: "0 0 8px rgba(167,139,250,0.5)" }} />
+              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--primary-light), var(--primary))", boxShadow: "0 0 8px var(--primary-surface)" }} />
               <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.userWallets")}</h3>
               <span className="text-text-disabled text-[11px]">({userWalletsCount})</span>
             </div>
@@ -255,16 +257,16 @@ export default async function WalletsPage({
                     <tr key={w.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(167,139,250,0.15)", color: "#A78BFA" }}>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "var(--primary-surface)", color: "var(--primary)" }}>
                             {(w.user?.name || "?")[0]}
                           </div>
                           <span className="text-[13px] font-bold text-text-primary">{w.user?.name || "—"}</span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num text-violet-400">{formatCurrency(Number(w.balance))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num text-red-400">{formatCurrency(Number(w.total_spent))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num text-emerald-400">{formatCurrency(Number(w.total_topped_up))}</td>
+                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--primary)" }}>{formatCurrency(Number(w.balance))}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_spent))}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.total_topped_up))}</td>
                       <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{w.updated_at ? formatDate(w.updated_at) : "—"}</td>
                     </tr>
                   ))}
@@ -309,22 +311,22 @@ export default async function WalletsPage({
                   </thead>
                   <tbody>
                     {transactions.map((tx) => {
-                      const txMeta = txTypeLabels[tx.type] || { label: tx.type, color: "#9CA3AF" };
+                      const txMeta = txTypeLabels[tx.type] || { label: tx.type, color: "var(--text-disabled)" };
                       const isPositive = Number(tx.amount) > 0;
                       return (
                         <tr key={tx.id} className="group/row dash-table-row">
                           <td className="py-3.5 px-4 text-[12px] text-text-primary font-medium">{tx.user_name || tx.wallet_id?.substring(0, 8) + "..."}</td>
                           <td className="py-3.5 px-4">
-                            <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: tx.wallet_type === "driver" ? "rgba(52,211,153,0.1)" : "rgba(167,139,250,0.1)", color: tx.wallet_type === "driver" ? "#34D399" : "#A78BFA", border: `1px solid ${tx.wallet_type === "driver" ? "rgba(52,211,153,0.2)" : "rgba(167,139,250,0.2)"}` }}>
+                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: tx.wallet_type === "driver" ? "var(--success-surface)" : "var(--primary-surface)", color: tx.wallet_type === "driver" ? "var(--success)" : "var(--primary)", border: `1px solid ${tx.wallet_type === "driver" ? "var(--success-border)" : "var(--accent-border)"}` }}>
                               {tx.wallet_type === "driver" ? t("common.driver") : t("common.user")}
                             </span>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: `${txMeta.color}15`, color: txMeta.color, border: `1px solid ${txMeta.color}25` }}>
+                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: `rgba(${txMeta.colorRaw},0.10)`, color: txMeta.color, border: `1px solid rgba(${txMeta.colorRaw},0.20)` }}>
                               {txMeta.label}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: isPositive ? "#34D399" : "#F87171" }}>
+                           <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: isPositive ? "var(--success)" : "var(--error)" }}>
                             {isPositive ? "+" : ""}{formatCurrency(Number(tx.amount))}
                           </td>
                           <td className="py-3.5 px-4 text-[12px] num text-text-tertiary">{formatCurrency(Number(tx.balance_before))}</td>

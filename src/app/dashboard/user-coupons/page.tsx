@@ -62,15 +62,15 @@ export default async function UserCouponsPage({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "#60A5FA", icon: Gift },
-            { label: t("userCoupons.stats.used"), value: totalUsed, color: "#34D399", icon: CheckCircle },
-            { label: t("userCoupons.stats.unused"), value: totalUnused, color: "#FBBF24", icon: Clock },
-            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "#F472B6", icon: Ticket },
+            { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "var(--info)", colorRaw: "37,99,235", icon: Gift },
+            { label: t("userCoupons.stats.used"), value: totalUsed, color: "var(--success)", colorRaw: "16,185,129", icon: CheckCircle },
+            { label: t("userCoupons.stats.unused"), value: totalUnused, color: "var(--warning)", colorRaw: "217,119,6", icon: Clock },
+            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "var(--primary)", colorRaw: "245,158,11", icon: Ticket },
           ].map((s) => (
             <div
               key={s.label}
               className="rounded-xl px-4 py-3"
-              style={{ background: `${s.color}11`, border: `1px solid ${s.color}22` }}
+              style={{ background: `rgba(${(s as any).colorRaw},0.08)`, border: `1px solid rgba(${(s as any).colorRaw},0.18)` }}
             >
               <div className="flex items-center gap-2 mb-1">
                 <s.icon size={13} style={{ color: s.color }} />
@@ -134,7 +134,7 @@ export default async function UserCouponsPage({
                       <td className="py-3.5 px-4">
                         <span
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold font-mono"
-                          style={{ background: "rgba(245,158,11,0.1)", color: "#FBBF24", border: "1px solid rgba(245,158,11,0.2)" }}
+                          style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
                         >
                           <Ticket size={11} />
                           {coupon?.code || "—"}
@@ -143,7 +143,7 @@ export default async function UserCouponsPage({
                       <td className="py-3.5 px-4 text-[12px] text-text-secondary">
                         {coupon?.discount_type === "percentage" ? t("userCoupons.discountType.percentage") : coupon?.discount_type === "fixed" ? t("userCoupons.discountType.fixed") : "—"}
                       </td>
-                      <td className="py-3.5 px-4 text-[13px] font-bold num text-emerald-400">
+                      <td className="py-3.5 px-4 text-[13px] font-bold num" style={{ color: "var(--success)" }}>
                         {coupon ? (
                           coupon.discount_type === "percentage"
                             ? `${coupon.discount_value}%`

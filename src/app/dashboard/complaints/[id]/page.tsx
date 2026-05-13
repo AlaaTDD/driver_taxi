@@ -32,7 +32,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
   const admin = (complaint as any).admin;
 
   const categoryLabel: Record<string, string> = { general: "عام", driver: "سائق", trip: "رحلة", payment: "دفع", app: "تطبيق", other: "أخرى" };
-  const priorityColor: Record<string, string> = { urgent: "#EF4444", high: "#F59E0B", normal: "#3B82F6", low: "#64748B" };
+  const priorityColor: Record<string, string> = { urgent: "var(--error)", high: "var(--warning)", normal: "var(--info)", low: "var(--text-disabled)" };
 
   return (
     <DashboardShell>
@@ -50,7 +50,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
           <h1 className="text-xl font-black text-text-primary">{complaint.title}</h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold"
-              style={{ background: "rgba(59,130,246,0.1)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+              style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-surface)" }}>
               {categoryLabel[complaint.category]}
             </span>
             <span className="text-[12px] font-bold" style={{ color: priorityColor[complaint.priority] }}>
@@ -66,7 +66,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider mb-3">المستخدم</h3>
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[15px]"
-            style={{ background: "rgba(59,130,246,0.15)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.2)" }}>
+            style={{ background: "var(--primary-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
             {user?.name?.charAt(0)?.toUpperCase()}
           </div>
           <div>

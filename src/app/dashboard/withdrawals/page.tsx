@@ -45,10 +45,10 @@ export default async function WithdrawalsPage({
   };
 
   const statCards = [
-    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "#FBBF24", icon: Clock },
-    { label: t("withdrawals.stats.approved"), value: stats.approved, color: "#60A5FA", icon: Loader2 },
-    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "#34D399", icon: CheckCircle },
-    { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "#F87171", icon: XCircle },
+    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "var(--warning)", colorRaw: "217,119,6", icon: Clock },
+    { label: t("withdrawals.stats.approved"), value: stats.approved, color: "var(--info)", colorRaw: "37,99,235", icon: Loader2 },
+    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "var(--success)", colorRaw: "16,185,129", icon: CheckCircle },
+    { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "var(--error)", colorRaw: "220,38,38", icon: XCircle },
   ];
 
   /* ── Query ── */
@@ -105,14 +105,14 @@ export default async function WithdrawalsPage({
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {statCards.map((s) => (
-            <div key={s.label} className="rounded-xl px-4 py-3" style={{ background: `${s.color}11`, border: `1px solid ${s.color}22` }}>
+            <div key={s.label} className="rounded-xl px-4 py-3" style={{ background: `rgba(${s.colorRaw},0.08)`, border: `1px solid rgba(${s.colorRaw},0.18)` }}>
               <div className="flex items-center gap-2 mb-1">
                 <s.icon size={13} style={{ color: s.color }} />
                 <span className="text-[10px] text-text-tertiary font-semibold">{s.label}</span>
               </div>
               <div className="text-[22px] font-black num" style={{ color: s.color }}>{s.value}</div>
               {s.amount && (
-                <div className="text-[11px] font-semibold num mt-0.5" style={{ color: `${s.color}AA` }}>{s.amount}</div>
+                <div className="text-[11px] font-semibold num mt-0.5" style={{ color: s.color, opacity: 0.7 }}>{s.amount}</div>
               )}
             </div>
           ))}
@@ -166,7 +166,7 @@ export default async function WithdrawalsPage({
                     <tr key={req.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "rgba(232,121,249,0.15)", color: "#E879F9" }}>
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "var(--primary-surface)", color: "var(--primary)" }}>
                             {(driver?.name || "?")[0]}
                           </div>
                           <div>
@@ -175,7 +175,7 @@ export default async function WithdrawalsPage({
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-[15px] font-black num text-emerald-400">{formatCurrency(Number(req.amount))}</td>
+                       <td className="py-3.5 px-4 text-[15px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(req.amount))}</td>
                       <td className="py-3.5 px-4">
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-semibold" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
                           <method.icon size={11} />
