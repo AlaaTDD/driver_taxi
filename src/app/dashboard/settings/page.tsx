@@ -1,4 +1,3 @@
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import { Settings, Shield, Globe, Palette } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -8,7 +7,7 @@ export default async function SettingsPage() {
   const t = await getTranslations();
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
@@ -66,6 +65,6 @@ export default async function SettingsPage() {
 
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

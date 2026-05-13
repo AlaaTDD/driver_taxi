@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
-import { DashboardShell } from "@/components/dashboard-shell";
 import TripsClient from "./trips-client";
 import { getTranslations } from "next-intl/server";
 import { MapPin, Gauge, ArrowUpRight, Clock, Car, User } from "lucide-react";
@@ -44,7 +43,7 @@ export default async function TripsPage({
     .reduce((s, t) => s + (Number(t.price) || 0), 0);
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
 
         {/* ── Header ── */}
@@ -107,20 +106,18 @@ export default async function TripsPage({
               (trips || []).map((trip) => (
                 <div
                   key={trip.id}
-                  className="group relative flex flex-col sm:flex-row justify-between p-3.5 rounded-xl border border-divider bg-surface transition-all duration-200 hover:border-primary/25 hover:shadow-sm"
+                  className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-divider bg-surface transition-all duration-200 hover:border-primary/25 hover:shadow-sm gap-4"
                 >
                   {/* Left: Route */}
-                  <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
-                    {/* Visual path */}
+                  <div className="flex items-stretch gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
                     <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
                       <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--success)", boxShadow: `0 0 0 4px var(--success-surface)` }} />
                       <div className="w-[1.5px] grow my-1.5" style={{ background: `linear-gradient(to bottom, var(--success-surface), var(--accent-surface))` }} />
                       <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--primary)", boxShadow: `0 0 0 4px var(--primary-surface)` }} />
                     </div>
 
-                    {/* Addresses */}
                     <div className="flex flex-col justify-between py-0.5 min-w-0 flex-1">
-                      <div className="mb-4">
+                      <div className="mb-3">
                         <p className="text-[13px] font-black text-text-primary truncate">{trip.pickup_address || "—"}</p>
                         <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.from")}</p>
                       </div>
@@ -131,56 +128,46 @@ export default async function TripsPage({
                     </div>
                   </div>
 
-                  {/* Right: Meta + Action */}
-                  <div className="flex flex-col items-end justify-between shrink-0 sm:pl-4 mt-3 sm:mt-0 sm:border-l border-divider gap-3 min-w-[160px]">
-                    <div className="flex flex-col items-end gap-1.5 w-full">
-                      {/* Price + Status */}
-                      <div className="flex items-center gap-2 justify-end w-full">
-                        <span className="text-[15px] font-black num tracking-tight text-text-primary">
-                          {formatCurrency(Number(trip.price))}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}
-                        >
-                          {getStatusLabel(trip.status)}
-                        </span>
+                  {/* Middle: Participants & Meta */}
+                  <div className="flex flex-col gap-2 shrink-0 sm:px-5 sm:border-x border-divider w-full sm:w-auto sm:min-w-[180px] py-1">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-[12px] text-text-secondary">
+                        <User size={13} className="text-text-tertiary" />
+                        <span className="font-semibold truncate max-w-[130px]">{userMap.get(trip.user_id) || "—"}</span>
                       </div>
-
-                      {/* Meta row */}
-                      <div className="flex items-center gap-3 text-text-tertiary">
-                        {/* Vehicle */}
-                        <span className="text-[11px] font-semibold">
-                          {trip.vehicle_type === "car" ? "🚗" : "🏍"} {Number(trip.distance_km).toFixed(1)} {t("common.km")}
-                        </span>
-                        {/* Date */}
-                        <div className="flex items-center gap-1">
-                          <Clock size={11} />
-                          <span className="text-[11px] font-bold">{formatDate(trip.created_at)}</span>
+                      {trip.driver_id && (
+                        <div className="flex items-center gap-2 text-[12px] text-text-secondary">
+                          <Car size={13} className="text-text-tertiary" />
+                          <span className="font-semibold truncate max-w-[130px]">{userMap.get(trip.driver_id) || "—"}</span>
                         </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-3 text-[11px] text-text-tertiary font-medium mt-1 pt-2 border-t border-divider/50">
+                      <div className="flex items-center gap-1">
+                        <Clock size={11} />
+                        <span>{formatDate(trip.created_at)}</span>
                       </div>
-
-                      {/* Passenger / Driver */}
-                      <div className="flex items-center gap-2 text-[11px] text-text-tertiary">
-                        <div className="flex items-center gap-1">
-                          <User size={10} />
-                          <span className="truncate max-w-[70px]">{userMap.get(trip.user_id) || "—"}</span>
-                        </div>
-                        {trip.driver_id && (
-                          <>
-                            <span className="opacity-40">·</span>
-                            <div className="flex items-center gap-1">
-                              <Car size={10} />
-                              <span className="truncate max-w-[70px]">{userMap.get(trip.driver_id) || "—"}</span>
-                            </div>
-                          </>
-                        )}
+                      <div className="flex items-center gap-1">
+                        <span>{trip.vehicle_type === "car" ? "🚗" : "🏍"} {Number(trip.distance_km).toFixed(1)} {t("common.km")}</span>
                       </div>
                     </div>
+                  </div>
 
-                    {/* View button */}
+                  {/* Right: Status, Price & Action */}
+                  <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between shrink-0 gap-3 w-full sm:w-[130px] py-1">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 w-full">
+                      <span className="text-[16px] font-black num tracking-tight text-text-primary">
+                        {formatCurrency(Number(trip.price))}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
+                        {getStatusLabel(trip.status)}
+                      </span>
+                    </div>
+
                     <Link
                       href={`/dashboard/trips/${trip.id}`}
-                      className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border border-primary/20 bg-primary/8 text-primary text-[11px] font-bold transition-all hover:bg-primary/15 hover:border-primary/35"
+                      className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-primary/20 bg-primary/8 text-primary text-[11px] font-bold transition-all hover:bg-primary/15 hover:border-primary/35 w-full sm:w-auto mt-auto"
                     >
                       {t("common.view")}
                       <ArrowUpRight size={12} />
@@ -202,6 +189,6 @@ export default async function TripsPage({
           </div>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

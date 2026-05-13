@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import DriversClient from "./drivers-client";
 import { getTranslations } from "next-intl/server";
 import { Car, CheckCircle, Clock, ShieldBan, AlertCircle, Star } from "lucide-react";
@@ -85,7 +84,7 @@ export default async function DriversPage({
   ];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         
         <div>
@@ -408,7 +407,7 @@ export default async function DriversPage({
         </div>
       )}
     </div>
-    </DashboardShell>
+    </>
   );
 }
 

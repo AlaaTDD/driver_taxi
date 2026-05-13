@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Ticket, User, CheckCircle, Clock, Gift } from "lucide-react";
@@ -51,7 +50,7 @@ export default async function UserCouponsPage({
   const totalDiscount = (usages || []).reduce((s, u) => s + (Number(u.discount_amount) || 0), 0);
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
 
         <div>
@@ -203,6 +202,6 @@ export default async function UserCouponsPage({
           )}
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

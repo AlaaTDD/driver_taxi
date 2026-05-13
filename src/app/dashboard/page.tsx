@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { LocalTimeDisplay } from "@/components/local-time-display";
 import { StatCard } from "@/components/stat-card";
 import { TripsStatusChart, RevenueChart } from "@/components/charts";
@@ -88,7 +87,7 @@ export default async function DashboardPage() {
   const recentActiveTrips = recentTrips.filter((trip) => !["completed", "cancelled"].includes(trip.status)).length;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
 
         {/* ─── PAGE HEADER ──────────────────────────────────────── */}
@@ -327,7 +326,7 @@ export default async function DashboardPage() {
         </div>
 
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

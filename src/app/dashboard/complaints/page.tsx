@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import ComplaintsClient from "@/app/dashboard/complaints/complaints-client";
 import { getTranslations } from "next-intl/server";
 import { MessageSquareWarning, CheckCircle, Clock, AlertTriangle, Zap } from "lucide-react";
@@ -80,7 +79,7 @@ export default async function ComplaintsPage({
   };
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         
         <div>
@@ -212,7 +211,7 @@ export default async function ComplaintsPage({
         </div>
       </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }
 

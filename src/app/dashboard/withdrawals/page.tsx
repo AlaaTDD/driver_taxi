@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import {
@@ -94,7 +93,7 @@ export default async function WithdrawalsPage({
   };
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -256,6 +255,6 @@ export default async function WithdrawalsPage({
           )}
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

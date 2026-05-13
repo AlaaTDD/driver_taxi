@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import {
   Activity,
@@ -88,7 +87,7 @@ export default async function DriverLocationsPage() {
   ];
 
   return (
-    <DashboardShell>
+    <>
       <div className="driver-locations-page space-y-5">
         <section className="driver-command-panel">
           <div className="driver-command-copy">
@@ -352,6 +351,6 @@ export default async function DriverLocationsPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

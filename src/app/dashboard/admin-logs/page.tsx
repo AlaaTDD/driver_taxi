@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import { Shield, Clock, User, Database, FileText } from "lucide-react";
 
@@ -65,7 +64,7 @@ export default async function AdminLogsPage({
   };
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         
         <div>
@@ -294,6 +293,6 @@ export default async function AdminLogsPage({
         )}
       </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }

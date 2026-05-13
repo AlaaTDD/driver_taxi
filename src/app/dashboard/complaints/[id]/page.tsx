@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import ComplaintDetailClient from "./complaint-detail-client";
 import { MessageSquareWarning, ArrowRight } from "lucide-react";
@@ -35,7 +34,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
   const priorityColor: Record<string, string> = { urgent: "var(--error)", high: "var(--warning)", normal: "var(--info)", low: "var(--text-disabled)" };
 
   return (
-    <DashboardShell>
+    <>
     <div className="space-y-6 max-w-3xl mx-auto">
       
       <Link href="/dashboard/complaints"
@@ -107,6 +106,6 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         <ComplaintDetailClient complaintId={complaint.id} currentStatus={complaint.status} />
       )}
     </div>
-    </DashboardShell>
+    </>
   );
 }

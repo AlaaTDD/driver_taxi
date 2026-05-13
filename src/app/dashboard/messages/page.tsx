@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { MessageSquare, User, Clock, ChevronLeft, ChevronRight, Headphones, MapPin, ArrowLeftRight } from "lucide-react";
@@ -93,7 +92,7 @@ export default async function MessagesPage({
   ];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
 
         {/* Header */}
@@ -337,6 +336,6 @@ export default async function MessagesPage({
           </div>
         )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

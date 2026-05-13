@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import { Car, CheckCircle, ShieldBan, AlertCircle, Star, Phone, Mail, User, FileText, ArrowRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +31,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
   const user = driver.users as any;
 
   return (
-    <DashboardShell>
+    <>
     <div className="space-y-6">
       
       <div className="flex flex-col gap-4">
@@ -229,6 +228,6 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
 
       </div>
     </div>
-    </DashboardShell>
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardShell } from "@/components/dashboard-shell";
 import UsersClient from "./users-client";
 import { getTranslations } from "next-intl/server";
 import { Users, ShieldBan, Shield, Crown } from "lucide-react";
@@ -95,7 +94,7 @@ export default async function UsersPage({
   ];
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
 
         {/* ── Page header ──────────────────────────────────── */}
@@ -204,6 +203,6 @@ export default async function UsersPage({
           currentUserId={currentUser?.id || ""}
         />
       </div>
-    </DashboardShell>
+    </>
   );
 }

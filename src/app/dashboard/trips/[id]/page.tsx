@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
 import { notFound } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { 
@@ -46,7 +45,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const driverProfile = driver?.drivers_profile as any;
 
   return (
-    <DashboardShell>
+    <>
     <div className="space-y-6 max-w-5xl mx-auto">
       
       
@@ -264,6 +263,6 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       )}
 
     </div>
-    </DashboardShell>
+    </>
   );
 }

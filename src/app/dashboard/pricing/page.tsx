@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import PricingClient from "./pricing-client";
 
@@ -13,7 +12,7 @@ export default async function PricingPage() {
     .order("sort_order");
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("pricing.title")}</h1>
@@ -21,6 +20,6 @@ export default async function PricingPage() {
         </div>
         <PricingClient configs={pricingConfigs || []} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

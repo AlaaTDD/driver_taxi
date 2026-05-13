@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import CouponsClient from "./coupons-client";
 import { getTranslations } from "next-intl/server";
 import { Tag, Percent, Hash, ChevronLeft, ChevronRight } from "lucide-react";
@@ -29,7 +28,7 @@ export default async function CouponsPage({
   const activeCount = (coupons || []).filter((c) => c.is_active).length;
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -251,6 +250,6 @@ export default async function CouponsPage({
         </div>
       )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

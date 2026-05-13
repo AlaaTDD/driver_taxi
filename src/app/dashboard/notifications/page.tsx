@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
-import { DashboardShell } from "@/components/dashboard-shell";
 import NotificationsClient from "./notifications-client";
 import { getTranslations } from "next-intl/server";
 import { Bell, Eye, Clock, User } from "lucide-react";
@@ -59,7 +58,7 @@ export default async function NotificationsPage({
   };
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -221,6 +220,6 @@ export default async function NotificationsPage({
         )}
       </div>
       </div>
-    </DashboardShell>
+    </>
   );
 }
