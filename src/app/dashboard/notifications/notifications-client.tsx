@@ -159,9 +159,6 @@ export default function NotificationsClient({
               boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
             }}
           >
-            
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: "linear-gradient(to left, transparent, #3B82F6, transparent)" }} />
 
             <div className="p-6">
               

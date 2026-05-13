@@ -91,9 +91,7 @@ export default async function ComplaintsPage({
       
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="group relative dash-card overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(to left, transparent, ${stat.color}, transparent)`, opacity: 0.6 }} />
+          <div key={i} className="group relative dash-stat overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{ background: `${stat.color}18`, border: `1px solid ${stat.color}25`, color: stat.color }}>

@@ -3,7 +3,8 @@
 
 :root {
   /* ══════════════════════════════════════════════════════════════════════
-     LIGHT MODE — Unified System (Purple Accent)
+     OBSIDIAN AMBER — Taxi Admin Design System
+     Primary: Amber Gold  |  Mode: Light
      ════════════════════════════════════════════════════════════════════ */
 
   /* ── BACKGROUNDS ── */
@@ -1236,7 +1237,7 @@ body {
 
   .driver-person-cell,
   .driver-muted-cell,
-  .driver-vehicle-cell > span,
+  .driver-vehicle-cell>span,
   .driver-heading,
   .driver-code-chip {
     display: inline-flex;
@@ -1276,7 +1277,7 @@ body {
     gap: 3px;
   }
 
-  .driver-vehicle-cell > span {
+  .driver-vehicle-cell>span {
     color: var(--text-secondary);
   }
 
@@ -1586,32 +1587,30 @@ body {
 
 /* Main content card */
 .dash-card {
-  background: linear-gradient(180deg, var(--surface), var(--surface-elevated));
+  background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 14px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .dash-card:hover {
-  border-color: var(--accent-border);
-  box-shadow: var(--shadow-md);
+  border-color: var(--divider-strong);
 }
 
 /* Table container card */
 .dash-table-card {
-  background: linear-gradient(180deg, var(--surface), var(--surface-elevated));
+  background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 14px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .dash-table-card:hover {
-  border-color: var(--accent-border);
-  box-shadow: var(--shadow-md);
+  border-color: var(--divider-strong);
 }
 
 /* Table header row */
@@ -1638,18 +1637,16 @@ body {
 
 /* Stat card base */
 .dash-stat {
-  background: linear-gradient(180deg, var(--surface), var(--surface-elevated));
+  background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 14px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   overflow: hidden;
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  transition: border-color 200ms ease;
 }
 
 .dash-stat:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-border);
-  box-shadow: var(--shadow-md);
+  border-color: var(--divider-strong);
 }
 
 /* Section header bar */
@@ -1722,13 +1719,7 @@ body {
   overflow: hidden;
 }
 
-.recent-trips-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.15), transparent);
-}
+
 
 .recent-trips-row {
   background: transparent;

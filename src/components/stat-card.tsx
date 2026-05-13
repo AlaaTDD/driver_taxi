@@ -38,10 +38,6 @@ export function StatCard({
         className
       )}
     >
-      <div
-        className="absolute inset-x-5 top-0 h-[2px] rounded-full opacity-80"
-        style={{ background: `linear-gradient(to left, transparent, ${accentColor}, transparent)` }}
-      />
       <div className="relative p-5 z-10">
         {/* Top row: title + icon */}
         <div className="flex items-start justify-between gap-3">

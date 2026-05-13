@@ -14,6 +14,8 @@ import {
   User,
   CreditCard,
   Smartphone,
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 
 export default async function WithdrawalsPage({

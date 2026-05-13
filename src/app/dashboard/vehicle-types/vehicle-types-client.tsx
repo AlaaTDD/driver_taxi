@@ -230,24 +230,21 @@ export default function VehicleTypesClient({
       )}
 
       
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {vehicleTypes.map((vt) => (
           <div
             key={vt.id}
-            className="group dash-card p-5 transition-all hover:scale-[1.005]"
-            style={{
-              border: `1px solid ${vt.is_active ? "rgba(16,185,129,0.15)" : "var(--divider)"}`,
-              opacity: vt.is_active ? 1 : 0.6,
-            }}
+            className="dash-stat p-5 transition-all"
+            style={{ opacity: vt.is_active ? 1 : 0.55 }}
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              
+              {/* Icon + Info */}
               <div className="flex items-center gap-4 flex-1">
                 <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
                   style={{
-                    background: vt.is_active ? "linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15))" : "var(--surface-glass)",
-                    border: `1px solid ${vt.is_active ? "rgba(59,130,246,0.2)" : "var(--divider)"}`,
+                    background: vt.is_active ? "var(--accent-surface)" : "var(--surface-elevated)",
+                    border: `1px solid ${vt.is_active ? "var(--accent-border)" : "var(--divider)"}`,
                   }}
                 >
                   {vt.name === "car" ? "🚗" : vt.name === "truck" ? "🚛" : vt.name === "motorcycle" ? "🏍" : "🚕"}
@@ -258,55 +255,57 @@ export default function VehicleTypesClient({
                     <span
                       className="px-2 py-0.5 rounded-lg text-[10px] font-bold"
                       style={{
-                        background: vt.is_active ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
-                        color: vt.is_active ? "#34D399" : "#F87171",
-                        border: `1px solid ${vt.is_active ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
+                        background: vt.is_active ? "var(--success-surface)" : "var(--error-surface)",
+                        color: vt.is_active ? "var(--success)" : "var(--error)",
+                        border: `1px solid ${vt.is_active ? "var(--success-border)" : "var(--error-border)"}`,
                       }}
                     >
                       {vt.is_active ? t("vehicleTypes.status.active") : t("vehicleTypes.status.inactive")}
                     </span>
                   </div>
-                  <p className="text-[12px] text-text-tertiary mt-0.5 font-mono">{vt.name} • ترتيب: {vt.sort_order}</p>
+                  <p className="text-[12px] text-text-tertiary mt-0.5 font-mono">{vt.name} · {t("vehicleTypes.form.sortOrder")}: {vt.sort_order}</p>
                 </div>
               </div>
 
-              
-              <div className="flex items-center gap-6">
+              {/* Pricing */}
+              <div className="flex items-center gap-4 shrink-0">
                 <div className="text-center">
                   <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">{t("vehicleTypes.form.baseFare")}</div>
-                  <div className="text-[16px] font-black text-emerald-400 num">{formatCurrency(Number(vt.base_fare))}</div>
+                  <div className="text-[16px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(vt.base_fare))}</div>
                 </div>
                 <div className="w-px h-10 bg-divider" />
                 <div className="text-center">
                   <div className="text-[10px] text-text-tertiary font-semibold uppercase tracking-wider mb-1">{t("vehicleTypes.form.pricePerKm")}</div>
-                  <div className="text-[16px] font-black text-blue-400 num">{formatCurrency(Number(vt.price_per_km))}</div>
+                  <div className="text-[16px] font-black num" style={{ color: "var(--primary)" }}>{formatCurrency(Number(vt.price_per_km))}</div>
                 </div>
               </div>
 
-              
+              {/* Actions */}
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => handleToggle(vt.id, vt.is_active)}
                   disabled={loading === vt.id}
-                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-surface-elevated disabled:opacity-50"
+                  className="p-2 rounded-xl transition-all border border-divider hover:bg-surface-elevated disabled:opacity-50"
                   title={vt.is_active ? "تعطيل" : "تفعيل"}
                 >
-                  {vt.is_active ? <ToggleRight size={16} className="text-emerald-400" /> : <ToggleLeft size={16} className="text-text-tertiary" />}
+                  {vt.is_active
+                    ? <ToggleRight size={16} style={{ color: "var(--success)" }} />
+                    : <ToggleLeft size={16} className="text-text-disabled" />}
                 </button>
                 <button
                   onClick={() => startEdit(vt)}
-                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-surface-elevated"
+                  className="p-2 rounded-xl transition-all border border-divider hover:bg-surface-elevated"
                   title="تعديل"
                 >
-                  <Pencil size={14} className="text-blue-400" />
+                  <Pencil size={14} style={{ color: "var(--primary)" }} />
                 </button>
                 <button
                   onClick={() => handleDelete(vt.id, vt.display_name)}
                   disabled={loading === vt.id}
-                  className="p-2.5 rounded-xl transition-all bg-surface-glass border border-divider hover:bg-error/10 disabled:opacity-50"
+                  className="p-2 rounded-xl transition-all border border-divider hover:bg-error/8 hover:border-error/25 disabled:opacity-50"
                   title="حذف"
                 >
-                  <Trash2 size={14} className="text-red-400" />
+                  <Trash2 size={14} style={{ color: "var(--error)" }} />
                 </button>
               </div>
             </div>

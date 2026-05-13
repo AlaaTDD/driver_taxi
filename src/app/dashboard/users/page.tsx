@@ -143,20 +143,8 @@ export default async function UsersPage({
             return (
               <div
                 key={stat.key}
-                className="group relative rounded-2xl overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 dash-card"
-                style={{
-                  border: `1px solid ${c.border}`
-                }}
+                className="group relative overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 dash-stat"
               >
-                {/* top glow line */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-[2px] transition-opacity duration-300 group-hover:opacity-100"
-                  style={{
-                    background: `linear-gradient(to left, transparent, ${c.accent}, transparent)`,
-                    opacity: 0.7,
-                  }}
-                />
-
                 {/* icon + value */}
                 <div className="relative flex items-start justify-between mb-3">
                   <div

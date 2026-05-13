@@ -3,7 +3,7 @@ import { formatDate, getStatusColor, getStatusLabel } from "@/lib/utils";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { ArrowLeftRight, User, Car, Eye, X } from "lucide-react";
+import { ArrowLeftRight, User, Car, ArrowUpRight, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default async function TripOffersPage({
   searchParams,
@@ -13,7 +13,7 @@ export default async function TripOffersPage({
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const statusFilter = params.status || "";
-  const pageSize = 15;
+  const pageSize = 12;
 
   const t = await getTranslations();
   const supabase = createAdminClient();
@@ -24,14 +24,11 @@ export default async function TripOffersPage({
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  if (statusFilter) {
-    query = query.eq("status", statusFilter);
-  }
+  if (statusFilter) query = query.eq("status", statusFilter);
 
   const { data: offers, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
-  
   const driverIds = [...new Set((offers || []).map((o) => o.driver_id).filter(Boolean))];
   const tripIds = [...new Set((offers || []).map((o) => o.trip_id).filter(Boolean))];
 
@@ -40,7 +37,7 @@ export default async function TripOffersPage({
     : { data: [] };
 
   const { data: trips } = tripIds.length
-    ? await supabase.from("trips").select("id, pickup_address, status, user_id").in("id", tripIds)
+    ? await supabase.from("trips").select("id, pickup_address, destination_address, status, user_id").in("id", tripIds)
     : { data: [] };
 
   const tripUserIds = [...new Set((trips || []).map((t) => t.user_id).filter(Boolean))];
@@ -52,11 +49,8 @@ export default async function TripOffersPage({
   const tripMap = new Map((trips || []).map((t) => [t.id, t]));
   const tripUserMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
-  
-  const { data: statusStats } = await supabase
-    .from("trip_offers")
-    .select("status");
-
+  // Stats
+  const { data: statusStats } = await supabase.from("trip_offers").select("status");
   const stats = {
     total: statusStats?.length || 0,
     pending: statusStats?.filter((s) => s.status === "pending").length || 0,
@@ -66,17 +60,35 @@ export default async function TripOffersPage({
   };
 
   const statCards = [
-    { label: t("tripOffers.stats.all"), value: stats.total, color: "#60A5FA", bg: "rgba(59,130,246,0.1)", href: "?" },
-    { label: t("tripOffers.stats.pending"), value: stats.pending, color: "#FBBF24", bg: "rgba(245,158,11,0.1)", href: "?status=pending" },
-    { label: t("tripOffers.stats.accepted"), value: stats.accepted, color: "#34D399", bg: "rgba(16,185,129,0.1)", href: "?status=accepted" },
-    { label: t("tripOffers.stats.rejected"), value: stats.rejected, color: "#F87171", bg: "rgba(239,68,68,0.1)", href: "?status=rejected" },
-    { label: t("tripOffers.stats.expired"), value: stats.expired, color: "#9CA3AF", bg: "rgba(107,114,128,0.1)", href: "?status=expired" },
+    { label: t("tripOffers.stats.all"), value: stats.total, color: "var(--primary)", bg: "var(--accent-surface)", border: "var(--accent-border)", href: "" },
+    { label: t("tripOffers.stats.pending"), value: stats.pending, color: "var(--warning)", bg: "var(--warning-surface)", border: "var(--warning-border)", href: "pending" },
+    { label: t("tripOffers.stats.accepted"), value: stats.accepted, color: "var(--success)", bg: "var(--success-surface)", border: "var(--success-border)", href: "accepted" },
+    { label: t("tripOffers.stats.rejected"), value: stats.rejected, color: "var(--error)", bg: "var(--error-surface)", border: "var(--error-border)", href: "rejected" },
+    { label: t("tripOffers.stats.expired"), value: stats.expired, color: "var(--text-disabled)", bg: "var(--neutral-surface)", border: "var(--neutral-border)", href: "expired" },
   ];
+
+  // Build pagination pages
+  const buildPages = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const delta = 2;
+    const range: (number | "...")[] = [];
+    const left = Math.max(2, page - delta);
+    const right = Math.min(totalPages - 1, page + delta);
+    range.push(1);
+    if (left > 2) range.push("...");
+    for (let i = left; i <= right; i++) range.push(i);
+    if (right < totalPages - 1) range.push("...");
+    range.push(totalPages);
+    return range;
+  };
+
+  const pages = totalPages > 1 ? buildPages() : [];
 
   return (
     <DashboardShell>
       <div className="space-y-6">
-        
+
+        {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("tripOffers.title")}</h1>
@@ -84,171 +96,193 @@ export default async function TripOffersPage({
           </div>
         </div>
 
-      
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {statCards.map((s) => (
-          <Link
-            key={s.label}
-            href={`/dashboard/trip-offers${s.href}`}
-            className="rounded-xl px-4 py-3 transition-all hover:scale-[1.02]"
-            style={{
-              background: s.bg,
-              border: `1px solid ${s.color}22`,
-            }}
-          >
-            <div className="text-[22px] font-black num" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-[11px] text-text-tertiary font-semibold mt-0.5">{s.label}</div>
-          </Link>
-        ))}
-      </div>
-
-      
-      <div className="dash-table-card">
-        <div className="dash-section-header justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, #8B5CF6, #6D28D9)", boxShadow: "0 0 8px rgba(139,92,246,0.5)" }} />
-            <div>
-              <h3 className="text-[13px] font-bold text-text-primary">{t("tripOffers.list")}</h3>
-              <p className="text-[10px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages || 1} — {count || 0}</p>
-            </div>
-          </div>
-          {statusFilter && (
+        {/* ── Stat Cards ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {statCards.map((s) => (
             <Link
-              href="/dashboard/trip-offers"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-amber-400 hover:text-amber-300 transition"
-              style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
+              key={s.href}
+              href={`/dashboard/trip-offers${s.href ? `?status=${s.href}` : ""}`}
+              className="rounded-xl px-4 py-3 transition-all hover:scale-[1.01]"
+              style={{
+                background: statusFilter === s.href || (!statusFilter && !s.href) ? s.bg : "var(--surface)",
+                border: `1px solid ${statusFilter === s.href || (!statusFilter && !s.href) ? s.border : "var(--divider)"}`,
+              }}
             >
-              <X size={10} />
-              {t("tripOffers.clearFilter")}
+              <div className="text-[22px] font-black num" style={{ color: s.color }}>{s.value}</div>
+              <div className="text-[11px] text-text-tertiary font-semibold mt-0.5">{s.label}</div>
             </Link>
-          )}
+          ))}
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="dash-table-head">
-                {[t("tripOffers.table.driver"), t("tripOffers.table.passenger"), t("tripOffers.table.address"), t("tripOffers.table.offerStatus"), t("tripOffers.table.tripStatus"), t("tripOffers.table.sentAt"), t("tripOffers.table.respondedAt"), t("tripOffers.table.action")].map((h) => (
-                  <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(offers || []).map((offer) => {
+        {/* ── Offers Card List ── */}
+        <div className="rounded-2xl border border-divider bg-surface flex flex-col">
+          {/* Header */}
+          <div className="px-5 py-4 border-b border-divider flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
+                <ArrowLeftRight size={16} className="text-primary" />
+              </div>
+              <div>
+                <h3 className="text-[15px] font-black text-text-primary leading-none">{t("tripOffers.list")}</h3>
+                <p className="mt-1 text-[12px] font-medium text-text-tertiary">
+                  {t("common.page")} {page} {t("common.of")} {totalPages || 1} — {count || 0}
+                </p>
+              </div>
+            </div>
+            {statusFilter && (
+              <Link
+                href="/dashboard/trip-offers"
+                className="text-[11px] font-bold px-2.5 py-1 rounded-lg border border-warning/30 bg-warning/10 text-warning hover:bg-warning/20 transition-colors"
+              >
+                ✕ {t("tripOffers.clearFilter")}
+              </Link>
+            )}
+          </div>
+
+          {/* Offer cards */}
+          <div className="p-4 flex flex-col gap-3">
+            {(offers || []).length > 0 ? (
+              (offers || []).map((offer) => {
                 const trip = tripMap.get(offer.trip_id);
                 return (
-                  <tr key={offer.id} className="group/row dash-table-row">
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
-                        <Car size={11} className="text-cyan-400" />
-                        {driverMap.get(offer.driver_id) || "—"}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-medium" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
-                        <User size={11} className="text-violet-400" />
-                        {trip ? tripUserMap.get(trip.user_id) || "—" : "—"}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 max-w-[160px] truncate text-[12px] text-text-tertiary">
-                      {trip?.pickup_address || "—"}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${getStatusColor(offer.status)}`}>
-                        {getStatusLabel(offer.status)}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {trip ? (
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${getStatusColor(trip.status)}`}>
-                          {getStatusLabel(trip.status)}
-                        </span>
-                      ) : (
-                        <span className="text-text-disabled text-[11px]">—</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 text-text-tertiary text-[11px] font-medium whitespace-nowrap">
-                      {formatDate(offer.created_at)}
-                    </td>
-                    <td className="py-3.5 px-4 text-text-tertiary text-[11px] font-medium whitespace-nowrap">
-                      {offer.responded_at ? formatDate(offer.responded_at) : <span className="text-text-disabled">—</span>}
-                    </td>
-                    <td className="py-3.5 px-4">
+                  <div
+                    key={offer.id}
+                    className="group flex flex-col sm:flex-row justify-between p-3.5 rounded-xl border border-divider bg-surface transition-all duration-200 hover:border-primary/25 hover:shadow-sm"
+                  >
+                    {/* Left: Route */}
+                    <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
+                      <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/10" />
+                        <div className="w-[1.5px] grow bg-gradient-to-b from-[#22C55E]/40 to-[#7C3AED]/40 my-1.5" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] ring-4 ring-[#7C3AED]/10" />
+                      </div>
+
+                      <div className="flex flex-col justify-between py-0.5 min-w-0 flex-1">
+                        <div className="mb-4">
+                          <p className="text-[13px] font-black text-text-primary truncate">{trip?.pickup_address || "—"}</p>
+                          <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.from")}</p>
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-black text-text-primary truncate">{trip?.destination_address || "—"}</p>
+                          <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.to")}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Meta + Actions */}
+                    <div className="flex flex-col items-end justify-between shrink-0 sm:pl-4 mt-3 sm:mt-0 sm:border-l border-divider gap-3 min-w-[180px]">
+                      <div className="flex flex-col items-end gap-1.5 w-full">
+                        {/* Statuses */}
+                        <div className="flex items-center gap-2 justify-end w-full">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(offer.status)}`}>
+                            {getStatusLabel(offer.status)}
+                          </span>
+                          {trip && (
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
+                              {getStatusLabel(trip.status)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Driver / Passenger */}
+                        <div className="flex items-center gap-3 text-[11px] text-text-tertiary">
+                          <div className="flex items-center gap-1">
+                            <Car size={10} />
+                            <span className="truncate max-w-[70px]">{driverMap.get(offer.driver_id) || "—"}</span>
+                          </div>
+                          <span className="opacity-40">·</span>
+                          <div className="flex items-center gap-1">
+                            <User size={10} />
+                            <span className="truncate max-w-[70px]">{trip ? tripUserMap.get(trip.user_id) || "—" : "—"}</span>
+                          </div>
+                        </div>
+
+                        {/* Date */}
+                        <div className="flex items-center gap-1 text-text-tertiary">
+                          <Clock size={11} />
+                          <span className="text-[11px] font-bold">{formatDate(offer.created_at)}</span>
+                          {offer.responded_at && (
+                            <span className="text-text-disabled text-[10px]">→ {formatDate(offer.responded_at)}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/trips/${offer.trip_id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-                          style={{ background: "rgba(59,130,246,0.1)", color: "#60A5FA", border: "1px solid rgba(59,130,246,0.2)" }}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-primary/20 bg-primary/8 text-primary text-[11px] font-bold transition-all hover:bg-primary/15"
                         >
-                          <Eye size={12} />
                           {t("tripOffers.trip")}
+                          <ArrowUpRight size={11} />
                         </Link>
                         {offer.status === "pending" && (
                           <form action="/api/trip-offers/cancel" method="POST">
                             <input type="hidden" name="offer_id" value={offer.id} />
                             <button
                               type="submit"
-                              id={`cancel-offer-${offer.id}`}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-                              style={{ background: "rgba(239,68,68,0.1)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-error/20 bg-error/8 text-error text-[11px] font-bold transition-all hover:bg-error/15"
                             >
-                              <X size={12} />
                               {t("tripOffers.cancel")}
                             </button>
                           </form>
                         )}
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {(!offers || offers.length === 0) && (
-                <tr>
-                  <td colSpan={8} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-3 text-text-disabled">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}>
-                        <ArrowLeftRight size={24} className="opacity-40" />
-                      </div>
-                      <div>
-                        <p className="text-text-secondary font-semibold">{t("tripOffers.noOffers")}</p>
-                        <p className="text-text-tertiary text-sm mt-1">{t("tripOffers.noOffersDesc")}</p>
-                      </div>
                     </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 py-4 px-6" style={{ borderTop: "1px solid var(--divider)" }}>
-            {page > 1 && (
-              <Link
-                href={`/dashboard/trip-offers?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition"
-                style={{ border: "1px solid var(--divider)" }}
-              >
-                {t("common.previous")}
-              </Link>
-            )}
-            <span className="text-[12px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
-            {page < totalPages && (
-              <Link
-                href={`/dashboard/trip-offers?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
-                className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-text-secondary hover:text-text-primary transition"
-                style={{ border: "1px solid var(--divider)" }}
-              >
-                {t("common.next")}
-              </Link>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-16 text-center flex flex-col items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface border border-divider">
+                  <ArrowLeftRight size={24} className="text-text-disabled" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-text-secondary">{t("tripOffers.noOffers")}</p>
+                  <p className="text-text-tertiary text-xs mt-1">{t("tripOffers.noOffersDesc")}</p>
+                </div>
+              </div>
             )}
           </div>
-        )}
-      </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1 py-4 border-t border-divider">
+              <Link
+                href={`/dashboard/trip-offers?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center border border-divider text-text-secondary transition-all ${page <= 1 ? "pointer-events-none opacity-30" : "hover:bg-surface"}`}
+              >
+                <ChevronRight size={14} />
+              </Link>
+
+              {pages.map((p, i) =>
+                p === "..." ? (
+                  <span key={`e-${i}`} className="w-8 h-8 flex items-center justify-center text-text-disabled text-[12px]">···</span>
+                ) : (
+                  <Link
+                    key={p}
+                    href={`/dashboard/trip-offers?page=${p}${statusFilter ? `&status=${statusFilter}` : ""}`}
+                    className="w-8 h-8 rounded-lg text-[12px] font-bold flex items-center justify-center transition-all"
+                    style={
+                      p === page
+                        ? { background: "var(--primary)", color: "white", border: "1px solid var(--primary)" }
+                        : { border: "1px solid var(--divider)", color: "var(--text-secondary)" }
+                    }
+                  >
+                    {p}
+                  </Link>
+                )
+              )}
+
+              <Link
+                href={`/dashboard/trip-offers?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center border border-divider text-text-secondary transition-all ${page >= totalPages ? "pointer-events-none opacity-30" : "hover:bg-surface"}`}
+              >
+                <ChevronLeft size={14} />
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </DashboardShell>
   );

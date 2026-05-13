@@ -139,17 +139,23 @@ export default async function WalletsPage({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((s) => (
-            <div key={s.label} className="rounded-xl px-4 py-3" style={{ background: `${s.color}11`, border: `1px solid ${s.color}22` }}>
-              <div className="flex items-center gap-2 mb-1">
-                <s.icon size={13} style={{ color: s.color }} />
-                <span className="text-[10px] text-text-tertiary font-semibold">{s.label}</span>
+            <div key={s.label} className="dash-stat p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{ background: `${s.color}15`, border: `1px solid ${s.color}25`, color: s.color }}
+                >
+                  <s.icon size={16} />
+                </div>
               </div>
-              <div className="text-[20px] font-black num" style={{ color: s.color }}>{s.value}</div>
+              <div className="text-[24px] font-black num tracking-tight" style={{ color: s.color }}>{s.value}</div>
+              <p className="text-[11px] text-text-tertiary font-semibold mt-1">{s.label}</p>
             </div>
           ))}
         </div>
+
 
         {/* Tabs */}
         <div className="flex gap-2 flex-wrap">
@@ -166,7 +172,7 @@ export default async function WalletsPage({
             >
               {t.label}
               {t.count > 0 && (
-              <span
+                <span
                   className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5 ${tab === t.key ? "text-white" : "bg-surface-glass text-text-tertiary border border-divider"}`}
                   style={{
                     background: tab === t.key ? t.color : undefined,

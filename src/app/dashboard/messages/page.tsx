@@ -156,7 +156,6 @@ export default async function MessagesPage({
                   className="group relative dash-card overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: "0 0 30px rgba(6,182,212,0.04) inset" }} />
-                  <div className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "linear-gradient(to left, transparent, rgba(6,182,212,0.4), transparent)" }} />
                   <div className="relative flex items-start gap-4 p-5">
                     <div className="shrink-0">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-white/10" style={{ background: avatarBg, boxShadow: "0 2px 10px rgba(0,0,0,0.3)" }}>

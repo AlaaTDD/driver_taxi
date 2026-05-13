@@ -73,10 +73,6 @@ export default function CouponsClient() {
             className="relative w-full max-w-md rounded-2xl overflow-hidden bg-surface shadow-xl border border-divider"
           >
             
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: "linear-gradient(to left, transparent, var(--primary), transparent)" }} />
-
-            
             <div className="fixed inset-0 -z-10" onClick={() => setIsOpen(false)} />
 
             <div className="p-6">

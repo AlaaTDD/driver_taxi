@@ -682,9 +682,6 @@ export default function UsersClient({
               animation: "fadeSlideDown 0.2s ease",
             }}
           >
-            {/* top gradient line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(to left, transparent, ${blockModal.action === "block" ? "var(--error)" : "var(--primary)"}, transparent)` }} />
 
             {/* drag handle (mobile) */}
             <div className="flex justify-center pt-3 pb-1 sm:hidden">
@@ -799,8 +796,6 @@ export default function UsersClient({
               animation: "fadeSlideDown 0.2s ease",
             }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px]"
-              style={{ background: "linear-gradient(to left, transparent, var(--primary), transparent)" }} />
 
             <div className="flex justify-center pt-3 pb-1 sm:hidden">
               <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />

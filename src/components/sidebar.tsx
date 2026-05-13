@@ -164,6 +164,7 @@ function NavLink({
     <Link
       ref={ref}
       href={item.href}
+      scroll={false}
       onClick={() => { hideTip(); onClose?.(); }}
       onMouseEnter={showTip}
       onMouseLeave={hideTip}
