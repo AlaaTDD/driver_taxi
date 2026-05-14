@@ -10,7 +10,7 @@ import {
   Bell, MessageSquare, MessageSquareWarning, LogOut, Menu,
   X, Star, Shield, Truck, ArrowLeftRight, Ticket,
   Navigation, Wallet, Banknote, PanelRightClose, PanelRightOpen,
-  Settings,
+  Settings, TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar, SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./sidebar-context";
@@ -68,6 +68,7 @@ const getNavGroups = (t: any): NavGroup[] => [
       { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           rgb: PRIMARY_RGB },
       { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  rgb: PRIMARY_RGB },
       { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/coupon-analytics", label: t("coupons.analytics.title"),   icon: TrendingUp,           rgb: PRIMARY_RGB },
       { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               rgb: PRIMARY_RGB },
       { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             rgb: PRIMARY_RGB },
     ],
@@ -112,7 +113,7 @@ function FloatingTooltip({ tip }: { tip: TooltipState }) {
         style={{
           borderTop:    "5px solid transparent",
           borderBottom: "5px solid transparent",
-          borderLeft:   "5px solid var(--tooltip-bg, rgba(20,32,52,0.97))",
+          borderLeft:   "5px solid var(--sb-tooltip-bg, rgba(20,32,52,0.97))",
         }}
       />
       <div
@@ -227,10 +228,10 @@ function NavLink({
           height:     collapsed ? 36 : 28,
           background: isActive
             ? `rgba(${rgb}, 0.14)`
-            : "var(--sidebar-icon-bg)",
+            : "var(--sb-icon-bg)",
           border: isActive
             ? `1px solid rgba(${rgb}, 0.24)`
-            : "1px solid var(--sidebar-icon-border)",
+            : "1px solid var(--sb-icon-border)",
         }}
       >
         <item.icon

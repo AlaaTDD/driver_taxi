@@ -599,27 +599,91 @@
   },
   "coupons": {
     "title": "إدارة الكوبونات",
-    "subtitle": "إنشاء وإدارة كوبونات الخصم",
+    "subtitle": "إنشاء وإدارة كوبونات الخصم والعروض الترويجية",
     "addCoupon": "إضافة الكوبون",
     "newCoupon": "كوبون جديد",
+    "editCoupon": "تعديل الكوبون",
     "addDiscount": "أضف كوبون خصم للمستخدمين",
+    "editDiscount": "تعديل بيانات الكوبون",
     "couponList": "قائمة الكوبونات",
     "totalCoupons": "كوبون إجمالاً",
     "noCoupons": "لا توجد كوبونات",
     "addCouponPrompt": "أضف كوبون جديد للبدء",
     "noExpiration": "بدون انتهاء",
+    "notStarted": "لم يبدأ بعد",
+    "budgetExhausted": "الميزانية نفدت",
     "fields": {
       "code": "كود الكوبون",
+      "title": "عنوان الكوبون",
       "discountType": "نوع الخصم",
       "discountValue": "قيمة الخصم",
-      "minTripPrice": "حد أدنى",
+      "maxDiscount": "حد أقصى للخصم",
+      "minTripPrice": "حد أدنى للرحلة",
       "maxUses": "أقصى استخدام",
+      "maxUsesPerUser": "أقصى استخدام/مستخدم",
       "uses": "الاستخدامات",
-      "expiresAt": "تاريخ الانتهاء"
+      "expiresAt": "تاريخ الانتهاء",
+      "startsAt": "تاريخ البدء",
+      "budgetLimit": "حد الميزانية",
+      "spentBudget": "المصروف",
+      "fundedBy": "ممول من",
+      "autoApply": "تطبيق تلقائي",
+      "newUsersOnly": "مستخدمين جدد فقط",
+      "firstRideOnly": "أول رحلة فقط",
+      "descriptionAr": "الوصف (عربي)",
+      "descriptionEn": "الوصف (إنجليزي)"
     },
     "types": {
       "percentage": "نسبة %",
       "fixed": "مبلغ ثابت"
+    },
+    "fundedByOptions": {
+      "platform": "المنصة",
+      "driver": "السائق",
+      "shared": "مشترك"
+    },
+    "stats": {
+      "totalActive": "كوبونات نشطة",
+      "totalDiscount": "إجمالي الخصومات",
+      "uniqueUsers": "مستخدمين فريدين",
+      "budgetRemaining": "ميزانية متبقية"
+    },
+    "analytics": {
+      "title": "تحليلات الكوبونات",
+      "subtitle": "تقارير وإحصائيات أداء الكوبونات",
+      "totalDiscountGiven": "إجمالي الخصومات",
+      "platformSubsidyCost": "تكلفة دعم المنصة",
+      "avgDiscountPerTrip": "متوسط الخصم/رحلة",
+      "completionRate": "معدل الإكمال",
+      "topCoupons": "أكثر الكوبونات استخداماً",
+      "dailyVolume": "حجم الخصومات اليومي",
+      "usageCount": "عدد الاستخدامات",
+      "uniqueUsersCount": "مستخدمين فريدين",
+      "completedTrips": "رحلات مكتملة",
+      "cancelledTrips": "رحلات ملغاة",
+      "budgetAlerts": "تنبيهات الميزانية",
+      "budgetAlertsDesc": "كوبونات تقترب من حدود الميزانية",
+      "noAlerts": "جميع الكوبونات ضمن حدود الميزانية الآمنة",
+      "alertLevel": {
+        "critical": "حرج",
+        "warning": "تحذير",
+        "exhausted": "مستنفد",
+        "ok": "سليم"
+      },
+      "auditLog": "سجل التدقيق",
+      "auditLogDesc": "أحداث دورة حياة الكوبونات الأخيرة",
+      "noAuditEvents": "لا توجد أحداث تدقيق مسجلة",
+      "eventTypes": {
+        "created": "تم الإنشاء",
+        "activated": "تم التفعيل",
+        "deactivated": "تم التعطيل",
+        "expired": "منتهي الصلاحية",
+        "budget_exhausted": "ميزانية مستنفدة",
+        "max_uses_reached": "وصل الحد الأقصى",
+        "budget_warning": "تحذير ميزانية",
+        "manual_edit": "تعديل يدوي",
+        "reversed": "تم العكس"
+      }
     }
   },
   "wallets": {
@@ -680,7 +744,8 @@
       "refund": "استرداد",
       "bonus": "بونص",
       "penalty": "غرامة",
-      "adjustment": "تعديل"
+      "adjustment": "تعديل",
+      "coupon_subsidy": "تعويض كوبون"
     }
   },
   "withdrawals": {

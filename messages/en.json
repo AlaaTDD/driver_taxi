@@ -599,27 +599,91 @@
   },
   "coupons": {
     "title": "Coupons Management",
-    "subtitle": "Create and manage discount coupons",
+    "subtitle": "Create and manage discount coupons & promotions",
     "addCoupon": "Add Coupon",
     "newCoupon": "New Coupon",
+    "editCoupon": "Edit Coupon",
     "addDiscount": "Add discount coupon for users",
+    "editDiscount": "Edit coupon details",
     "couponList": "Coupons List",
     "totalCoupons": "total coupons",
     "noCoupons": "No coupons found",
     "addCouponPrompt": "Add a new coupon to start",
     "noExpiration": "No expiration",
+    "notStarted": "Not started yet",
+    "budgetExhausted": "Budget exhausted",
     "fields": {
       "code": "Coupon Code",
+      "title": "Coupon Title",
       "discountType": "Discount Type",
       "discountValue": "Discount Value",
+      "maxDiscount": "Max Discount Cap",
       "minTripPrice": "Min Trip Price",
       "maxUses": "Max Uses",
+      "maxUsesPerUser": "Max Uses/User",
       "uses": "Uses",
-      "expiresAt": "Expires At"
+      "expiresAt": "Expires At",
+      "startsAt": "Starts At",
+      "budgetLimit": "Budget Limit",
+      "spentBudget": "Spent",
+      "fundedBy": "Funded By",
+      "autoApply": "Auto Apply",
+      "newUsersOnly": "New Users Only",
+      "firstRideOnly": "First Ride Only",
+      "descriptionAr": "Description (AR)",
+      "descriptionEn": "Description (EN)"
     },
     "types": {
       "percentage": "Percentage %",
       "fixed": "Fixed Amount"
+    },
+    "fundedByOptions": {
+      "platform": "Platform",
+      "driver": "Driver",
+      "shared": "Shared"
+    },
+    "stats": {
+      "totalActive": "Active Coupons",
+      "totalDiscount": "Total Discounts",
+      "uniqueUsers": "Unique Users",
+      "budgetRemaining": "Budget Remaining"
+    },
+    "analytics": {
+      "title": "Coupon Analytics",
+      "subtitle": "Performance reports and coupon statistics",
+      "totalDiscountGiven": "Total Discounts Given",
+      "platformSubsidyCost": "Platform Subsidy Cost",
+      "avgDiscountPerTrip": "Avg Discount/Trip",
+      "completionRate": "Completion Rate",
+      "topCoupons": "Top Coupons by Usage",
+      "dailyVolume": "Daily Discount Volume",
+      "usageCount": "Usage Count",
+      "uniqueUsersCount": "Unique Users",
+      "completedTrips": "Completed Trips",
+      "cancelledTrips": "Cancelled Trips",
+      "budgetAlerts": "Budget Alerts",
+      "budgetAlertsDesc": "Coupons approaching budget limits",
+      "noAlerts": "All coupons within safe budget levels",
+      "alertLevel": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "exhausted": "Exhausted",
+        "ok": "Healthy"
+      },
+      "auditLog": "Audit Log",
+      "auditLogDesc": "Recent coupon lifecycle events",
+      "noAuditEvents": "No audit events recorded",
+      "eventTypes": {
+        "created": "Created",
+        "activated": "Activated",
+        "deactivated": "Deactivated",
+        "expired": "Expired",
+        "budget_exhausted": "Budget Exhausted",
+        "max_uses_reached": "Max Uses Reached",
+        "budget_warning": "Budget Warning",
+        "manual_edit": "Manual Edit",
+        "reversed": "Reversed"
+      }
     }
   },
   "wallets": {
@@ -680,7 +744,8 @@
       "refund": "Refund",
       "bonus": "Bonus",
       "penalty": "Penalty",
-      "adjustment": "Adjustment"
+      "adjustment": "Adjustment",
+      "coupon_subsidy": "Coupon Subsidy"
     }
   },
   "withdrawals": {

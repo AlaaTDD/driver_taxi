@@ -33,6 +33,7 @@
   --primary-rgb: 245, 158, 11;
   --primary-dark: #D97706;
   --primary-light: #FCD34D;
+  --primary-text: #B45309;  /* WCAG AA on white — 4.64:1 contrast */
   --primary-surface: rgba(245, 158, 11, 0.10);
   --primary-surface-strong: rgba(245, 158, 11, 0.18);
 
@@ -83,13 +84,13 @@
   --shadow-xl: 0 16px 48px rgba(0,0,0,0.10), 0 24px 64px rgba(0,0,0,0.07);
 
   /* ── SIDEBAR ALIASES ── */
-  --sidebar-bg: #12151C;
-  --sidebar-border: #282E3A;
-  --sidebar-item-hover: #1E232E;
-  --sidebar-item-active: #1E232E;
-  --sidebar-text: #94A3B8;
-  --sidebar-text-active: #F8FAFC;
-  --sidebar-icon-active: #F59E0B;
+  --sidebar-bg: #F6F7FA;
+  --sidebar-border: #E2E5EC;
+  --sidebar-item-hover: #EBEEF5;
+  --sidebar-item-active: #FFF8EB;
+  --sidebar-text: #64748B;
+  --sidebar-text-active: #1E293B;
+  --sidebar-icon-active: #D97706;
 
   --topbar-bg: rgba(255, 255, 255, 0.92);
   --topbar-border: #E2E8F0;
@@ -99,51 +100,51 @@
   --chrome-join-line: #E2E8F0;
   --chrome-shadow: 0 16px 34px rgba(0, 0, 0, 0.06);
   --dashboard-content-bg: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-  --sidebar-chrome-shadow: inset -1px 0 0 var(--chrome-join-line), 10px 0 30px rgba(0, 0, 0, 0.04);
+  --sidebar-chrome-shadow: inset -1px 0 0 var(--chrome-join-line), 4px 0 16px rgba(0, 0, 0, 0.03);
 
   /* ── SIDEBAR TOKENS — LIGHT ── */
-  --sb-bg-gradient: #080A0F;
-  --sb-border: #282E3A;
+  --sb-bg-gradient: linear-gradient(180deg, #F6F7FA 0%, #ECEEF4 100%);
+  --sb-border: #E2E5EC;
 
-  --sb-nav-text: #94A3B8;
-  --sb-nav-text-active: #F8FAFC;
-  --sb-nav-hover-bg: rgba(245, 158, 11, 0.12);
-  --sb-nav-hover-border: rgba(245, 158, 11, 0.20);
+  --sb-nav-text: #64748B;
+  --sb-nav-text-active: #1E293B;
+  --sb-nav-hover-bg: rgba(245, 158, 11, 0.08);
+  --sb-nav-hover-border: rgba(245, 158, 11, 0.16);
 
-  --sb-icon-bg: rgba(245, 158, 11, 0.12);
-  --sb-icon-border: rgba(245, 158, 11, 0.25);
+  --sb-icon-bg: rgba(245, 158, 11, 0.08);
+  --sb-icon-border: rgba(245, 158, 11, 0.18);
 
-  --sb-divider: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+  --sb-divider: linear-gradient(to right, transparent, #D4D8E3, transparent);
 
-  --sb-group-label: #64748B;
-  --sb-group-line: rgba(255,255,255,0.06);
-  --sb-group-dot: rgba(255,255,255,0.15);
+  --sb-group-label: #94A3B8;
+  --sb-group-line: #E2E5EC;
+  --sb-group-dot: #CBD5E1;
 
-  --sb-footer-text: #64748B;
-  --sb-footer-hover: #F8FAFC;
+  --sb-footer-text: #94A3B8;
+  --sb-footer-hover: #1E293B;
   --sb-logout-text: #EF4444;
 
   --sb-logo-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   --sb-logo-glow: none;
-  --sb-logo-shadow: 0 8px 20px rgba(245, 158, 11, 0.30);
-  --sb-logo-border: transparent;
+  --sb-logo-shadow: 0 4px 12px rgba(245, 158, 11, 0.20);
+  --sb-logo-border: rgba(245, 158, 11, 0.12);
 
-  --sb-brand-gradient: linear-gradient(to right, #F8FAFC 0%, #CBD5E1 100%);
+  --sb-brand-gradient: linear-gradient(to right, #0F172A 0%, #334155 100%);
   --sb-brand-sub: #94A3B8;
 
-  --sb-tooltip-bg: #0F172A;
-  --sb-tooltip-border: #282E3A;
+  --sb-tooltip-bg: #1E293B;
+  --sb-tooltip-border: #334155;
   --sb-tooltip-text: #F8FAFC;
-  --sb-tooltip-shadow: 0 10px 26px rgba(0, 0, 0, 0.40);
+  --sb-tooltip-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
 
   --sb-noise-opacity: 0;
   --sb-top-glow: none;
   --sb-top-glow-opacity: 0;
-  --sb-version-text: #475569;
-  --sb-mobile-btn-bg: rgba(15, 23, 42, 0.95);
-  --sb-mobile-btn-border: #282E3A;
-  --sb-mobile-btn-text: #F59E0B;
-  --sb-backdrop: rgba(15, 23, 42, 0.60);
+  --sb-version-text: #94A3B8;
+  --sb-mobile-btn-bg: rgba(255, 255, 255, 0.95);
+  --sb-mobile-btn-border: #E2E5EC;
+  --sb-mobile-btn-text: #D97706;
+  --sb-backdrop: rgba(15, 23, 42, 0.40);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -176,6 +177,7 @@
   --primary-rgb: 245, 158, 11;
   --primary-dark: #D97706;
   --primary-light: #FCD34D;
+  --primary-text: #F59E0B;  /* Amber has excellent contrast on dark */
   --primary-surface: rgba(245, 158, 11, 0.15);
   --primary-surface-strong: rgba(245, 158, 11, 0.25);
   --primary-border: rgba(245, 158, 11, 0.40);
@@ -313,6 +315,7 @@
   --color-error: var(--error);
   --color-error-light: var(--error-light);
   --color-info: var(--info);
+  --color-primary-text: var(--primary-text);
   /* لا نحتاج ألوان إضافية؛ التصميم كله معتمد على primary */
 }
 
@@ -482,6 +485,16 @@ body {
 
   .btn-error:hover {
     background: rgba(var(--error-rgb), 0.18);
+  }
+
+  .btn-warning {
+    background: var(--warning-surface);
+    color: var(--warning);
+    border-color: var(--warning-border);
+  }
+
+  .btn-warning:hover {
+    background: rgba(var(--warning-rgb), 0.18);
   }
 
   .btn-ghost {
