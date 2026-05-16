@@ -1,7 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
     const { user_id, coupon_id } = await req.json();
     if (!user_id || !coupon_id) {

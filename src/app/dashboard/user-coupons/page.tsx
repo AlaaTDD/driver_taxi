@@ -61,10 +61,10 @@ export default async function UserCouponsPage({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "var(--info)", colorRaw: "37,99,235", icon: Gift },
-            { label: t("userCoupons.stats.used"), value: totalUsed, color: "var(--success)", colorRaw: "16,185,129", icon: CheckCircle },
-            { label: t("userCoupons.stats.unused"), value: totalUnused, color: "var(--warning)", colorRaw: "217,119,6", icon: Clock },
-            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "var(--primary)", colorRaw: "245,158,11", icon: Ticket },
+            { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "var(--info)", colorRaw: "var(--info-rgb)", icon: Gift },
+            { label: t("userCoupons.stats.used"), value: totalUsed, color: "var(--success)", colorRaw: "var(--success-rgb)", icon: CheckCircle },
+            { label: t("userCoupons.stats.unused"), value: totalUnused, color: "var(--warning)", colorRaw: "var(--warning-rgb)", icon: Clock },
+            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "var(--primary)", colorRaw: "var(--primary-rgb)", icon: Ticket },
           ].map((s) => (
             <div
               key={s.label}
@@ -125,7 +125,7 @@ export default async function UserCouponsPage({
                     <tr key={uc.id} className="group/row dash-table-row">
                       <td className="py-3.5 px-4">
                         <span className="inline-flex items-center gap-1.5 text-[12px] text-text-primary font-medium">
-                          <User size={12} className="text-violet-400" />
+                          <User size={12} className="text-info" />
                           {user?.name || "—"}
                         </span>
                       </td>

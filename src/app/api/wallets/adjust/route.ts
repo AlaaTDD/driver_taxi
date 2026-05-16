@@ -1,8 +1,12 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  // ── Auth Guard ──────────────────────────────────────────────────────────────
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   const formData = await request.formData();
   const walletId = formData.get("wallet_id") as string;
   const walletType = formData.get("wallet_type") as string; // "driver" | "user"
@@ -15,9 +19,6 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
-  const authClient = await createClient();
-  const { data: { user } } = await authClient.auth.getUser();
-
   const table = walletType === "driver" ? "driver_wallets" : "user_wallets";
 
   // Get current balance
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     amount,
     balance_before: currentBalance,
     balance_after: newBalance,
-    description: `${description} (بواسطة: ${user?.email || "admin"})`,
+    description: `${description} (بواسطة: ${guard.email})`,
     status: "completed",
   });
 

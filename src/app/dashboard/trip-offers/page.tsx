@@ -198,11 +198,11 @@ export default async function TripOffersPage({
                     <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between shrink-0 gap-3 w-full sm:w-[150px] py-1">
                       <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 w-full">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(offer.status)}`}>
-                          {getStatusLabel(offer.status)}
+                          {getStatusLabel(offer.status, t)}
                         </span>
                         {trip && (
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
-                            {t("tripOffers.trip")} {getStatusLabel(trip.status)}
+                            {t("tripOffers.trip")} {getStatusLabel(trip.status, t)}
                           </span>
                         )}
                       </div>
@@ -264,7 +264,7 @@ export default async function TripOffersPage({
                     className="w-8 h-8 rounded-lg text-[12px] font-bold flex items-center justify-center transition-all"
                     style={
                       p === page
-                        ? { background: "var(--primary)", color: "white", border: "1px solid var(--primary)" }
+                        ? { background: "var(--primary)", color: "var(--color-white)", border: "1px solid var(--primary)" }
                         : { border: "1px solid var(--divider)", color: "var(--text-secondary)" }
                     }
                   >

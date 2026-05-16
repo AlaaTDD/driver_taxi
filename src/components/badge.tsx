@@ -13,53 +13,32 @@ interface BadgeProps {
 export function Badge({ variant, children, className, dot = false, size = "md" }: BadgeProps) {
   const variants = {
     success: {
-      cls: "text-success border",
-      bg: "var(--success-surface)",
-      border: "var(--success-border)",
-      dotBg: "var(--success)",
-      glow: "rgba(var(--success-rgb),0.35)",
+      cls: "text-success bg-success/10 border-success/20",
+      dotCls: "bg-success shadow-[0_0_6px_var(--success)]",
     },
     warning: {
-      cls: "text-warning border",
-      bg: "var(--warning-surface)",
-      border: "var(--warning-border)",
-      dotBg: "var(--warning)",
-      glow: "rgba(var(--warning-rgb),0.35)",
+      cls: "text-warning bg-warning/10 border-warning/20",
+      dotCls: "bg-warning shadow-[0_0_6px_var(--warning)]",
     },
     error: {
-      cls: "text-error border",
-      bg: "var(--error-surface)",
-      border: "var(--error-border)",
-      dotBg: "var(--error)",
-      glow: "rgba(var(--error-rgb),0.35)",
+      cls: "text-error bg-error/10 border-error/20",
+      dotCls: "bg-error shadow-[0_0_6px_var(--error)]",
     },
     info: {
-      cls: "text-primary border",
-      bg: "var(--accent-surface)",
-      border: "var(--accent-border)",
-      dotBg: "var(--primary)",
-      glow: "rgba(var(--primary-rgb),0.35)",
+      cls: "text-info bg-info/10 border-info/20",
+      dotCls: "bg-info shadow-[0_0_6px_var(--info)]",
     },
     purple: {
-      cls: "text-primary border",
-      bg: "var(--accent-surface)",
-      border: "var(--accent-border)",
-      dotBg: "var(--primary)",
-      glow: "rgba(var(--primary-rgb),0.35)",
+      cls: "text-[var(--color-purple)] bg-[var(--color-purple)]/10 border-[var(--color-purple)]/25",
+      dotCls: "bg-[var(--color-purple)] shadow-[0_0_6px_var(--color-purple)]",
     },
     cyan: {
-      cls: "text-primary border",
-      bg: "var(--accent-surface)",
-      border: "var(--accent-border)",
-      dotBg: "var(--primary)",
-      glow: "rgba(var(--primary-rgb),0.35)",
+      cls: "text-[var(--color-cyan)] bg-[var(--color-cyan)]/10 border-[var(--color-cyan)]/25",
+      dotCls: "bg-[var(--color-cyan)] shadow-[0_0_6px_var(--color-cyan)]",
     },
     default: {
-      cls: "text-text-secondary border",
-      bg: "var(--surface-elevated)",
-      border: "var(--divider)",
-      dotBg: "var(--text-tertiary)",
-      glow: "rgba(140,160,195,0.24)",
+      cls: "text-text-secondary bg-surface-elevated border-divider",
+      dotCls: "bg-text-tertiary shadow-[0_0_6px_var(--text-tertiary)]",
     },
   };
 
@@ -71,21 +50,15 @@ export function Badge({ variant, children, className, dot = false, size = "md" }
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full font-semibold tracking-wide transition-all duration-200",
+        "inline-flex items-center rounded-full font-semibold tracking-wide transition-all duration-200 border shadow-[var(--shadow-sm)]",
         v.cls,
         sizeClass,
         className
       )}
-      style={{
-        background: v.bg,
-        borderColor: v.border,
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
-      }}
     >
       {dot && (
         <span
-          className={cn("rounded-full flex-shrink-0", size === "sm" ? "w-1 h-1" : "w-1.5 h-1.5")}
-          style={{ background: v.dotBg, boxShadow: `0 0 6px ${v.glow}` }}
+          className={cn("rounded-full flex-shrink-0", size === "sm" ? "w-1 h-1" : "w-1.5 h-1.5", v.dotCls)}
         />
       )}
       {children}

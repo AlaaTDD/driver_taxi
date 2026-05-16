@@ -9,6 +9,7 @@ import {
   Lock, Unlock, Crown, AlertTriangle, Filter,
   MoreVertical, CheckCircle2
 } from "lucide-react";
+import { UserBlockModal, UserRoleModal } from "./user-modals";
 
 interface User {
   id: string;
@@ -44,28 +45,16 @@ const glassCard: React.CSSProperties = {
   color: "var(--text-primary)",
 };
 
-const userColor = {
-  primary: "var(--primary)",
-  primaryBg: "rgba(var(--primary-rgb),0.12)",
-  primaryBgStrong: "rgba(var(--primary-rgb),0.18)",
-  primaryBorder: "rgba(var(--primary-rgb),0.22)",
-  primaryStrongBorder: "rgba(var(--primary-rgb),0.24)",
-  error: "var(--error)",
-  errorBg: "rgba(var(--error-rgb),0.12)",
-  errorBgStrong: "rgba(var(--error-rgb),0.18)",
-  errorBorder: "rgba(var(--error-rgb),0.24)",
-};
-
 const avatarGrad = (user: User) =>
   user.is_blocked
-    ? { bg: userColor.errorBgStrong, color: userColor.error, border: userColor.errorBorder }
-    : { bg: userColor.primaryBgStrong, color: userColor.primary, border: userColor.primaryBorder };
+    ? { className: "variant-error-strong" }
+    : { className: "variant-primary-strong" };
 
 const roleLabel = (user: User, t: any) =>
-  user.is_admin ? { label: t("users.roles.admin"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
-  : user.role === "driver" ? { label: t("users.roles.driver"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
-  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryStrongBorder }
-  : { label: t("users.roles.user"), bg: userColor.primaryBg, color: userColor.primary, border: userColor.primaryBorder };
+  user.is_admin ? { label: t("users.roles.admin"), className: "variant-primary-strong" }
+  : user.role === "driver" ? { label: t("users.roles.driver"), className: "variant-primary-strong" }
+  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), className: "variant-primary-strong" }
+  : { label: t("users.roles.user"), className: "variant-primary" };
 
 /* ─── ActionMenu (three-dot dropdown) ───────────────────── */
 function ActionMenu({
@@ -396,8 +385,7 @@ export default function UsersClient({
                     <td className="py-3.5 px-5">
                       <div className="flex items-center gap-3">
                         <div
-                          className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0 transition-transform group-hover/row:scale-105"
-                          style={{ background: av.bg, color: av.color, border: `1px solid ${av.border}` }}
+                          className={`relative w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0 transition-transform group-hover/row:scale-105 ${av.className}`}
                         >
                           {user.name?.charAt(0)?.toUpperCase() || "U"}
                           {user.is_blocked && (
@@ -426,8 +414,7 @@ export default function UsersClient({
                     {/* Role badge */}
                     <td className="py-3.5 px-5">
                       <span
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap"
-                        style={{ background: rl.bg, color: rl.color, border: `1px solid ${rl.border}` }}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap ${rl.className}`}
                       >
                         {rl.label}
                       </span>
@@ -445,8 +432,7 @@ export default function UsersClient({
                     <td className="py-3.5 px-5">
                       {user.is_blocked ? (
                         <div className="flex flex-col gap-0.5">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                            style={{ background: "rgba(var(--error-rgb),0.12)", color: "var(--error)", border: "1px solid rgba(var(--error-rgb),0.2)" }}>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-error">
                             <Lock size={9} /> {t("common.blocked")}
                           </span>
                           {user.blocked_reason && (
@@ -456,14 +442,12 @@ export default function UsersClient({
                           )}
                         </div>
                       ) : user.is_active ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                          style={{ background: "rgba(var(--primary-rgb),0.12)", color: "var(--primary)", border: "1px solid rgba(var(--primary-rgb),0.2)" }}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-primary">
                           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
                           {t("common.active")}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
-                          style={{ background: "var(--neutral-surface)", color: "var(--text-tertiary)", border: "1px solid var(--neutral-border)" }}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-neutral">
                           {t("common.inactive")}
                         </span>
                       )}
@@ -477,12 +461,7 @@ export default function UsersClient({
                           <button
                             onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
                             id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action"
-                            style={{
-                              background: user.is_blocked ? "rgba(var(--primary-rgb),0.1)" : "rgba(var(--error-rgb),0.1)",
-                              color: user.is_blocked ? "var(--primary)" : "var(--error)",
-                              border: `1px solid ${user.is_blocked ? "rgba(var(--primary-rgb),0.22)" : "rgba(var(--error-rgb),0.22)"}`,
-                            }}
+                            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action ${user.is_blocked ? "variant-primary" : "variant-error"}`}
                           >
                             {user.is_blocked ? <><Unlock size={10} /> رفع</> : <><Lock size={10} /> حظر</>}
                           </button>
@@ -535,8 +514,7 @@ export default function UsersClient({
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center text-[14px] font-black flex-shrink-0"
-                      style={{ background: av.bg, color: av.color, border: `1px solid ${av.border}` }}
+                      className={`w-11 h-11 rounded-xl flex items-center justify-center text-[14px] font-black flex-shrink-0 ${av.className}`}
                     >
                       {user.name?.charAt(0)?.toUpperCase()}
                     </div>
@@ -549,13 +527,11 @@ export default function UsersClient({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                      style={{ background: rl.bg, color: rl.color, border: `1px solid ${rl.border}` }}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg ${rl.className}`}>
                       {rl.label}
                     </span>
                     {user.is_blocked && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                        style={{ background: "rgba(var(--error-rgb),0.12)", color: "var(--error)", border: "1px solid rgba(var(--error-rgb),0.2)" }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg variant-error">
                         {t("common.blocked")}
                       </span>
                     )}
@@ -588,20 +564,14 @@ export default function UsersClient({
                   <div className="flex gap-2 pt-0.5">
                     <button
                       onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                      className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
-                      style={{
-                        background: user.is_blocked ? "rgba(var(--primary-rgb),0.1)" : "rgba(var(--error-rgb),0.1)",
-                        color: user.is_blocked ? "var(--primary)" : "var(--error)",
-                        border: `1px solid ${user.is_blocked ? "rgba(var(--primary-rgb),0.24)" : "rgba(var(--error-rgb),0.24)"}`,
-                      }}
+                      className={`flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action ${user.is_blocked ? "variant-primary" : "variant-error"}`}
                     >
                       {user.is_blocked ? <><Unlock size={12} /> رفع الحظر</> : <><Lock size={12} /> حظر</>}
                     </button>
                     {user.role !== "driver" && (
                       <button
                         onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                        className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
-                        style={{ background: "rgba(var(--primary-rgb),0.1)", color: "var(--primary)", border: "1px solid rgba(var(--primary-rgb),0.24)" }}
+                        className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action variant-primary"
                       >
                         <Shield size={12} />
                         {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
@@ -647,7 +617,7 @@ export default function UsersClient({
                 onClick={() => goPage(p as number)}
                 className="w-9 h-9 rounded-xl text-[13px] font-bold btn-action"
                 style={p === currentPage
-                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "#fff", boxShadow: "0 8px 20px rgba(var(--primary-rgb),0.26)", border: "1px solid var(--accent-border)" }
+                  ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "var(--color-white)", boxShadow: "0 8px 20px rgba(var(--primary-rgb),0.26)", border: "1px solid var(--accent-border)" }
                   : { ...glassCard, color: "var(--text-secondary)" }}
               >
                 {p}
@@ -666,204 +636,21 @@ export default function UsersClient({
         </div>
       )}
 
-      {/* ══ Block / Unblock Modal ══════════════════════════════ */}
-      {blockModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) { setBlockModal(null); setBlockReason(""); } }}
-        >
-          <div
-            className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
-            style={{
-              background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
-              border: `1px solid ${blockModal.action === "block" ? "var(--error-border)" : "var(--accent-border)"}`,
-              boxShadow: "var(--shadow-xl)",
-              animation: "fadeSlideDown 0.2s ease",
-            }}
-          >
+      <UserBlockModal
+        blockModal={blockModal}
+        setBlockModal={setBlockModal}
+        handleBlock={handleBlock}
+        blockReason={blockReason}
+        setBlockReason={setBlockReason}
+        actionLoading={actionLoading}
+      />
 
-            {/* drag handle (mobile) */}
-            <div className="flex justify-center pt-3 pb-1 sm:hidden">
-              <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />
-            </div>
-
-            <div className="p-6 pt-4 sm:pt-6">
-              {/* header */}
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center"
-                    style={{ background: blockModal.action === "block" ? "rgba(var(--error-rgb),0.14)" : "rgba(var(--primary-rgb),0.14)" }}
-                  >
-                    {blockModal.action === "block"
-                      ? <ShieldBan size={20} style={{ color: "var(--error)" }} />
-                      : <UserCheck size={20} style={{ color: "var(--primary)" }} />
-                    }
-                  </div>
-                  <div>
-                    <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
-                      {blockModal.action === "block" ? t("users.blockUser") : t("users.unblockUser")}
-                    </h3>
-                    <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{blockModal.user.name}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => { setBlockModal(null); setBlockReason(""); }}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center btn-action"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }}
-                >
-                  <X size={13} />
-                </button>
-              </div>
-
-              {blockModal.action === "block" && (
-                <div className="mb-4">
-                  <label className="block text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-tertiary)" }}>
-                    {t("users.blockReason")}
-                  </label>
-                  <textarea
-                    value={blockReason}
-                    onChange={(e) => setBlockReason(e.target.value)}
-                    placeholder="اكتب سبب الحظر..."
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none transition-all"
-                    style={{
-                      background: "var(--surface)",
-                      border: "1px solid var(--divider)",
-                      color: "var(--text-primary)",
-                    }}
-                  />
-                </div>
-              )}
-
-              {blockModal.action === "unblock" && (
-                <div
-                  className="flex items-start gap-2.5 p-3.5 rounded-xl mb-4"
-                  style={{ background: "rgba(var(--primary-rgb),0.08)", border: "1px solid rgba(var(--primary-rgb),0.16)" }}
-                >
-                  <CheckCircle2 size={15} style={{ color: "var(--primary)", flexShrink: 0, marginTop: 1 }} />
-                  <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
-                    سيتم استعادة وصول المستخدم للتطبيق فوراً بعد رفع الحظر.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-2.5">
-                <button
-                  onClick={() => { setBlockModal(null); setBlockReason(""); }}
-                  className="flex-1 py-3 rounded-xl text-[13px] font-bold btn-action"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
-                >
-                  إلغاء
-                </button>
-                <button
-                  onClick={handleBlock}
-                  disabled={actionLoading}
-                  id="confirm-block-action"
-                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
-                  style={{
-                    background: blockModal.action === "block"
-                      ? "linear-gradient(135deg, var(--error), var(--error))"
-                      : "linear-gradient(135deg, var(--primary), var(--primary))",
-                    boxShadow: "var(--shadow-md)",
-                  }}
-                >
-                  {actionLoading
-                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> {t("common.loading")}...</span>
-                    : blockModal.action === "block" ? t("users.confirmBlock") : t("users.confirmUnblock")
-                  }
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══ Role Modal ════════════════════════════════════════ */}
-      {roleModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setRoleModal(null); }}
-        >
-          <div
-            className="relative w-full sm:max-w-[400px] rounded-t-3xl sm:rounded-2xl overflow-hidden"
-            style={{
-              background: "linear-gradient(160deg, var(--surface-elevated), var(--surface))",
-              border: "1px solid var(--accent-border)",
-              boxShadow: "var(--shadow-xl)",
-              animation: "fadeSlideDown 0.2s ease",
-            }}
-          >
-
-            <div className="flex justify-center pt-3 pb-1 sm:hidden">
-              <div className="w-10 h-1 rounded-full" style={{ background: "var(--divider)" }} />
-            </div>
-
-            <div className="p-6 pt-4 sm:pt-6">
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                    style={{ background: "rgba(var(--primary-rgb),0.14)" }}>
-                    <Shield size={20} style={{ color: "var(--primary)" }} />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-[15px]" style={{ color: "var(--text-primary)" }}>
-                      {t("users.setRole")}
-                    </h3>
-                    <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{roleModal.user.name}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setRoleModal(null)}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center btn-action"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }}
-                >
-                  <X size={13} />
-                </button>
-              </div>
-
-              <div
-                className="flex items-start gap-2.5 p-3.5 rounded-xl mb-5"
-                style={{ background: "rgba(var(--primary-rgb),0.08)", border: "1px solid rgba(var(--primary-rgb),0.16)" }}
-              >
-                <AlertTriangle size={14} style={{ color: "var(--primary)", flexShrink: 0, marginTop: 1 }} />
-                <p className="text-[12px]" style={{ color: "var(--text-secondary)" }}>
-                  {roleModal.role === "supervisor"
-                    ? t("users.roleSupervisorWarning")
-                    : t("users.roleUserWarning")}
-                </p>
-              </div>
-
-              <div className="flex gap-2.5">
-                <button
-                  onClick={() => setRoleModal(null)}
-                  className="flex-1 py-3 rounded-xl text-[13px] font-bold btn-action"
-                  style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
-                >
-                  {t("common.cancel")}
-                </button>
-                <button
-                  onClick={handleSetRole}
-                  disabled={actionLoading}
-                  id="confirm-role-action"
-                  className="flex-1 py-3 rounded-xl text-[13px] font-black text-white disabled:opacity-50 btn-action"
-                  style={{
-                    background: "linear-gradient(135deg, var(--primary), var(--primary))",
-                    boxShadow: "var(--shadow-md)",
-                  }}
-                >
-                  {actionLoading
-                    ? <span className="flex items-center justify-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" /> {t("common.loading")}...</span>
-                    : t("common.confirm")
-                  }
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <UserRoleModal
+        roleModal={roleModal}
+        setRoleModal={setRoleModal}
+        handleSetRole={handleSetRole}
+        actionLoading={actionLoading}
+      />
     </>
   );
 }

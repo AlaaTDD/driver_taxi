@@ -81,6 +81,15 @@ export default async function CouponAnalyticsPage() {
     .sort((a, b) => (b.used_count || 0) - (a.used_count || 0))
     .slice(0, 8);
 
+  // ── Fetch Timeline for Top Coupon ──
+  let topCouponTimeline: any[] = [];
+  if (topCoupons.length > 0) {
+    const { data: timeline } = await supabase.rpc("fn_coupon_usage_timeline", {
+      p_coupon_id: topCoupons[0].id
+    });
+    topCouponTimeline = timeline || [];
+  }
+
   // Unique users across all coupons (approximate from used_count)
   const totalUniqueUsers = allCoupons.reduce((sum, c) => sum + (c.used_count || 0), 0);
 

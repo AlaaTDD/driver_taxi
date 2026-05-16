@@ -53,9 +53,9 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">تغيير الحالة</label>
           <div className="flex gap-2 flex-wrap">
             {[
-              { value: "in_progress", label: "قيد المعالجة", color: "var(--info)", colorRaw: "37,99,235" },
-              { value: "resolved", label: "محلول", color: "var(--success)", colorRaw: "16,185,129" },
-              { value: "closed", label: "مغلق", color: "var(--text-disabled)", colorRaw: "113,113,122" },
+              { value: "in_progress", label: "قيد المعالجة", color: "var(--info)", colorRaw: "var(--info-rgb)" },
+              { value: "resolved", label: "محلول", color: "var(--success)", colorRaw: "var(--success-rgb)" },
+              { value: "closed", label: "مغلق", color: "var(--text-disabled)", colorRaw: "var(--text-disabled-rgb)" },
             ].map((opt) => (
               <button
                 key={opt.value}

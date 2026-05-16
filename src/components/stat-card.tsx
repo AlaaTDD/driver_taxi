@@ -1,17 +1,25 @@
 import { cn } from "@/lib/utils";
 
+type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
+
+const COLOR_MAP: Record<ColorVariant, { bg: string; border: string; text: string; var: string; rgb: string }> = {
+  primary: { bg: "bg-primary/10", border: "border-primary/20", text: "text-primary", var: "var(--primary)", rgb: "var(--primary-rgb)" },
+  info: { bg: "bg-info/10", border: "border-info/20", text: "text-info", var: "var(--info)", rgb: "var(--info-rgb)" },
+  success: { bg: "bg-success/10", border: "border-success/20", text: "text-success", var: "var(--success)", rgb: "var(--success-rgb)" },
+  warning: { bg: "bg-warning/10", border: "border-warning/20", text: "text-warning", var: "var(--warning)", rgb: "var(--warning-rgb)" },
+  error: { bg: "bg-error/10", border: "border-error/20", text: "text-error", var: "var(--error)", rgb: "var(--error-rgb)" },
+};
+
 interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
-  iconColor?: string;
-  iconBg?: string;
+  colorVariant?: ColorVariant;
   trend?: { value: number; label: string };
   className?: string;
-  accentColor?: string;
   subtitle?: string;
-  /** optional sparkline-style mini chart */
-  sparkColor?: string;
+  /** if true, shows sparkline mini chart */
+  showSparkline?: boolean;
   trendPercent?: string;
   trendUp?: boolean;
 }
@@ -20,16 +28,17 @@ export function StatCard({
   title,
   value,
   icon,
-  iconColor = "text-white",
-  iconBg = "bg-primary",
+  colorVariant = "primary",
   trend,
   className,
-  accentColor = "var(--primary)",
   subtitle,
-  sparkColor,
+  showSparkline,
   trendPercent,
   trendUp = true,
 }: StatCardProps) {
+  const colors = COLOR_MAP[colorVariant];
+  const sparkColor = colors.var;
+
   return (
     <div
       className={cn(
@@ -69,7 +78,7 @@ export function StatCard({
             )}
 
             {/* Sparkline mini chart */}
-            {sparkColor && (
+            {showSparkline && (
               <svg className="mt-3 w-full h-[32px]" viewBox="0 0 120 32" fill="none" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id={`spark-grad-${title}`} x1="0" y1="0" x2="0" y2="1">
@@ -84,7 +93,8 @@ export function StatCard({
                   strokeLinecap="round"
                   fill="none"
                   opacity="0.9"
-                  style={{ filter: "drop-shadow(0 2px 6px rgba(var(--primary-rgb),0.25))" }}
+                  className="sparkline-path"
+                  style={{ "--spark-rgb": colors.rgb } as React.CSSProperties}
                 />
                 <path
                   d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4 L120 32 L0 32 Z"
@@ -96,7 +106,7 @@ export function StatCard({
             {/* Trend info */}
             {trend && (
               <div className="flex items-center gap-1.5 mt-2">
-                <span style={{ color: accentColor }} className="text-[12px] font-bold num">{trend.value}</span>
+                <span className={cn("text-[12px] font-bold num", colors.text)}>{trend.value}</span>
                 <span className="text-[11px] text-text-tertiary">{trend.label}</span>
               </div>
             )}
@@ -106,24 +116,22 @@ export function StatCard({
           <div
             className={cn(
               "relative flex-shrink-0 w-[52px] h-[52px] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105",
-              iconColor
+              colors.bg,
+              colors.border,
+              colors.text,
+              "border"
             )}
-            style={{
-              background: "var(--accent-surface)",
-              border: "1px solid var(--accent-border)",
-              color: accentColor,
-            }}
           >
             {icon}
           </div>
         </div>
 
         {/* Bottom bar indicator */}
-        {!sparkColor && !trendPercent && !trend && (
+        {!showSparkline && !trendPercent && !trend && (
           <div
             className="mt-4 h-[3px] rounded-full opacity-30"
             style={{ 
-              background: `linear-gradient(to left, transparent, ${accentColor})`,
+              background: `linear-gradient(to left, transparent, ${sparkColor})`,
               width: "60%",
             }}
           />

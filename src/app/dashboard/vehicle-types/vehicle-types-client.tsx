@@ -116,7 +116,7 @@ export default function VehicleTypesClient({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">{t("vehicleTypes.manage")}</span>
-            <span className="w-1 h-1 rounded-full bg-teal-500/60" />
+            <span className="w-1 h-1 rounded-full" style={{ background: "rgba(var(--success-rgb), 0.6)" }} />
             <span className="text-[11px] text-text-disabled">{t("vehicleTypes.title")}</span>
           </div>
           <h1 className="page-title">{t("vehicleTypes.title")}</h1>
@@ -138,7 +138,7 @@ export default function VehicleTypesClient({
             <h3 className="text-[15px] font-bold text-text-primary">
               {editId ? t("vehicleTypes.editType") : t("vehicleTypes.addType")}
             </h3>
-            <button onClick={resetForm} className="p-1.5 rounded-lg hover:bg-white/5 text-text-tertiary">
+            <button onClick={resetForm} className="p-1.5 rounded-lg hover:bg-[rgba(var(--color-white-rgb),0.05)] text-text-tertiary">
               <X size={16} />
             </button>
           </div>

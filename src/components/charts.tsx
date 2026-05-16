@@ -220,7 +220,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
                 dataKey="name"
                 stroke="var(--text-tertiary)"
                 fontSize={12}
-                fontFamily="'Cairo', sans-serif"
+                fontFamily="inherit"
                 tick={{ fill: "var(--text-secondary)" }}
                 axisLine={false}
                 tickLine={false}

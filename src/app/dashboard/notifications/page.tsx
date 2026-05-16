@@ -69,21 +69,12 @@ export default async function NotificationsPage({
 
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-              style={{ background: "var(--error-surface)", border: "1px solid var(--error-border)", color: "var(--error)" }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-error"
-                style={{ boxShadow: "0 0 5px rgba(239,68,68,0.6)" }}
-              />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold variant-error">
+              <span className="w-1.5 h-1.5 rounded-full bg-error shadow-[0_0_5px_rgba(var(--error-rgb),0.6)]" />
               {unreadCount} {t("notifications.unread")}
             </div>
           )}
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold"
-            style={{ background: "var(--info-surface)", border: "1px solid var(--info-surface)", color: "var(--info)" }}
-          >
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold variant-info">
             <Bell size={11} />
             {count || 0} {t("notifications.total")}
           </div>
@@ -106,50 +97,21 @@ export default async function NotificationsPage({
           return (
             <div
               key={notif.id}
-              className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
-              style={{
-                background: isUnread
-                  ? "linear-gradient(145deg, var(--surface-glass) 0%, var(--bg-secondary),0.9) 100%)"
-                  : "linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%)",
-                border: isUnread
-                  ? "1px solid rgba(59,130,246,0.2)"
-                  : "1px solid var(--divider)",
-                boxShadow: isUnread
-                  ? "0 2px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.08)"
-                  : "0 1px 6px rgba(0,0,0,0.2)",
-              }}
+              className={`group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5 ${isUnread ? "notif-card-unread" : "notif-card"}`}
             >
               
               {isUnread && (
-                <div
-                  className="absolute right-0 top-0 bottom-0 w-[3px] rounded-l-full"
-                  style={{
-                    background: "linear-gradient(to bottom, var(--primary), var(--info))",
-                    boxShadow: "0 0 8px rgba(59,130,246,0.5)",
-                  }}
-                />
+                <div className="absolute right-0 top-0 bottom-0 w-[3px] rounded-l-full notif-unread-bar" />
               )}
 
               
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ boxShadow: "0 0 30px rgba(59,130,246,0.04) inset" }}
-              />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: "var(--shadow-sm) inset" }} />
 
               <div className="relative p-5">
                 <div className="flex items-start gap-4">
                   
-                  <div
-                    className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5"
-                    style={{
-                      background: isUnread ? "rgba(59,130,246,0.12)" : "var(--surface-glass)",
-                      border: `1px solid ${isUnread ? "rgba(59,130,246,0.2)" : "var(--divider)"}`,
-                    }}
-                  >
-                    <Bell
-                      size={16}
-                      style={{ color: isUnread ? "var(--info)" : "var(--text-tertiary)" }}
-                    />
+                  <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5 ${isUnread ? "variant-info" : "bg-[var(--surface-glass)] border border-[var(--divider)]"}`}>
+                    <Bell size={16} className={isUnread ? "text-[var(--info)]" : "text-text-tertiary"} />
                   </div>
 
                   

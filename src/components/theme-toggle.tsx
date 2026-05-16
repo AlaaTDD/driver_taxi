@@ -9,7 +9,7 @@ function getServerSnapshot() { return false; }
 function getSnapshot() { return true; }
 function subscribe() { return () => {}; }
 
-const PRIMARY_RGB = "var(--primary-rgb)";
+
 
 export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
   const { setTheme, resolvedTheme } = useTheme();
@@ -50,23 +50,12 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
         onClick={toggleTheme}
         aria-label={t("theme")}
         title={t("theme")}
-        className="group relative w-[40px] h-[40px] rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90"
-        style={{
-          background: `rgba(${PRIMARY_RGB}, 0.08)`,
-          border: `1px solid rgba(${PRIMARY_RGB}, 0.15)`,
-        }}
+        className="group relative w-[40px] h-[40px] rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 bg-primary/10 border border-primary/20"
       >
-        <div
-          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          style={{ background: `rgba(${PRIMARY_RGB}, 0.06)` }}
-        />
+        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-primary/5" />
         <Icon
           size={16}
-          className="relative transition-all duration-200 group-hover:scale-110"
-          style={{
-            color: `rgb(${PRIMARY_RGB})`,
-            filter: `drop-shadow(0 0 4px rgba(${PRIMARY_RGB}, 0.4))`,
-          }}
+          className="relative transition-all duration-200 group-hover:scale-110 theme-toggle-icon"
         />
       </button>
     );
@@ -86,12 +75,8 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
       >
         {/* sliding active indicator */}
         <div
-          className="absolute top-[2px] left-0 rounded-md pointer-events-none z-0"
-          style={{
-            ...indicatorStyle,
-            background: `rgba(${PRIMARY_RGB}, 0.18)`,
-            boxShadow: `0 0 8px rgba(${PRIMARY_RGB}, 0.08)`,
-          }}
+          className="absolute top-[2px] left-0 rounded-md pointer-events-none z-0 theme-toggle-indicator"
+          style={indicatorStyle}
         />
 
         {/* Light button */}
@@ -99,18 +84,9 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
           data-theme-btn
           onClick={() => setTheme("light")}
           aria-label={t("light")}
-          className="relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200"
-          style={{
-            color: !isDark ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",
-          }}
+          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${!isDark ? 'theme-toggle-icon-active' : 'text-[var(--sb-footer-text)]'}`}
         >
-          <Sun
-            size={13}
-            style={{
-              filter: !isDark ? `drop-shadow(0 0 4px rgba(${PRIMARY_RGB}, 0.5))` : "none",
-              transition: "filter 200ms ease, color 200ms ease",
-            }}
-          />
+          <Sun size={13} className="transition-all duration-200" />
         </button>
 
         {/* Dark button */}
@@ -118,18 +94,9 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
           data-theme-btn
           onClick={() => setTheme("dark")}
           aria-label={t("dark")}
-          className="relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200"
-          style={{
-            color: isDark ? `rgb(${PRIMARY_RGB})` : "var(--sb-footer-text)",
-          }}
+          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${isDark ? 'theme-toggle-icon-active' : 'text-[var(--sb-footer-text)]'}`}
         >
-          <Moon
-            size={13}
-            style={{
-              filter: isDark ? `drop-shadow(0 0 4px rgba(${PRIMARY_RGB}, 0.5))` : "none",
-              transition: "filter 200ms ease, color 200ms ease",
-            }}
-          />
+          <Moon size={13} className="transition-all duration-200" />
         </button>
       </div>
     </div>

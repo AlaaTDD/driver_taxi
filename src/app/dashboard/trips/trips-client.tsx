@@ -136,7 +136,7 @@ export default function TripsClient({
                     p === currentPage
                       ? {
                           background: "var(--primary)",
-                          color: "white",
+                          color: "var(--color-white)",
                           border: "1px solid var(--primary)",
                         }
                       : { ...selectStyle, color: "var(--text-secondary)" }

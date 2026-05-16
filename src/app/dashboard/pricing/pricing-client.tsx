@@ -34,14 +34,14 @@ export default function PricingClient({ configs }: PricingClientProps) {
   ];
 
   const COLORS = [
-    { name: t("pricing.colors.blue"), value: "#3B82F6" },
-    { name: t("pricing.colors.green"), value: "#10B981" },
-    { name: t("pricing.colors.red"), value: "#EF4444" },
-    { name: t("pricing.colors.yellow"), value: "#F59E0B" },
-    { name: t("pricing.colors.purple"), value: "#8B5CF6" },
-    { name: t("pricing.colors.pink"), value: "#EC4899" },
-    { name: t("pricing.colors.cyan"), value: "#06B6D4" },
-    { name: t("pricing.colors.orange"), value: "#F97316" },
+    { name: t("pricing.colors.blue"), value: "var(--info)" },
+    { name: t("pricing.colors.green"), value: "var(--success)" },
+    { name: t("pricing.colors.red"), value: "var(--error)" },
+    { name: t("pricing.colors.yellow"), value: "var(--warning)" },
+    { name: t("pricing.colors.purple"), value: "var(--color-purple)" },
+    { name: t("pricing.colors.pink"), value: "var(--color-pink)" },
+    { name: t("pricing.colors.cyan"), value: "var(--color-cyan)" },
+    { name: t("pricing.colors.orange"), value: "var(--color-orange)" },
   ];
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -181,7 +181,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest">{t("pricing.manage")}</span>
-            <span className="w-1 h-1 rounded-full bg-green-500/60" />
+            <span className="w-1 h-1 rounded-full bg-success/60" />
             <span className="text-[11px] text-text-disabled">{t("pricing.vehicleTypes")}</span>
           </div>
 
@@ -224,13 +224,13 @@ export default function PricingClient({ configs }: PricingClientProps) {
                     <div
                       className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
-                        background: isActive ? "rgba(16,185,129,0.12)" : "var(--surface-glass)",
-                        border: `1px solid ${isActive ? "rgba(16,185,129,0.25)" : "var(--divider)"}`,
+                        background: isActive ? "rgba(var(--success-rgb),0.12)" : "var(--surface-glass)",
+                        border: `1px solid ${isActive ? "rgba(var(--success-rgb),0.25)" : "var(--divider)"}`,
                       }}
                     >
                       <IconComponent
                         size={22}
-                        style={{ color: isActive ? "#10B981" : "var(--text-disabled)" }}
+                        style={{ color: isActive ? "var(--success)" : "var(--text-disabled)" }}
                       />
                     </div>
                     <div>
@@ -334,7 +334,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
+          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
         >
           <div
             className="relative w-full max-w-md rounded-2xl overflow-hidden bg-surface shadow-xl border border-divider"
@@ -413,9 +413,9 @@ export default function PricingClient({ configs }: PricingClientProps) {
                         onClick={() => setForm({ ...form, icon: iconOpt.value })}
                         className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all"
                         style={{
-                          background: isSelected ? "rgba(16,185,129,0.15)" : "var(--surface-glass)",
-                          border: isSelected ? "1px solid rgba(16,185,129,0.4)" : "1px solid var(--divider)",
-                          color: isSelected ? "#10B981" : "var(--text-secondary)",
+                          background: isSelected ? "rgba(var(--success-rgb),0.15)" : "var(--surface-glass)",
+                          border: isSelected ? "1px solid rgba(var(--success-rgb),0.4)" : "1px solid var(--divider)",
+                          color: isSelected ? "var(--success)" : "var(--text-secondary)",
                           minWidth: "60px",
                         }}
                       >

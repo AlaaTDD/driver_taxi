@@ -377,7 +377,7 @@ export default async function CouponsPage({
                 className="w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all"
                 style={
                   p === page
-                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px var(--accent-shadow)", border: "1px solid var(--accent-border)" }
+                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "var(--color-white)", boxShadow: "0 4px 12px var(--accent-shadow)", border: "1px solid var(--accent-border)" }
                     : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
                 }
               >

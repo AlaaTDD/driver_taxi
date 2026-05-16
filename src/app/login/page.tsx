@@ -45,11 +45,11 @@ export default function LoginPage() {
     <div className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-background">
       
       <div className="absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", animation: "float 12s ease-in-out infinite" }} />
+        style={{ background: "radial-gradient(circle, rgba(var(--info-rgb),0.08) 0%, transparent 70%)", animation: "float 12s ease-in-out infinite" }} />
       <div className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)", animation: "float 10s ease-in-out 4s infinite" }} />
+        style={{ background: "radial-gradient(circle, rgba(var(--color-purple-rgb),0.06) 0%, transparent 70%)", animation: "float 10s ease-in-out 4s infinite" }} />
       <div className="absolute top-1/2 left-1/4 w-[400px] h-[400px] rounded-full pointer-events-none -translate-y-1/2 opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(6,182,212,0.04) 0%, transparent 70%)", animation: "float 14s ease-in-out 2s infinite" }} />
+        style={{ background: "radial-gradient(circle, rgba(var(--color-cyan-rgb),0.04) 0%, transparent 70%)", animation: "float 14s ease-in-out 2s infinite" }} />
 
       
       <div className="absolute top-4 right-4 left-4 flex justify-between items-center z-20">
@@ -62,9 +62,9 @@ export default function LoginPage() {
         
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
-            <div className="absolute inset-0 rounded-2xl scale-125 blur-xl bg-primary/20 dark:bg-primary/40 animate-pulse-glow" />
-            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-primary to-accent-purple shadow-lg shadow-primary/20">
-              <Zap size={28} className="text-white" />
+            <div className="absolute inset-0 rounded-2xl scale-125 blur-xl animate-pulse-glow" style={{ background: "rgba(var(--primary-rgb), 0.3)" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-[var(--primary)] to-[var(--color-purple)] shadow-lg shadow-[rgba(var(--primary-rgb),0.2)]">
+              <Zap size={28} className="text-[var(--color-white)]" />
             </div>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-text-primary">

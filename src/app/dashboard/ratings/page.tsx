@@ -28,8 +28,8 @@ export default async function RatingsPage({
   ]);
 
   const tabs = [
-    { key: "driver_ratings", label: t("ratings.tabs.driverRatings"), count: driverRatingsCountRes.count || 0, icon: Car, color: "var(--warning)", colorRaw: "217,119,6" },
-    { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "var(--primary)", colorRaw: "245,158,11" },
+    { key: "driver_ratings", label: t("ratings.tabs.driverRatings"), count: driverRatingsCountRes.count || 0, icon: Car, color: "var(--warning)", colorRaw: "var(--warning-rgb)" },
+    { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "var(--primary)", colorRaw: "var(--primary-rgb)" },
   ];
 
   // Driver list for filter
@@ -250,7 +250,7 @@ export default async function RatingsPage({
               <button
                 type="submit"
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-bold transition-all"
-                style={{ background: "var(--primary)", color: "#000", border: "1px solid var(--primary)" }}
+                style={{ background: "var(--primary)", color: "var(--color-black)", border: "1px solid var(--primary)" }}
               >
                 {t("ratings.filters.apply")}
               </button>

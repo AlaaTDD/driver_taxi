@@ -22,7 +22,7 @@ export default async function TripsPage({
   let query = supabase
     .from("trips")
     .select(
-      "id, status, vehicle_type, pickup_address, destination_address, distance_km, price, payment_method, created_at, completed_at, user_id, driver_id",
+      "id, status, vehicle_type, pickup_address, destination_address, distance_km, price, payment_method, created_at, completed_at, user_id, driver_id, trip_route_plans(id)",
       { count: "exact" }
     )
     .order("created_at", { ascending: false })
@@ -118,7 +118,12 @@ export default async function TripsPage({
 
                     <div className="flex flex-col justify-between py-0.5 min-w-0 flex-1">
                       <div className="mb-3">
-                        <p className="text-[13px] font-black text-text-primary truncate">{trip.pickup_address || "—"}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[13px] font-black text-text-primary truncate">{trip.pickup_address || "—"}</p>
+                          {(trip.trip_route_plans?.length > 0) && (
+                            <span className="shrink-0 text-[9px] font-bold bg-info/10 text-info px-1.5 py-0.5 rounded border border-info/20">متعددة</span>
+                          )}
+                        </div>
                         <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.from")}</p>
                       </div>
                       <div>
@@ -161,7 +166,7 @@ export default async function TripsPage({
                         {formatCurrency(Number(trip.price))}
                       </span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
-                        {getStatusLabel(trip.status)}
+                        {getStatusLabel(trip.status, t)}
                       </span>
                     </div>
 

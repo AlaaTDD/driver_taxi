@@ -785,5 +785,97 @@
     "notFound": "الصفحة غير موجودة",
     "unauthorized": "غير مصرح",
     "forbidden": "غير مسموح"
+  },
+  "bonuses": {
+    "title": "المكافآت والحوافز",
+    "subtitle": "إدارة قواعد المكافآت وحوافز السائقين",
+    "activeRules": "قاعدة نشطة",
+    "totalRules": "إجمالي القواعد",
+    "totalAwarded": "إجمالي التوزيعات",
+    "totalPaid": "إجمالي المدفوع",
+    "rulesTitle": "قواعد المكافآت",
+    "rulesCount": "قاعدة",
+    "ruleName": "اسم القاعدة",
+    "triggerType": "نوع الشرط",
+    "threshold": "الحد المطلوب",
+    "bonusAmount": "قيمة المكافأة",
+    "vehicleTypes": "أنواع المركبات",
+    "validity": "الصلاحية",
+    "recentAwards": "آخر المكافآت الموزعة",
+    "recentAwardsSubtitle": "آخر 20 مكافأة تم توزيعها"
+  },
+  "serviceAreas": {
+    "title": "مناطق الخدمة",
+    "subtitle": "إدارة المناطق الجغرافية لخدمة التوصيل",
+    "totalAreas": "منطقة",
+    "driversAssigned": "سائقين معينين",
+    "geohashPrefixes": "أكواد المنطقة"
+  },
+  "appConfig": {
+    "title": "إعدادات النظام",
+    "subtitle": "التحكم في خيارات التطبيق والميزات"
+  },
+  "settings": {
+    "title": "الإعدادات العامة",
+    "subtitle": "إدارة مظهر ولغة لوحة التحكم",
+    "appearance": "المظهر",
+    "appearanceDesc": "تبديل بين الوضع الفاتح والداكن",
+    "language": "اللغة",
+    "languageDesc": "اختر لغة واجهة لوحة التحكم"
+  },
+  "revision": {
+    "title": "طلب مراجعة",
+    "backToDrivers": "العودة للسائقين",
+    "reviewDocumentsFor": "طلب مراجعة الوثائق للسائق",
+    "noDriverSelected": "لم يتم تحديد سائق. يرجى الاختيار من قائمة السائقين.",
+    "requestData": "بيانات الطلب",
+    "requiredFields": "الحقول المطلوبة",
+    "messageToDriver": "رسالة للسائق",
+    "messagePlaceholder": "اكتب تفاصيل طلب المراجعة...",
+    "charCount": "حرف",
+    "sending": "جاري الإرسال...",
+    "sentSuccess": "تم الإرسال بنجاح!",
+    "submitRequest": "إرسال طلب المراجعة",
+    "loading": "جاري التحميل...",
+    "errorPrefix": "حدث خطأ",
+    "errorFallback": "فشل إرسال الطلب",
+    "fields": {
+      "national_id_image_url": "صورة الهوية الوطنية",
+      "license_image_url": "صورة رخصة القيادة",
+      "criminal_record_url": "صحيفة الحالة الجنائية",
+      "vehicle_image_url": "صورة المركبة",
+      "vehicle_plate": "رقم اللوحة",
+      "national_id": "الرقم القومي",
+      "license_number": "رقم الرخصة"
+    }
+  },
+  "complaintDetail": {
+    "replyTitle": "الرد على الشكوى",
+    "changeStatus": "تغيير الحالة",
+    "statusInProgress": "قيد المعالجة",
+    "statusResolved": "محلول",
+    "statusClosed": "مغلق",
+    "replyText": "نص الرد",
+    "replyPlaceholder": "اكتب ردك على المستخدم هنا...",
+    "charCount": "حرف",
+    "sending": "جاري الإرسال...",
+    "sentSuccess": "تم الإرسال بنجاح!",
+    "submitReply": "إرسال الرد",
+    "completionDate": "تاريخ الاكتمال",
+    "cancellationDate": "تاريخ الإلغاء",
+    "cancelReason": "سبب الإلغاء",
+    "noDriverAssigned": "لم يتم تعيين سائق أو تم الإلغاء قبل التعيين"
+  },
+  "notificationsBulk": {
+    "sendBulk": "إرسال إشعار جماعي",
+    "cancel": "إلغاء",
+    "sending": "جاري الإرسال...",
+    "sentSuccess": "تم الإرسال!",
+    "sendToAll": "إرسال للجميع"
+  },
+  "driverActions": {
+    "revokeVerification": "إلغاء الاعتماد",
+    "makeSupervisor": "تعيين مشرف",
+    "removeSupervisor": "إلغاء مشرف"
   }
 }

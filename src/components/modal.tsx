@@ -22,10 +22,10 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-[var(--overlay)] backdrop-blur-sm" onClick={onClose} />
       <div
         className={cn(
-          "relative bg-surface/95 backdrop-blur-xl rounded-2xl border border-divider/60 w-full p-6 shadow-2xl shadow-black/40",
+          "relative bg-surface/95 backdrop-blur-xl rounded-2xl border border-divider/60 w-full p-6 shadow-2xl shadow-[rgba(var(--color-black-rgb),0.4)]",
           sizes[size]
         )}
       >

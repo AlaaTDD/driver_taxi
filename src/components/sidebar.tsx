@@ -10,7 +10,7 @@ import {
   Bell, MessageSquare, MessageSquareWarning, LogOut, Menu,
   X, Star, Shield, Truck, ArrowLeftRight, Ticket,
   Navigation, Wallet, Banknote, PanelRightClose, PanelRightOpen,
-  Settings, TrendingUp,
+  Settings, TrendingUp, Globe2, Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar, SIDEBAR_EXPANDED_W, SIDEBAR_COLLAPSED_W } from "./sidebar-context";
@@ -23,7 +23,7 @@ type NavItem = {
   href:   string;
   label:  string;
   icon:   LucideIcon;
-  rgb:    string;
+  navClass: string;
   badge?: number;
 };
 
@@ -39,55 +39,58 @@ const getNavGroups = (t: any): NavGroup[] => [
   {
     id: "overview",
     items: [
-      { href: "/dashboard",                  label: t("dashboard.overview"),          icon: LayoutDashboard,      rgb: PRIMARY_RGB },
+      { href: "/dashboard",                  label: t("dashboard.overview"),          icon: LayoutDashboard,      navClass: "nav-primary" },
     ],
   },
   {
     id: "people",
     label: t("sidebar.sections.people"),
     items: [
-      { href: "/dashboard/users",            label: t("common.users"),          icon: Users,                rgb: PRIMARY_RGB },
-      { href: "/dashboard/drivers",          label: t("common.drivers"),            icon: Car,                  rgb: PRIMARY_RGB },
-      { href: "/dashboard/driver-locations", label: t("common.driverLocations"),      icon: Navigation,           rgb: PRIMARY_RGB },
+      { href: "/dashboard/users",            label: t("common.users"),          icon: Users,                navClass: "nav-purple" },
+      { href: "/dashboard/drivers",          label: t("common.drivers"),            icon: Car,                  navClass: "nav-info" },
+      { href: "/dashboard/driver-locations", label: t("common.driverLocations"),      icon: Navigation,           navClass: "nav-cyan" },
     ],
   },
   {
     id: "operations",
     label: t("sidebar.sections.operations"),
     items: [
-      { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               rgb: PRIMARY_RGB },
-      { href: "/dashboard/trip-offers",      label: t("common.tripOffers"),        icon: ArrowLeftRight,       rgb: PRIMARY_RGB },
-      { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 rgb: PRIMARY_RGB },
-      { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, rgb: PRIMARY_RGB },
+      { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               navClass: "nav-success" },
+      { href: "/dashboard/route-plans",      label: "مسارات الرحلات",               icon: Navigation,           navClass: "nav-success" },
+      { href: "/dashboard/trip-offers",      label: t("common.tripOffers"),        icon: ArrowLeftRight,       navClass: "nav-primary" },
+      { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 navClass: "nav-warning" },
+      { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, navClass: "nav-error" },
+      { href: "/dashboard/service-areas",    label: t("serviceAreas.title"),       icon: Globe2,               navClass: "nav-info" },
     ],
   },
   {
     id: "financial",
     label: t("sidebar.sections.financial"),
     items: [
-      { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           rgb: PRIMARY_RGB },
-      { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  rgb: PRIMARY_RGB },
-      { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               rgb: PRIMARY_RGB },
-      { href: "/dashboard/coupon-analytics", label: t("coupons.analytics.title"),   icon: TrendingUp,           rgb: PRIMARY_RGB },
-      { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               rgb: PRIMARY_RGB },
-      { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             rgb: PRIMARY_RGB },
+      { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           navClass: "nav-success" },
+      { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  navClass: "nav-pink" },
+      { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               navClass: "nav-pink" },
+      { href: "/dashboard/coupon-analytics", label: t("coupons.analytics.title"),   icon: TrendingUp,           navClass: "nav-purple" },
+      { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               navClass: "nav-success" },
+      { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             navClass: "nav-warning" },
+      { href: "/dashboard/bonuses",          label: t("bonuses.title"),            icon: Trophy,               navClass: "nav-orange" },
     ],
   },
   {
     id: "system",
     label: t("sidebar.sections.system"),
     items: [
-      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                rgb: PRIMARY_RGB },
-      { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 rgb: PRIMARY_RGB },
-      { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        rgb: PRIMARY_RGB },
-      { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               rgb: PRIMARY_RGB },
+      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                navClass: "nav-cyan" },
+      { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 navClass: "nav-warning" },
+      { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        navClass: "nav-info" },
+      { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               navClass: "nav-purple" },
     ],
   },
   {
     id: "settings",
     label: t("sidebar.sections.settings"),
     items: [
-      { href: "/dashboard/settings",         label: t("common.settings"),    icon: Settings,             rgb: PRIMARY_RGB },
+      { href: "/dashboard/settings",         label: t("common.settings"),    icon: Settings,             navClass: "nav-primary" },
     ],
   },
 ];
@@ -113,7 +116,7 @@ function FloatingTooltip({ tip }: { tip: TooltipState }) {
         style={{
           borderTop:    "5px solid transparent",
           borderBottom: "5px solid transparent",
-          borderLeft:   "5px solid var(--sb-tooltip-bg, rgba(20,32,52,0.97))",
+          borderLeft:   "5px solid var(--sb-tooltip-bg, rgba(var(--color-black-rgb),0.97))",
         }}
       />
       <div
@@ -148,7 +151,7 @@ function NavLink({
   onClose?:  () => void;
   onTooltip: (tip: TooltipState) => void;
 }) {
-  const { rgb } = item;
+  const { navClass } = item;
   const ref = useRef<HTMLAnchorElement>(null);
 
   const showTip = useCallback(() => {
@@ -172,6 +175,7 @@ function NavLink({
       className={cn(
         "sidebar-nav-link group relative flex items-center rounded-xl text-[13px] font-bold",
         "transition-all duration-300 overflow-hidden animate-fade-in",
+        navClass,
         collapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5",
         isActive ? "sidebar-nav-active" : "sidebar-nav-inactive"
       )}
@@ -183,21 +187,9 @@ function NavLink({
       {/* active fill */}
       {isActive && (
         <>
-          <div
-            className="absolute inset-0 rounded-xl backdrop-blur-md"
-            style={{
-              background: `rgba(${rgb}, 0.15)`,
-              border:     `1px solid rgba(${rgb}, 0.3)`,
-              boxShadow:  "inset 0 1px 1px rgba(255,255,255,0.05)",
-            }}
-          />
+          <div className="absolute inset-0 rounded-xl backdrop-blur-md nav-item-active-fill" />
           {/* top specular glint */}
-          <div
-            className="absolute inset-x-3 top-0 h-px"
-            style={{
-              background: `linear-gradient(to right, transparent, rgba(${rgb},0.5), transparent)`,
-            }}
-          />
+          <div className="absolute inset-x-3 top-0 h-px nav-item-glint" />
         </>
       )}
 
@@ -210,48 +202,37 @@ function NavLink({
 
       {/* right accent bar */}
       <div
-        className="absolute right-0 top-1/2 -translate-y-1/2 rounded-l-full"
+        className="absolute right-0 top-1/2 -translate-y-1/2 rounded-l-full nav-item-accent-bar"
         style={{
           width:      "3px",
           height:     isActive ? "24px" : "0px",
-          background: `linear-gradient(to bottom, rgba(${rgb},1), rgba(${rgb},0.4))`,
-          boxShadow:  isActive ? `0 0 16px rgba(${rgb},0.8), 0 0 6px rgba(${rgb},1)` : "none",
           transition: "height 250ms cubic-bezier(0.16,1,0.3,1), box-shadow 250ms ease",
         }}
       />
 
       {/* icon container */}
       <div
-        className="relative flex-shrink-0 flex items-center justify-center rounded-lg transition-all duration-200"
+        className={cn(
+          "relative flex-shrink-0 flex items-center justify-center rounded-lg transition-all duration-200",
+          isActive ? "nav-item-icon-wrap" : "bg-[var(--sb-icon-bg)] border-[var(--sb-icon-border)] border"
+        )}
         style={{
-          width:      collapsed ? 36 : 28,
-          height:     collapsed ? 36 : 28,
-          background: isActive
-            ? `rgba(${rgb}, 0.14)`
-            : "var(--sb-icon-bg)",
-          border: isActive
-            ? `1px solid rgba(${rgb}, 0.24)`
-            : "1px solid var(--sb-icon-border)",
+          width:  collapsed ? 36 : 28,
+          height: collapsed ? 36 : 28,
         }}
       >
         <item.icon
           size={collapsed ? 16 : 14}
-          style={{
-            color:      `rgb(${rgb})`,
-            opacity:    isActive ? 1 : 0.5,
-            filter:     isActive ? `drop-shadow(0 0 5px rgba(${rgb},0.75))` : undefined,
-            transition: "all 0.2s ease",
-          }}
-          className="group-hover:opacity-75"
+          className={cn(
+            "group-hover:opacity-75 transition-all duration-200",
+            isActive ? "opacity-100 nav-item-icon nav-item-icon-active" : "opacity-50 nav-item-icon"
+          )}
         />
         {/* pulse ring on active */}
         {isActive && (
           <div
-            className="absolute inset-0 rounded-lg animate-pulse"
-            style={{
-              background:        `rgba(${rgb}, 0.15)`,
-              animationDuration: "3s",
-            }}
+            className="absolute inset-0 rounded-lg animate-pulse nav-item-pulse"
+            style={{ animationDuration: "3s" }}
           />
         )}
       </div>
@@ -264,12 +245,7 @@ function NavLink({
           </span>
           {item.badge != null && item.badge > 0 && (
             <span
-              className="relative flex-shrink-0 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold leading-none"
-              style={{
-                background: `rgba(${rgb}, 0.16)`,
-                color:      `rgb(${rgb})`,
-                border:     `1px solid rgba(${rgb}, 0.26)`,
-              }}
+              className="relative flex-shrink-0 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold leading-none nav-item-badge"
             >
               {item.badge > 99 ? "99+" : item.badge}
             </span>
@@ -446,7 +422,7 @@ function SidebarContent({
             >
               <LogOut
                 size={14}
-                className="transition-colors duration-200 group-hover:text-red-400 sidebar-logout-icon"
+                className="transition-colors duration-200 group-hover:text-error sidebar-logout-icon"
               />
             </div>
             {!collapsed && (
@@ -529,7 +505,7 @@ export default function Sidebar() {
         )}
         style={{
           width:     EXPANDED_W,
-          boxShadow: mobileOpen ? "-28px 0 64px rgba(0,0,0,0.35)" : "none",
+          boxShadow: mobileOpen ? "-28px 0 64px rgba(var(--color-black-rgb),0.35)" : "none",
         }}
       >
         <SidebarContent

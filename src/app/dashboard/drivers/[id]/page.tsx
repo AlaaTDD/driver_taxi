@@ -105,7 +105,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
         
         <div className="rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
-            <User size={18} className="text-violet-400" />
+            <User size={18} className="text-info" />
             المعلومات الشخصية
           </h2>
           <div className="space-y-4">
@@ -135,7 +135,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
         
         <div className="rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
-            <Car size={18} className="text-cyan-400" />
+            <Car size={18} style={{ color: "var(--color-cyan)" }} />
             تفاصيل المركبة
           </h2>
           <div className="space-y-4">
@@ -165,17 +165,17 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
         
         <div className="md:col-span-2 rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
-            <Star size={18} className="text-amber-400" />
+            <Star size={18} className="text-warning" />
             الأداء والإحصائيات
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 rounded-xl text-center" style={{ background: "var(--surface-glass)" }}>
               <p className="text-text-disabled text-sm mb-1">التقييم</p>
-              <p className="text-2xl font-black num text-amber-400">{user.rating?.toFixed(1) || "0.0"}</p>
+              <p className="text-2xl font-black num text-warning">{user.rating?.toFixed(1) || "0.0"}</p>
             </div>
             <div className="p-4 rounded-xl text-center" style={{ background: "var(--surface-glass)" }}>
               <p className="text-text-disabled text-sm mb-1">إجمالي الرحلات</p>
-              <p className="text-2xl font-black num text-blue-400">{user.total_trips || 0}</p>
+              <p className="text-2xl font-black num text-info">{user.total_trips || 0}</p>
             </div>
             <div className="p-4 rounded-xl text-center" style={{ background: "var(--surface-glass)" }}>
               <p className="text-text-disabled text-sm mb-1">حالة التوفر</p>
@@ -195,7 +195,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
         
         <div className="md:col-span-2 rounded-2xl p-6" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2 mb-4">
-            <FileText size={18} className="text-emerald-400" />
+            <FileText size={18} className="text-success" />
             الوثائق والمستندات
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -208,16 +208,16 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
               <div key={idx} className="flex flex-col gap-2">
                 <span className="text-text-secondary text-sm font-bold">{doc.label}</span>
                 {doc.url ? (
-                  <a href={doc.url} target="_blank" rel="noopener noreferrer" className="relative group block rounded-xl overflow-hidden aspect-4/3 bg-black/50 border border-divider">
+                  <a href={doc.url} target="_blank" rel="noopener noreferrer" className="relative group block rounded-xl overflow-hidden aspect-4/3 bg-[rgba(var(--color-black-rgb),0.5)] border border-divider">
                     <img src={doc.url} alt={doc.label} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="px-3 py-1.5 rounded-lg text-white font-bold text-[12px]" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
+                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(var(--color-black-rgb),0.3)] opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="px-3 py-1.5 rounded-lg text-white font-bold text-[12px]" style={{ background: "rgba(var(--color-white-rgb),0.15)", backdropFilter: "blur(4px)" }}>
                         عرض الصورة
                       </span>
                     </div>
                   </a>
                 ) : (
-                  <div className="rounded-xl aspect-4/3 flex items-center justify-center text-text-disabled text-[12px] bg-black/20 border border-divider border-dashed">
+                  <div className="rounded-xl aspect-4/3 flex items-center justify-center text-text-disabled text-[12px] bg-[rgba(var(--color-black-rgb),0.2)] border border-divider border-dashed">
                     لم يتم الرفع
                   </div>
                 )}

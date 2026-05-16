@@ -27,8 +27,8 @@ export default async function MessagesPage({
   ]);
 
   const tabs = [
-    { key: "support", label: t("messages.tabs.support"), count: supportCountRes.count || 0, icon: Headphones, color: "var(--info)", colorRaw: "37,99,235" },
-    { key: "trip", label: t("messages.tabs.trip"), count: tripMsgCountRes.count || 0, icon: MapPin, color: "var(--primary)", colorRaw: "217,119,6" },
+    { key: "support", label: t("messages.tabs.support"), count: supportCountRes.count || 0, icon: Headphones, navClass: "nav-info" },
+    { key: "trip", label: t("messages.tabs.trip"), count: tripMsgCountRes.count || 0, icon: MapPin, navClass: "nav-warning" },
   ];
 
   /* ── Support Messages ── */
@@ -103,7 +103,7 @@ export default async function MessagesPage({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/5 border border-cyan-500/20 text-cyan-500">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold variant-cyan">
               <MessageSquare size={11} />
               {(supportCountRes.count || 0) + (tripMsgCountRes.count || 0)} {t("messages.total")}
             </div>
@@ -117,23 +117,15 @@ export default async function MessagesPage({
               key={t.key}
               href={`/dashboard/messages?tab=${t.key}`}
               id={`messages-tab-${t.key}`}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
-              style={
-                tab === t.key
-                  ? { background: `rgba(${t.colorRaw},0.12)`, border: `1px solid rgba(${t.colorRaw},0.26)`, color: t.color, boxShadow: `0 4px 12px rgba(${t.colorRaw},0.12)` }
-                  : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }
-              }
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 ${t.navClass} ${tab === t.key ? "nav-tab-active" : ""}`}
+              style={tab !== t.key ? { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" } : undefined}
             >
               <t.icon size={14} />
               {t.label}
               {t.count > 0 && (
                 <span
-                  className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
-                  style={{
-                    background: tab === t.key ? `rgba(${t.colorRaw},0.20)` : "var(--surface-glass)",
-                    color: tab === t.key ? t.color : "var(--text-tertiary)",
-                    border: tab === t.key ? `1px solid rgba(${t.colorRaw},0.28)` : "1px solid var(--divider)",
-                  }}
+                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5 ${tab === t.key ? "nav-tab-badge-active" : ""}`}
+                  style={tab !== t.key ? { background: "var(--surface-glass)", color: "var(--text-tertiary)", border: "1px solid var(--divider)" } : undefined}
                 >
                   {t.count}
                 </span>
@@ -154,10 +146,10 @@ export default async function MessagesPage({
                   key={msg.id}
                   className="group relative dash-card overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: "0 0 30px rgba(6,182,212,0.04) inset" }} />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ boxShadow: "var(--shadow-sm) inset" }} />
                   <div className="relative flex items-start gap-4 p-5">
                     <div className="shrink-0">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-white/10" style={{ background: avatarBg, boxShadow: "0 2px 10px rgba(0,0,0,0.3)" }}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-[13px] border border-[var(--divider)]" style={{ background: avatarBg, boxShadow: "var(--shadow-sm)" }}>
                         {initial}
                       </div>
                     </div>
@@ -175,7 +167,7 @@ export default async function MessagesPage({
                       </div>
                       <p className="text-text-secondary text-[13px] leading-relaxed">{msg.message}</p>
                     </div>
-                    <div className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity" style={{ background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.15)" }}>
+                    <div className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity variant-cyan">
                       <Headphones size={14} className="text-info" />
                     </div>
                   </div>
@@ -225,7 +217,7 @@ export default async function MessagesPage({
                   <span className="text-text-disabled text-[11px]">({tripMsgCount})</span>
                 </div>
                 {tripIdFilter && (
-                  <span className="text-[11px] text-amber-400 px-2.5 py-1 rounded-lg" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg variant-warning">
                     {t("messages.trip.filter")}: {tripIdFilter.substring(0, 8)}...
                   </span>
                 )}
@@ -315,12 +307,8 @@ export default async function MessagesPage({
               <a
                 key={p}
                 href={`/dashboard/messages?tab=${tab}&page=${p}${tripIdFilter ? `&trip_id=${tripIdFilter}` : ""}`}
-                className="w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all"
-                style={
-                  p === page
-                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: `0 4px 12px rgba(var(--primary-rgb),0.28)`, border: "1px solid var(--primary)" }
-                    : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }
-                }
+                className={`w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all ${p === page ? "bg-[linear-gradient(135deg,var(--primary),var(--primary-dark))] text-white border-primary shadow-[0_4px_12px_rgba(var(--primary-rgb),0.28)]" : "bg-[var(--surface-glass)] border-[var(--divider)] text-[var(--text-secondary)]"}`}
+                style={p !== page ? { border: "1px solid var(--divider)" } : undefined}
               >
                 {p}
               </a>

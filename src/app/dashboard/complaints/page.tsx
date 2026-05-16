@@ -48,10 +48,10 @@ export default async function ComplaintsPage({
   ]);
 
   const stats = [
-    { label: t("complaints.statuses.open"), value: openRes.count || 0, icon: <Clock size={18} />, color: "var(--warning)", colorRaw: "217,119,6" },
-    { label: t("complaints.statuses.in_progress"), value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "var(--info)", colorRaw: "37,99,235" },
-    { label: t("complaints.statuses.resolved"), value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "var(--success)", colorRaw: "16,185,129" },
-    { label: t("complaints.priority.urgent"), value: urgentRes.count || 0, icon: <Zap size={18} />, color: "var(--error)", colorRaw: "220,38,38" },
+    { label: t("complaints.statuses.open"), value: openRes.count || 0, icon: <Clock size={18} />, color: "var(--warning)", colorRaw: "var(--warning-rgb)" },
+    { label: t("complaints.statuses.in_progress"), value: inProgressRes.count || 0, icon: <AlertTriangle size={18} />, color: "var(--info)", colorRaw: "var(--info-rgb)" },
+    { label: t("complaints.statuses.resolved"), value: resolvedRes.count || 0, icon: <CheckCircle size={18} />, color: "var(--success)", colorRaw: "var(--success-rgb)" },
+    { label: t("complaints.priority.urgent"), value: urgentRes.count || 0, icon: <Zap size={18} />, color: "var(--error)", colorRaw: "var(--error-rgb)" },
   ];
 
   const statusVariant = (s: string) => {

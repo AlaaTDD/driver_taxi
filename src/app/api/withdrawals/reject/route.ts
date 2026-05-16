@@ -1,8 +1,12 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  // ── Auth Guard ──────────────────────────────────────────────────────────────
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   const formData = await request.formData();
   const requestId = formData.get("request_id") as string;
   const reason = (formData.get("reason") as string) || "تم الرفض من قبل الإدارة";
@@ -12,19 +16,12 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
-  const authClient = await createClient();
-  const { data: { user } } = await authClient.auth.getUser();
 
-  const { error } = await supabase
-    .from("withdrawal_requests")
-    .update({
-      status: "rejected",
-      admin_id: user?.id || null,
-      rejection_reason: reason,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", requestId)
-    .eq("status", "pending");
+  const { error } = await supabase.rpc("reject_withdrawal", {
+    p_withdrawal_id: requestId,
+    p_admin_id: guard.user.id,
+    p_rejection_reason: reason
+  });
 
   if (error) {
     console.error("Reject withdrawal error:", error);

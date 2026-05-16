@@ -34,17 +34,18 @@ export function getStatusColor(status: string): string {
   return colors[status] || "status-pill-muted border";
 }
 
-export function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    searching: "جاري البحث",
-    accepted: "تم القبول",
-    driver_arriving: "السائق قادم",
-    in_progress: "جارية",
-    completed: "مكتملة",
-    cancelled: "ملغية",
-    pending: "معلق",
-    rejected: "مرفوض",
-    expired: "منتهي",
-  };
-  return labels[status] || status;
+export function getStatusLabel(status: string, t?: any): string {
+  if (!t) return status;
+  // Next-intl fallback chain
+  try {
+    const translation = t(`trips.statuses.${status}`);
+    // If next-intl returns the key itself because it's missing, try common
+    if (translation === `trips.statuses.${status}`) {
+      const common = t(`common.${status}`);
+      if (common !== `common.${status}`) return common;
+    }
+    return translation;
+  } catch {
+    return status;
+  }
 }

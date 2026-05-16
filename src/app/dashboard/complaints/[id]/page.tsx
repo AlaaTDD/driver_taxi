@@ -87,8 +87,8 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
       
       {complaint.admin_reply && (
         <div className="rounded-2xl p-5" style={{
-          background: "rgba(16,185,129,0.06)",
-          border: "1px solid rgba(16,185,129,0.15)",
+          background: "rgba(var(--success-rgb),0.06)",
+          border: "1px solid rgba(var(--success-rgb),0.15)",
         }}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-[12px] font-bold text-success uppercase tracking-wider">الرد السابق</h3>

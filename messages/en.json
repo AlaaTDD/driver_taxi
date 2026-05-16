@@ -785,5 +785,97 @@
     "notFound": "Page not found",
     "unauthorized": "Unauthorized",
     "forbidden": "Forbidden"
+  },
+  "bonuses": {
+    "title": "Bonuses & Incentives",
+    "subtitle": "Manage bonus rules and driver incentives",
+    "activeRules": "Active Rules",
+    "totalRules": "Total Rules",
+    "totalAwarded": "Total Awarded",
+    "totalPaid": "Total Paid",
+    "rulesTitle": "Bonus Rules",
+    "rulesCount": "rules",
+    "ruleName": "Rule Name",
+    "triggerType": "Trigger Type",
+    "threshold": "Threshold",
+    "bonusAmount": "Bonus Amount",
+    "vehicleTypes": "Vehicle Types",
+    "validity": "Validity",
+    "recentAwards": "Recent Awards",
+    "recentAwardsSubtitle": "Last 20 bonuses awarded"
+  },
+  "serviceAreas": {
+    "title": "Service Areas",
+    "subtitle": "Manage geographic service zones",
+    "totalAreas": "areas",
+    "driversAssigned": "Drivers Assigned",
+    "geohashPrefixes": "Zone Codes"
+  },
+  "appConfig": {
+    "title": "System Settings",
+    "subtitle": "Control app features and system options"
+  },
+  "settings": {
+    "title": "General Settings",
+    "subtitle": "Manage dashboard appearance and language",
+    "appearance": "Appearance",
+    "appearanceDesc": "Toggle between light and dark mode",
+    "language": "Language",
+    "languageDesc": "Choose dashboard interface language"
+  },
+  "revision": {
+    "title": "Request Revision",
+    "backToDrivers": "Back to Drivers",
+    "reviewDocumentsFor": "Request document revision for driver",
+    "noDriverSelected": "No driver selected. Please choose from the drivers list.",
+    "requestData": "Request Data",
+    "requiredFields": "Required Fields",
+    "messageToDriver": "Message to Driver",
+    "messagePlaceholder": "Write details for the revision request...",
+    "charCount": "characters",
+    "sending": "Sending...",
+    "sentSuccess": "Sent successfully!",
+    "submitRequest": "Submit Revision Request",
+    "loading": "Loading...",
+    "errorPrefix": "An error occurred",
+    "errorFallback": "Failed to submit request",
+    "fields": {
+      "national_id_image_url": "National ID Image",
+      "license_image_url": "Driving License Image",
+      "criminal_record_url": "Criminal Record",
+      "vehicle_image_url": "Vehicle Image",
+      "vehicle_plate": "Plate Number",
+      "national_id": "National ID Number",
+      "license_number": "License Number"
+    }
+  },
+  "complaintDetail": {
+    "replyTitle": "Reply to Complaint",
+    "changeStatus": "Change Status",
+    "statusInProgress": "In Progress",
+    "statusResolved": "Resolved",
+    "statusClosed": "Closed",
+    "replyText": "Reply Text",
+    "replyPlaceholder": "Write your reply to the user here...",
+    "charCount": "characters",
+    "sending": "Sending...",
+    "sentSuccess": "Sent successfully!",
+    "submitReply": "Send Reply",
+    "completionDate": "Completion Date",
+    "cancellationDate": "Cancellation Date",
+    "cancelReason": "Cancellation Reason",
+    "noDriverAssigned": "No driver assigned or trip cancelled before assignment"
+  },
+  "notificationsBulk": {
+    "sendBulk": "Send Bulk Notification",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "sentSuccess": "Sent!",
+    "sendToAll": "Send to All"
+  },
+  "driverActions": {
+    "revokeVerification": "Revoke Verification",
+    "makeSupervisor": "Make Supervisor",
+    "removeSupervisor": "Remove Supervisor"
   }
 }

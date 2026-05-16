@@ -99,9 +99,9 @@ export default function NotificationsClient({
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 hover:-translate-y-0.5 mr-auto"
           style={{
             background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
-            color: "white",
-            boxShadow: "0 4px 14px rgba(59,130,246,0.35)",
-            border: "1px solid rgba(59,130,246,0.3)",
+            color: "var(--color-white)",
+            boxShadow: "0 4px 14px rgba(var(--primary-rgb),0.35)",
+            border: "1px solid rgba(var(--primary-rgb),0.3)",
           }}
         >
           <Send size={14} />
@@ -126,7 +126,7 @@ export default function NotificationsClient({
                 className="w-9 h-9 rounded-xl text-[13px] font-bold"
                 style={
                   p === currentPage
-                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)", border: "1px solid rgba(59,130,246,0.3)" }
+                    ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "var(--color-white)", boxShadow: "0 4px 12px rgba(var(--primary-rgb),0.3)", border: "1px solid rgba(var(--primary-rgb),0.3)" }
                     : { ...selectStyle, color: "var(--text-secondary)" }
                 }
               >
@@ -149,14 +149,14 @@ export default function NotificationsClient({
       {showSendModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
+          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
         >
           <div
             className="relative w-full max-w-lg rounded-2xl overflow-hidden"
             style={{
               background: "var(--surface)",
-              border: "1px solid rgba(59,130,246,0.2)",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
+              border: "1px solid rgba(var(--primary-rgb),0.2)",
+              boxShadow: "0 24px 60px rgba(var(--color-black-rgb, 0,0,0),0.6), 0 0 0 1px rgba(var(--color-white-rgb, 255,255,255),0.04) inset",
             }}
           >
 
@@ -243,7 +243,7 @@ export default function NotificationsClient({
                       ? "linear-gradient(135deg, var(--success), var(--success-light))"
                       : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
                     opacity: (!form.title || !form.message || sending) ? 0.6 : 1,
-                    boxShadow: "0 4px 14px rgba(59,130,246,0.35)",
+                    boxShadow: "0 4px 14px rgba(var(--primary-rgb),0.35)",
                   }}
                 >
                   {sending ? (

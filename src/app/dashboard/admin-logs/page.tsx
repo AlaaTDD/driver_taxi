@@ -75,8 +75,8 @@ export default async function AdminLogsPage({
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: t("adminLogs.stats.total"), value: count || 0, icon: FileText, color: "var(--info)", colorRaw: "37,99,235" },
-          { label: t("adminLogs.stats.activeAdmins"), value: (admins || []).length, icon: User, color: "var(--success)", colorRaw: "16,185,129" },
+          { label: t("adminLogs.stats.total"), value: count || 0, icon: FileText, color: "var(--info)", colorRaw: "var(--info-rgb)" },
+          { label: t("adminLogs.stats.activeAdmins"), value: (admins || []).length, icon: User, color: "var(--success)", colorRaw: "var(--success-rgb)" },
         ].map((stat) => (
           <div
             key={stat.label}

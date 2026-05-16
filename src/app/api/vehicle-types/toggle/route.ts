@@ -1,11 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
-    const formData = await request.formData();
-    const id = formData.get("id") as string;
-    const is_active = formData.get("is_active") === "true";
+    const { id, is_active } = await request.json();
 
     if (!id) {
       return NextResponse.json({ error: "ID مطلوب" }, { status: 400 });

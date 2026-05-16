@@ -22,12 +22,7 @@ import {
 } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 
-const DASHBOARD_COLORS = {
-  primary: "var(--primary)",
-  info: "var(--primary)",
-  success: "var(--success)",
-  warning: "var(--warning)",
-};
+
 
 export default async function DashboardPage() {
   const t = await getTranslations();
@@ -122,9 +117,8 @@ export default async function DashboardPage() {
             title={t("dashboard.stats.totalUsers")}
             value={totalUsers}
             icon={<Users size={24} strokeWidth={2.5} />}
-            iconColor="text-white"
-            accentColor={DASHBOARD_COLORS.primary}
-            sparkColor={DASHBOARD_COLORS.primary}
+            colorVariant="primary"
+            showSparkline
             subtitle={t("dashboard.stats.activeUsers")}
           />
           {/* Card 2: إجمالي السائقين */}
@@ -132,8 +126,7 @@ export default async function DashboardPage() {
             title={t("dashboard.stats.totalDrivers")}
             value={totalDrivers}
             icon={<Car size={24} strokeWidth={2.5} />}
-            iconColor="text-white"
-            accentColor={DASHBOARD_COLORS.info}
+            colorVariant="info"
             subtitle={`${availableDrivers} ${t("dashboard.stats.availableDriversSubtitle")}`}
           />
           {/* Card 3: رحلات نشطة */}
@@ -141,9 +134,8 @@ export default async function DashboardPage() {
             title={t("dashboard.stats.activeTrips")}
             value={activeTrips}
             icon={<MapPin size={24} strokeWidth={2.5} />}
-            iconColor="text-white"
-            accentColor={DASHBOARD_COLORS.success}
-            sparkColor={DASHBOARD_COLORS.success}
+            colorVariant="success"
+            showSparkline
             subtitle={activeTrips === 0 ? t("dashboard.stats.noActiveTrips") : undefined}
           />
           {/* Card 4 (leftmost in RTL): إجمالي الإيرادات */}
@@ -151,9 +143,8 @@ export default async function DashboardPage() {
             title={t("dashboard.stats.totalRevenue")}
             value={formatCurrency(totalRevenue)}
             icon={<DollarSign size={24} strokeWidth={2.5} />}
-            iconColor="text-white"
-            accentColor={DASHBOARD_COLORS.primary}
-            sparkColor={DASHBOARD_COLORS.primary}
+            colorVariant="primary"
+            showSparkline
             trendPercent="12.5%"
             trendUp={true}
           />
@@ -175,7 +166,7 @@ export default async function DashboardPage() {
               value={availableDrivers}
               suffix={`${t("dashboard.kpis.outOf")} ${totalDrivers}`}
               icon={<UserCheck size={18} strokeWidth={2.5} />}
-              color={DASHBOARD_COLORS.success}
+              colorVariant="success"
               progress={totalDrivers > 0 ? (availableDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.onlineNow")}
             />
@@ -185,7 +176,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.pendingDrivers")}
               value={pendingDrivers}
               icon={<Clock size={18} strokeWidth={2.5} />}
-              color={DASHBOARD_COLORS.warning}
+              colorVariant="warning"
               progress={totalDrivers > 0 ? (pendingDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.awaitingReview")}
             />
@@ -195,7 +186,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.completionRate")}
               value={`${completionRate}%`}
               icon={<AlertTriangle size={18} strokeWidth={2.5} />}
-              color={DASHBOARD_COLORS.success}
+              colorVariant="success"
               progress={completionRate}
               sublabel={t("dashboard.kpis.ofTotalTrips")}
             />
@@ -205,7 +196,7 @@ export default async function DashboardPage() {
               label={t("dashboard.kpis.acceptanceRate")}
               value={`${acceptanceRate}%`}
               icon={<TrendingUp size={18} strokeWidth={2.5} />}
-              color={DASHBOARD_COLORS.primary}
+              colorVariant="primary"
               progress={acceptanceRate}
               sublabel={t("dashboard.kpis.ofTotalRequests")}
             />
@@ -255,9 +246,9 @@ export default async function DashboardPage() {
                   {/* Left: Route (Primary Focus) */}
                   <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
                     <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--success)", boxShadow: `0 0 0 4px var(--success-surface)` }} />
-                      <div className="w-[1.5px] grow my-1.5" style={{ background: `linear-gradient(to bottom, var(--success-surface), var(--accent-surface))` }} />
-                      <div className="w-2.5 h-2.5 rounded-full ring-4" style={{ background: "var(--primary)", boxShadow: `0 0 0 4px var(--primary-surface)` }} />
+                      <div className="w-2.5 h-2.5 rounded-full bg-success ring-4 ring-success/10" />
+                      <div className="w-[1.5px] grow my-1.5 bg-gradient-to-b from-success/10 to-primary/10" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-primary/10" />
                     </div>
                     
                     <div className="flex flex-col justify-between py-0.5 min-w-0">
@@ -279,23 +270,8 @@ export default async function DashboardPage() {
                         <span className="text-[15px] font-black num tracking-tight text-text-primary">
                           {formatCurrency(Number(trip.price))}
                         </span>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider`}
-                          style={{
-                            background: trip.status === "completed"
-                              ? "var(--success-surface)"
-                              : trip.status === "cancelled"
-                              ? "var(--error-surface)"
-                              : "var(--accent-surface)",
-                            color: trip.status === "completed"
-                              ? "var(--success)"
-                              : trip.status === "cancelled"
-                              ? "var(--error)"
-                              : "var(--primary)",
-                            border: `1px solid ${trip.status === "completed" ? "var(--success-border)" : trip.status === "cancelled" ? "var(--error-border)" : "var(--accent-border)"}`,
-                          }}
-                        >
-                          {getStatusLabel(trip.status)}
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
+                          {getStatusLabel(trip.status, t)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-text-tertiary group-hover:text-text-secondary transition-colors">

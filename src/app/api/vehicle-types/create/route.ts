@@ -1,15 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
-    const formData = await request.formData();
-    const name = formData.get("name") as string;
-    const display_name = formData.get("display_name") as string;
-    const icon = formData.get("icon") as string;
-    const base_fare = Number(formData.get("base_fare"));
-    const price_per_km = Number(formData.get("price_per_km"));
-    const sort_order = Number(formData.get("sort_order") || 0);
+    const { name, display_name, icon, base_fare, price_per_km, sort_order = 0 } = await request.json();
 
     if (!name || !display_name || !base_fare || !price_per_km) {
       return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });

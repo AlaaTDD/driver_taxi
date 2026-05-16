@@ -1,8 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
+  // ── Auth Guard ──────────────────────────────────────────────────────────────
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
     const formData = await request.formData();
     const userId = formData.get("user_id") as string;

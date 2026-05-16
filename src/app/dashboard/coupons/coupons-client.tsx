@@ -139,7 +139,7 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
       {isOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
+          style={{ background: "var(--overlay)", backdropFilter: "blur(8px)" }}
         >
           <div className="relative w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden bg-surface shadow-xl border border-divider flex flex-col">
             {/* Backdrop close */}

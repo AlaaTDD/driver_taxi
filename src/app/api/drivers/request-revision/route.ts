@@ -1,8 +1,12 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
     const body = await request.json();
     const { driver_id, fields, message } = body;

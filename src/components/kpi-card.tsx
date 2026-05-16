@@ -1,4 +1,14 @@
-"use client";
+import { cn } from "@/lib/utils";
+
+type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
+
+const COLOR_MAP: Record<ColorVariant, { bg: string; border: string; text: string; var: string; rgb: string }> = {
+  primary: { bg: "bg-primary/10", border: "border-primary/20", text: "text-primary", var: "var(--primary)", rgb: "var(--primary-rgb)" },
+  info: { bg: "bg-info/10", border: "border-info/20", text: "text-info", var: "var(--info)", rgb: "var(--info-rgb)" },
+  success: { bg: "bg-success/10", border: "border-success/20", text: "text-success", var: "var(--success)", rgb: "var(--success-rgb)" },
+  warning: { bg: "bg-warning/10", border: "border-warning/20", text: "text-warning", var: "var(--warning)", rgb: "var(--warning-rgb)" },
+  error: { bg: "bg-error/10", border: "border-error/20", text: "text-error", var: "var(--error)", rgb: "var(--error-rgb)" },
+};
 
 interface KpiCardProps {
   label: string;
@@ -6,7 +16,7 @@ interface KpiCardProps {
   total?: number;
   suffix?: string;
   icon: React.ReactNode;
-  color: string;
+  colorVariant?: ColorVariant;
   progress: number;
   sublabel?: string;
 }
@@ -17,11 +27,12 @@ export function KpiCard({
   total,
   suffix,
   icon,
-  color,
+  colorVariant = "primary",
   progress,
   sublabel,
 }: KpiCardProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
+  const colors = COLOR_MAP[colorVariant];
   
   // Circumference for the SVG ring
   const radius = 22;
@@ -49,7 +60,7 @@ export function KpiCard({
             cx="32"
             cy="32"
             r={radius}
-            stroke={color}
+            stroke={colors.var}
             strokeWidth="5"
             fill="none"
             strokeLinecap="round"
@@ -57,7 +68,7 @@ export function KpiCard({
               strokeDasharray: circumference,
               strokeDashoffset: strokeDashoffset,
               transition: "stroke-dashoffset 1s ease-out",
-              filter: "drop-shadow(0 0 4px rgba(var(--primary-rgb),0.34))",
+              filter: `drop-shadow(0 0 4px rgba(${colors.rgb},0.34))`,
             }}
           />
         </svg>
@@ -83,12 +94,13 @@ export function KpiCard({
         
         {/* Left Icon */}
         <div
-          className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{
-            background: "var(--accent-surface)",
-            border: "1px solid var(--accent-border)",
-            color: color,
-          }}
+          className={cn(
+            "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center",
+            colors.bg,
+            colors.border,
+            colors.text,
+            "border"
+          )}
         >
           {icon}
         </div>

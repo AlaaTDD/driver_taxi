@@ -50,16 +50,16 @@ export default async function WalletsPage({
   const totalUserBalance = userWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
 
   const statCards = [
-    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), color: "var(--success)", colorRaw: "16,185,129", icon: Car },
-    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), color: "var(--info)", colorRaw: "37,99,235", icon: TrendingUp },
-    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), color: "var(--error)", colorRaw: "220,38,38", icon: TrendingDown },
-    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), color: "var(--primary)", colorRaw: "217,119,6", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), variantClass: "variant-success", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), variantClass: "variant-info", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), variantClass: "variant-error", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), variantClass: "variant-warning", icon: User },
   ];
 
   const tabs = [
-    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, color: "var(--success)", colorRaw: "16,185,129" },
-    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, color: "var(--primary)", colorRaw: "217,119,6" },
-    { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, color: "var(--info)", colorRaw: "37,99,235" },
+    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, navClass: "nav-success" },
+    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, navClass: "nav-warning" },
+    { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, navClass: "nav-info" },
   ];
 
   /* ── Driver wallets with user info ── */
@@ -116,16 +116,16 @@ export default async function WalletsPage({
     }
   }
 
-  const txTypeLabels: Record<string, { label: string; color: string; colorRaw: string }> = {
-    trip_earning: { label: t("wallets.txTypes.trip_earning"), color: "var(--success)", colorRaw: "16,185,129" },
-    trip_payment: { label: t("wallets.txTypes.trip_payment"), color: "var(--info)", colorRaw: "37,99,235" },
-    withdrawal: { label: t("wallets.txTypes.withdrawal"), color: "var(--error)", colorRaw: "220,38,38" },
-    withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), color: "var(--warning)", colorRaw: "217,119,6" },
-    top_up: { label: t("wallets.txTypes.top_up"), color: "var(--primary)", colorRaw: "217,119,6" },
-    refund: { label: t("wallets.txTypes.refund"), color: "var(--info)", colorRaw: "37,99,235" },
-    bonus: { label: t("wallets.txTypes.bonus"), color: "var(--success)", colorRaw: "16,185,129" },
-    penalty: { label: t("wallets.txTypes.penalty"), color: "var(--error)", colorRaw: "220,38,38" },
-    adjustment: { label: t("wallets.txTypes.adjustment"), color: "var(--warning)", colorRaw: "217,119,6" },
+  const txTypeLabels: Record<string, { label: string; variantClass: string }> = {
+    trip_earning: { label: t("wallets.txTypes.trip_earning"), variantClass: "variant-success" },
+    trip_payment: { label: t("wallets.txTypes.trip_payment"), variantClass: "variant-info" },
+    withdrawal: { label: t("wallets.txTypes.withdrawal"), variantClass: "variant-error" },
+    withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), variantClass: "variant-warning" },
+    top_up: { label: t("wallets.txTypes.top_up"), variantClass: "variant-warning" },
+    refund: { label: t("wallets.txTypes.refund"), variantClass: "variant-info" },
+    bonus: { label: t("wallets.txTypes.bonus"), variantClass: "variant-success" },
+    penalty: { label: t("wallets.txTypes.penalty"), variantClass: "variant-error" },
+    adjustment: { label: t("wallets.txTypes.adjustment"), variantClass: "variant-warning" },
   };
 
   return (
@@ -142,14 +142,11 @@ export default async function WalletsPage({
           {statCards.map((s) => (
             <div key={s.label} className="dash-stat p-4">
               <div className="flex items-center justify-between mb-3">
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: `rgba(${s.colorRaw},0.12)`, border: `1px solid rgba(${s.colorRaw},0.24)`, color: s.color }}
-                >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.variantClass}`}>
                   <s.icon size={16} />
                 </div>
               </div>
-              <div className="text-[24px] font-black num tracking-tight" style={{ color: s.color }}>{s.value}</div>
+              <div className="text-[24px] font-black num tracking-tight" style={{ color: s.variantClass.replace('variant-', 'var(--') + ')' }}>{s.value}</div>
               <p className="text-[11px] text-text-tertiary font-semibold mt-1">{s.label}</p>
             </div>
           ))}
@@ -162,22 +159,14 @@ export default async function WalletsPage({
             <Link
               key={t.key}
               href={`/dashboard/wallets?tab=${t.key}`}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
-              style={
-                tab === t.key
-                  ? { background: `rgba(${t.colorRaw},0.12)`, border: `1px solid rgba(${t.colorRaw},0.28)`, color: t.color, boxShadow: `0 4px 12px rgba(${t.colorRaw},0.12)` }
-                  : { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" }
-              }
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 ${t.navClass} ${tab === t.key ? "nav-tab-active" : ""}`}
+              style={tab !== t.key ? { background: "var(--surface-glass)", border: "1px solid var(--divider)", color: "var(--text-tertiary)" } : undefined}
             >
               {t.label}
               {t.count > 0 && (
                 <span
-                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5`}
-                  style={{
-                    background: tab === t.key ? `rgba(${t.colorRaw},0.20)` : "var(--surface-elevated)",
-                    color: tab === t.key ? t.color : "var(--text-tertiary)",
-                    border: "1px solid var(--divider)",
-                  }}
+                  className={`min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5 ${tab === t.key ? "nav-tab-badge-active" : ""}`}
+                  style={tab !== t.key ? { background: "var(--surface-elevated)", color: "var(--text-tertiary)", border: "1px solid var(--divider)" } : undefined}
                 >
                   {t.count}
                 </span>
@@ -287,8 +276,8 @@ export default async function WalletsPage({
             {/* Filters */}
             <div className="flex items-center gap-3 flex-wrap">
               <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary-surface text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.all")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.drivers")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.users")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-success/15 text-success border border-success/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.drivers")}</Link>
+              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-info/15 text-info border border-info/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.users")}</Link>
             </div>
 
             <div className="dash-table-card">
@@ -310,18 +299,18 @@ export default async function WalletsPage({
                   </thead>
                   <tbody>
                     {transactions.map((tx) => {
-                      const txMeta = txTypeLabels[tx.type] || { label: tx.type, color: "var(--text-disabled)" };
+                      const txMeta = txTypeLabels[tx.type] || { label: tx.type, variantClass: "variant-neutral" };
                       const isPositive = Number(tx.amount) > 0;
                       return (
                         <tr key={tx.id} className="group/row dash-table-row">
                           <td className="py-3.5 px-4 text-[12px] text-text-primary font-medium">{tx.user_name || tx.wallet_id?.substring(0, 8) + "..."}</td>
                           <td className="py-3.5 px-4">
-                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: tx.wallet_type === "driver" ? "var(--success-surface)" : "var(--primary-surface)", color: tx.wallet_type === "driver" ? "var(--success)" : "var(--primary)", border: `1px solid ${tx.wallet_type === "driver" ? "var(--success-border)" : "var(--accent-border)"}` }}>
+                             <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold ${tx.wallet_type === "driver" ? "variant-success" : "variant-primary"}`}>
                               {tx.wallet_type === "driver" ? t("common.driver") : t("common.user")}
                             </span>
                           </td>
                           <td className="py-3.5 px-4">
-                             <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold" style={{ background: `rgba(${txMeta.colorRaw},0.10)`, color: txMeta.color, border: `1px solid rgba(${txMeta.colorRaw},0.20)` }}>
+                             <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold ${txMeta.variantClass}`}>
                               {txMeta.label}
                             </span>
                           </td>

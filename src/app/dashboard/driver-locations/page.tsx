@@ -14,6 +14,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import DriverLocationsMap from "./driver-locations-map";
 
 function initials(name?: string | null, fallback = "?") {
   return name?.trim()?.charAt(0)?.toUpperCase() || fallback;
@@ -135,6 +136,39 @@ export default async function DriverLocationsPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* ── Live Map (Phase 2 Finding #3) ── */}
+        <div className="driver-table-card" style={{ padding: 0, overflow: "hidden" }}>
+          <div className="driver-table-toolbar" style={{ padding: "16px 20px" }}>
+            <div className="driver-table-title">
+              <span className="driver-table-icon driver-table-icon-cyan">
+                <Navigation size={16} />
+              </span>
+              <div>
+                <h2>خريطة المواقع الحية</h2>
+                <p>{onlineCount} متصل من {totalCount} سائق</p>
+              </div>
+            </div>
+          </div>
+          <div style={{ height: 460 }}>
+            <DriverLocationsMap
+              drivers={locationRows.map((loc) => {
+                const d = driverMap.get(loc.driver_id);
+                const p = profileMap.get(loc.driver_id);
+                return {
+                  id: loc.driver_id,
+                  name: d?.name || "—",
+                  lat: Number(loc.lat),
+                  lng: Number(loc.lng),
+                  heading: loc.heading != null ? Number(loc.heading) : undefined,
+                  online: isOnline(loc.driver_id),
+                  vehicle: p ? `${p.vehicle_brand || ""} ${p.vehicle_model || ""}`.trim() : undefined,
+                  plate: p?.vehicle_plate || undefined,
+                };
+              })}
+            />
+          </div>
         </div>
 
         <div className="driver-table-card">

@@ -44,10 +44,10 @@ export default async function WithdrawalsPage({
   };
 
   const statCards = [
-    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "var(--warning)", colorRaw: "217,119,6", icon: Clock },
-    { label: t("withdrawals.stats.approved"), value: stats.approved, color: "var(--info)", colorRaw: "37,99,235", icon: Loader2 },
-    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "var(--success)", colorRaw: "16,185,129", icon: CheckCircle },
-    { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "var(--error)", colorRaw: "220,38,38", icon: XCircle },
+    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "var(--warning)", colorRaw: "var(--warning-rgb)", icon: Clock },
+    { label: t("withdrawals.stats.approved"), value: stats.approved, color: "var(--info)", colorRaw: "var(--info-rgb)", icon: Loader2 },
+    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "var(--success)", colorRaw: "var(--success-rgb)", icon: CheckCircle },
+    { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "var(--error)", colorRaw: "var(--error-rgb)", icon: XCircle },
   ];
 
   /* ── Query ── */
