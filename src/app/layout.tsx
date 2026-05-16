@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
-import { Cairo, Inter } from "next/font/google";
+
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const cairo = Cairo({
+const cairo = {
   variable: "--font-cairo",
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-});
+};
 
-const inter = Inter({
+const inter = {
   variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const messages = await getMessages();

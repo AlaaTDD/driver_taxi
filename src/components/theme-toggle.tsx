@@ -68,8 +68,8 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
         ref={pillRef}
         className="relative flex items-center rounded-lg overflow-hidden"
         style={{
-          background: "var(--sb-icon-bg)",
-          border: "1px solid var(--sb-nav-hover-border)",
+          background: "var(--primary-surface)",
+          border: "1px solid var(--accent-border)",
           padding: 2,
         }}
       >
@@ -84,7 +84,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
           data-theme-btn
           onClick={() => setTheme("light")}
           aria-label={t("light")}
-          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${!isDark ? 'theme-toggle-icon-active' : 'text-[var(--sb-footer-text)]'}`}
+          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${!isDark ? 'theme-toggle-icon-active' : 'text-[var(--text-disabled)]'}`}
         >
           <Sun size={13} className="transition-all duration-200" />
         </button>
@@ -94,7 +94,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
           data-theme-btn
           onClick={() => setTheme("dark")}
           aria-label={t("dark")}
-          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${isDark ? 'theme-toggle-icon-active' : 'text-[var(--sb-footer-text)]'}`}
+          className={`relative z-10 flex items-center justify-center p-1.5 rounded-md transition-all duration-200 ${isDark ? 'theme-toggle-icon-active' : 'text-[var(--text-disabled)]'}`}
         >
           <Moon size={13} className="transition-all duration-200" />
         </button>

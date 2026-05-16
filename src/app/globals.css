@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 
@@ -64,8 +65,6 @@
   --color-pink-rgb: 236, 72, 153;
   --color-cyan: #06B6D4;
   --color-cyan-rgb: 6, 182, 212;
-  --color-orange: #F97316;
-  --color-orange-rgb: 249, 115, 22;
   --color-white: #FFFFFF;
   --color-white-rgb: 255, 255, 255;
   --color-black: #000000;
@@ -90,56 +89,34 @@
   --shadow-lg: 0 8px 28px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.05);
 
   /* ── SIDEBAR ALIASES ── */
-  --topbar-bg: rgba(255, 255, 255, 0.92);
-  --topbar-border: var(--divider);
-  --chrome-main-bg: rgba(255, 255, 255, 0.94);
   --chrome-control-bg: #F1F5F9;
-  --chrome-control-border: #E2E8F0;
-  --chrome-join-line: var(--divider);
   --chrome-shadow: 0 16px 34px rgba(0, 0, 0, 0.06);
   --dashboard-content-bg: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-  --sidebar-chrome-shadow: inset -1px 0 0 var(--chrome-join-line), 4px 0 16px rgba(0, 0, 0, 0.03);
+  --sidebar-chrome-shadow: inset -1px 0 0 var(--divider), 4px 0 16px rgba(0, 0, 0, 0.03);
 
   /* ── SIDEBAR TOKENS — LIGHT ── */
   --sb-bg-gradient: linear-gradient(180deg, #F6F7FA 0%, #ECEEF4 100%);
-  --sb-border: #E2E5EC;
 
-  --sb-nav-text: #64748B;
   --sb-nav-text-active: #1E293B;
-  --sb-nav-hover-bg: rgba(245, 158, 11, 0.08);
-  --sb-nav-hover-border: rgba(245, 158, 11, 0.16);
 
-  --sb-icon-bg: rgba(245, 158, 11, 0.08);
-  --sb-icon-border: rgba(245, 158, 11, 0.18);
 
   --sb-divider: linear-gradient(to right, transparent, #D4D8E3, transparent);
 
-  --sb-group-label: #94A3B8;
-  --sb-group-line: #E2E5EC;
   --sb-group-dot: #CBD5E1;
 
-  --sb-footer-text: #94A3B8;
   --sb-footer-hover: #1E293B;
   --sb-logout-text: var(--error);
 
   --sb-logo-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   --sb-logo-shadow: 0 4px 12px rgba(245, 158, 11, 0.20);
-  --sb-logo-border: rgba(245, 158, 11, 0.12);
 
   --sb-brand-gradient: linear-gradient(to right, #0F172A 0%, #334155 100%);
-  --sb-brand-sub: #94A3B8;
 
-  --sb-tooltip-bg: #1E293B;
-  --sb-tooltip-border: #334155;
-  --sb-tooltip-text: #F8FAFC;
   --sb-tooltip-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
 
   --sb-noise-opacity: 0;
   --sb-top-glow: none;
   --sb-top-glow-opacity: 0;
-  --sb-version-text: #94A3B8;
-  --sb-mobile-btn-bg: rgba(255, 255, 255, 0.95);
-  --sb-mobile-btn-border: #E2E5EC;
   --sb-mobile-btn-text: #D97706;
   --sb-backdrop: rgba(15, 23, 42, 0.40);
 }
@@ -205,8 +182,6 @@
   --color-pink-rgb: 236, 72, 153;
   --color-cyan: #06B6D4;
   --color-cyan-rgb: 6, 182, 212;
-  --color-orange: #F97316;
-  --color-orange-rgb: 249, 115, 22;
   --color-white: #FFFFFF;
   --color-white-rgb: 255, 255, 255;
   --color-black: #000000;
@@ -223,15 +198,10 @@
   --overlay: rgba(8, 10, 15, 0.85);
 
   /* ── CHROME & SHELL ── */
-  --topbar-bg: rgba(18, 21, 28, 0.92);
-  --topbar-border: var(--divider);
-  --chrome-main-bg: rgba(18, 21, 28, 0.95);
   --chrome-control-bg: #1E232E;
-  --chrome-control-border: #3B4354;
-  --chrome-join-line: var(--divider);
   --chrome-shadow: 0 18px 42px rgba(0, 0, 0, 0.60);
   --dashboard-content-bg: #080A0F;
-  --sidebar-chrome-shadow: inset -1px 0 0 var(--chrome-join-line), 10px 0 30px rgba(0, 0, 0, 0.30);
+  --sidebar-chrome-shadow: inset -1px 0 0 var(--divider), 10px 0 30px rgba(0, 0, 0, 0.30);
 
   /* ── SHADOWS (Darker and richer) ── */
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.40);
@@ -240,44 +210,27 @@
 
   /* ── SIDEBAR TOKENS — DARK ── */
   --sb-bg-gradient: #080A0F;
-  --sb-border: #282E3A;
 
-  --sb-nav-text: #94A3B8;
   --sb-nav-text-active: #F8FAFC;
-  --sb-nav-hover-bg: rgba(245, 158, 11, 0.12);
-  --sb-nav-hover-border: rgba(245, 158, 11, 0.25);
 
-  --sb-icon-bg: rgba(245, 158, 11, 0.15);
-  --sb-icon-border: rgba(245, 158, 11, 0.30);
 
   --sb-divider: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.06), transparent);
 
-  --sb-group-label: #64748B;
-  --sb-group-line: rgba(255, 255, 255, 0.05);
   --sb-group-dot: rgba(255, 255, 255, 0.15);
 
-  --sb-footer-text: #94A3B8;
   --sb-footer-hover: #F8FAFC;
   --sb-logout-text: var(--error);
 
   --sb-logo-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   --sb-logo-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
-  --sb-logo-border: transparent;
 
   --sb-brand-gradient: linear-gradient(to right, #F8FAFC 0%, #CBD5E1 100%);
-  --sb-brand-sub: #94A3B8;
 
-  --sb-tooltip-bg: #1E232E;
-  --sb-tooltip-border: #3B4354;
-  --sb-tooltip-text: #F8FAFC;
   --sb-tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.60);
 
   --sb-noise-opacity: 0;
   --sb-top-glow: none;
   --sb-top-glow-opacity: 0;
-  --sb-version-text: #475569;
-  --sb-mobile-btn-bg: rgba(18, 21, 28, 0.96);
-  --sb-mobile-btn-border: #282E3A;
   --sb-mobile-btn-text: #F59E0B;
   --sb-backdrop: rgba(8, 10, 15, 0.80);
 }
@@ -323,7 +276,6 @@
   --color-purple: var(--color-purple);
   --color-pink: var(--color-pink);
   --color-cyan: var(--color-cyan);
-  --color-orange: var(--color-orange);
   --color-white: var(--color-white);
   --color-black: var(--color-black);
 }
@@ -393,7 +345,7 @@
   }
   .variant-orange {
     background: rgba(var(--color-orange-rgb), 0.12);
-    color: var(--color-orange);
+    color: var(--warning);
     border: 1px solid rgba(var(--color-orange-rgb), 0.22);
   }
 
@@ -819,7 +771,7 @@ body {
 
   .sidebar-panel {
     background: var(--sb-bg-gradient);
-    border-color: var(--sb-border);
+    border-color: var(--divider);
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
   }
@@ -839,7 +791,7 @@ body {
 
   .sidebar-logo {
     background: var(--sb-logo-gradient);
-    border-color: var(--sb-logo-border);
+    border-color: var(--accent-surface);
     box-shadow: var(--sb-logo-shadow);
     transition: all 0.3s ease;
   }
@@ -852,7 +804,7 @@ body {
   }
 
   .sidebar-brand-sub {
-    color: var(--sb-brand-sub);
+    color: var(--text-disabled);
   }
 
   .sidebar-divider {
@@ -860,11 +812,11 @@ body {
   }
 
   .sidebar-group-label {
-    color: var(--sb-group-label);
+    color: var(--text-tertiary);
   }
 
   .sidebar-group-line {
-    background: var(--sb-group-line);
+    background: var(--divider);
   }
 
   .sidebar-group-dot {
@@ -876,32 +828,32 @@ body {
   }
 
   .sidebar-nav-inactive {
-    color: var(--sb-nav-text);
+    color: var(--text-tertiary);
   }
 
   .sidebar-nav-hover-fill {
-    background: var(--sb-nav-hover-bg);
-    border: 1px solid var(--sb-nav-hover-border);
+    background: var(--primary-surface);
+    border: 1px solid var(--accent-border);
   }
 
   .sidebar-icon-bg {
-    background: var(--sb-icon-bg);
+    background: var(--primary-surface);
   }
 
   .sidebar-icon-border {
-    border-color: var(--sb-icon-border);
+    border-color: var(--accent-border);
   }
 
   .sidebar-footer-btn {
-    color: var(--sb-footer-text);
+    color: var(--text-disabled);
   }
 
   .sidebar-footer-icon {
-    color: var(--sb-footer-text);
+    color: var(--text-disabled);
   }
 
   .sidebar-footer-text {
-    color: var(--sb-footer-text);
+    color: var(--text-disabled);
   }
 
   .sidebar-footer-btn:hover .sidebar-footer-icon,
@@ -922,7 +874,7 @@ body {
   }
 
   .sidebar-logout-icon-wrap {
-    background: var(--sb-icon-bg);
+    background: var(--primary-surface);
   }
 
   .sidebar-logout-hover-fill {
@@ -931,19 +883,19 @@ body {
   }
 
   .sidebar-version {
-    color: var(--sb-version-text);
+    color: var(--text-disabled);
   }
 
   .sidebar-tooltip {
-    background: var(--sb-tooltip-bg);
-    border: 1px solid var(--sb-tooltip-border);
-    color: var(--sb-tooltip-text);
+    background: var(--surface-elevated);
+    border: 1px solid var(--divider-strong);
+    color: var(--text-primary);
     box-shadow: var(--sb-tooltip-shadow);
   }
 
   .sidebar-mobile-toggle {
-    background: var(--sb-mobile-btn-bg);
-    border: 1px solid var(--sb-mobile-btn-border);
+    background: var(--surface);
+    border: 1px solid var(--divider);
     color: var(--sb-mobile-btn-text);
     box-shadow: var(--shadow-md);
     backdrop-filter: blur(12px);
@@ -962,8 +914,8 @@ body {
   /* ══ DASHBOARD CHROME ═══════════════════════════════════════════════ */
 
   .dashboard-chrome {
-    background: var(--chrome-main-bg);
-    border-bottom: 1px solid var(--topbar-border);
+    background: var(--surface-glass);
+    border-bottom: 1px solid var(--divider);
     box-shadow: var(--chrome-shadow);
     backdrop-filter: blur(22px) saturate(160%);
     -webkit-backdrop-filter: blur(22px) saturate(160%);
@@ -972,7 +924,7 @@ body {
   .dashboard-brand-zone {
     position: relative;
     background: var(--sb-bg-gradient);
-    box-shadow: inset 0 -1px 0 var(--chrome-join-line);
+    box-shadow: inset 0 -1px 0 var(--divider);
   }
 
   .dashboard-brand-zone::after {
@@ -982,7 +934,7 @@ body {
     inset-inline-end: -1px;
     width: 1px;
     border-radius: 999px;
-    background: linear-gradient(to bottom, transparent, var(--chrome-join-line), transparent);
+    background: linear-gradient(to bottom, transparent, var(--divider), transparent);
   }
 
   .dashboard-brand-logo {
@@ -995,7 +947,7 @@ body {
 
   .dashboard-main-topbar {
     position: relative;
-    background: var(--chrome-main-bg);
+    background: var(--surface-glass);
   }
 
   .dashboard-route-chip {
@@ -1006,7 +958,7 @@ body {
   .dashboard-icon-button,
   .dashboard-date-chip {
     background: var(--chrome-control-bg);
-    border: 1px solid var(--chrome-control-border);
+    border: 1px solid var(--divider-strong);
     color: var(--text-secondary);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
   }
@@ -1037,11 +989,11 @@ body {
   }
 
   .dashboard-sidebar-panel {
-    border-color: var(--chrome-join-line);
+    border-color: var(--divider);
   }
 
   .dashboard-sidebar-root {
-    box-shadow: inset 0 1px 0 var(--chrome-join-line);
+    box-shadow: inset 0 1px 0 var(--divider);
   }
 
   @media (max-width: 1023px) {
@@ -1885,8 +1837,8 @@ body {
 }
 
 .dashboard-topbar {
-  background: var(--topbar-bg);
-  border-color: var(--topbar-border);
+  background: var(--surface-glass);
+  border-color: var(--divider);
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);

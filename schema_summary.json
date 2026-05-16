@@ -1,0 +1,560 @@
+{
+  "tables": {
+    "admin_logs": {
+      "columns": [
+        "id",
+        "admin_id",
+        "action",
+        "table_name",
+        "record_id",
+        "old_data",
+        "new_data",
+        "ip_address",
+        "user_agent",
+        "created_at"
+      ]
+    },
+    "app_config": {
+      "columns": [
+        "key",
+        "value",
+        "label",
+        "category",
+        "updated_at",
+        "updated_by"
+      ]
+    },
+    "bonus_rules": {
+      "columns": [
+        "id",
+        "name",
+        "name_ar",
+        "trigger_type",
+        "threshold",
+        "bonus_amount",
+        "vehicle_types",
+        "service_area_id",
+        "is_active",
+        "starts_at",
+        "expires_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "complaints": {
+      "columns": [
+        "id",
+        "user_id",
+        "trip_id",
+        "title",
+        "description",
+        "status",
+        "created_at",
+        "resolved_at",
+        "admin_notes",
+        "category",
+        "priority",
+        "admin_reply",
+        "replied_at",
+        "admin_id"
+      ]
+    },
+    "coupon_audit_log": {
+      "columns": [
+        "id",
+        "coupon_id",
+        "event_type",
+        "details",
+        "performed_by",
+        "created_at"
+      ]
+    },
+    "coupon_usages": {
+      "columns": [
+        "id",
+        "trip_id",
+        "user_coupon_id",
+        "discount_amount",
+        "created_at"
+      ]
+    },
+    "coupons": {
+      "columns": [
+        "id",
+        "code",
+        "discount_type",
+        "discount_value",
+        "min_trip_price",
+        "max_uses",
+        "used_count",
+        "expires_at",
+        "is_active",
+        "created_at",
+        "max_uses_per_user",
+        "first_ride_only",
+        "max_discount",
+        "description_ar",
+        "description_en",
+        "title",
+        "starts_at",
+        "budget_limit",
+        "spent_budget",
+        "auto_apply",
+        "new_users_only",
+        "funded_by",
+        "eligible_cities",
+        "eligible_services"
+      ]
+    },
+    "driver_bonus_ledger": {
+      "columns": [
+        "id",
+        "driver_id",
+        "bonus_rule_id",
+        "period_key",
+        "bonus_amount",
+        "trips_counted",
+        "transaction_id",
+        "awarded_at"
+      ]
+    },
+    "driver_locations": {
+      "columns": [
+        "id",
+        "driver_id",
+        "lat",
+        "lng",
+        "heading",
+        "geohash",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "driver_revision_requests": {
+      "columns": [
+        "id",
+        "driver_id",
+        "fields_requested",
+        "message",
+        "status",
+        "created_at",
+        "resolved_at"
+      ]
+    },
+    "driver_service_areas": {
+      "columns": [
+        "id",
+        "driver_id",
+        "service_area_id",
+        "assigned_at",
+        "assigned_by",
+        "is_active"
+      ]
+    },
+    "driver_wallets": {
+      "columns": [
+        "id",
+        "balance",
+        "total_earned",
+        "total_withdrawn",
+        "commission_rate",
+        "pending_withdrawal",
+        "updated_at"
+      ]
+    },
+    "drivers_profile": {
+      "columns": [
+        "id",
+        "national_id",
+        "national_id_image_url",
+        "license_number",
+        "license_image_url",
+        "criminal_record_url",
+        "vehicle_type",
+        "vehicle_brand",
+        "vehicle_model",
+        "vehicle_year",
+        "vehicle_color",
+        "vehicle_plate",
+        "vehicle_image_url",
+        "is_verified",
+        "is_available",
+        "geohash",
+        "current_lat",
+        "current_lng",
+        "updated_at",
+        "geohash5",
+        "heading",
+        "target_route_lat",
+        "target_route_lng",
+        "target_route_address",
+        "target_route_active",
+        "target_route_radius_km",
+        "target_origin_lat",
+        "target_origin_lng",
+        "target_origin_radius_km",
+        "target_dest_lat",
+        "target_dest_lng"
+      ]
+    },
+    "messages": {
+      "columns": [
+        "id",
+        "id",
+        "sender_id",
+        "sender_id",
+        "receiver_id",
+        "receiver_id",
+        "trip_id",
+        "trip_id",
+        "content",
+        "content",
+        "is_read",
+        "is_read",
+        "created_at",
+        "created_at",
+        "read_at",
+        "read_at",
+        "deleted_by_sender",
+        "deleted_by_sender",
+        "deleted_by_receiver",
+        "deleted_by_receiver",
+        "type",
+        "type",
+        "attachment_url",
+        "attachment_url"
+      ]
+    },
+    "notifications": {
+      "columns": [
+        "id",
+        "user_id",
+        "title",
+        "message",
+        "type",
+        "is_read",
+        "reference_id",
+        "created_at",
+        "title_ar",
+        "body_ar"
+      ]
+    },
+    "pricing_config": {
+      "columns": [
+        "id",
+        "vehicle_type",
+        "base_fare",
+        "price_per_km",
+        "minimum_fare",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "ratings": {
+      "columns": [
+        "id",
+        "trip_id",
+        "user_id",
+        "driver_id",
+        "rating",
+        "comment",
+        "created_at"
+      ]
+    },
+    "service_areas": {
+      "columns": [
+        "id",
+        "name",
+        "name_ar",
+        "code",
+        "geohash_prefixes",
+        "boundary",
+        "is_active",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "spatial_ref_sys": {
+      "columns": [
+        "srid",
+        "auth_name",
+        "auth_srid",
+        "srtext",
+        "proj4text"
+      ]
+    },
+    "support_messages": {
+      "columns": [
+        "id",
+        "user_id",
+        "message",
+        "created_at",
+        "sender_role",
+        "sender_id"
+      ]
+    },
+    "trip_offers": {
+      "columns": [
+        "id",
+        "trip_id",
+        "driver_id",
+        "status",
+        "created_at",
+        "responded_at",
+        "updated_at",
+        "proposed_price",
+        "driver_location_lat",
+        "driver_location_lng"
+      ]
+    },
+    "trip_route_plans": {
+      "columns": [
+        "id",
+        "trip_id",
+        "label",
+        "status",
+        "total_distance_km",
+        "total_duration_min",
+        "estimated_price",
+        "encoded_polyline",
+        "is_system_generated",
+        "created_by",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "trip_route_waypoints": {
+      "columns": [
+        "id",
+        "route_plan_id",
+        "seq_order",
+        "role",
+        "lat",
+        "lng",
+        "address",
+        "place_id",
+        "leg_distance_km",
+        "leg_duration_min",
+        "planned_wait_min",
+        "actual_arrived_at",
+        "actual_departed_at",
+        "notes",
+        "created_at"
+      ]
+    },
+    "trips": {
+      "columns": [
+        "id",
+        "user_id",
+        "driver_id",
+        "pickup_address",
+        "pickup_lat",
+        "pickup_lng",
+        "destination_address",
+        "destination_lat",
+        "destination_lng",
+        "vehicle_type",
+        "distance_km",
+        "price",
+        "status",
+        "payment_method",
+        "is_paid",
+        "created_at",
+        "accepted_at",
+        "started_at",
+        "completed_at",
+        "geohash",
+        "meeting_lat",
+        "meeting_lng",
+        "meeting_address",
+        "final_price",
+        "user_rating_to_driver",
+        "driver_rating_to_user",
+        "cancelled_at",
+        "cancel_reason",
+        "cancelled_by",
+        "updated_at",
+        "driver_earnings",
+        "platform_commission",
+        "coupon_discount",
+        "payment_source",
+        "service_area_id",
+        "estimated_duration_min",
+        "scheduled_at",
+        "cancel_reason_category"
+      ]
+    },
+    "user_coupons": {
+      "columns": [
+        "id",
+        "user_id",
+        "coupon_id",
+        "is_used",
+        "assigned_at",
+        "used_at"
+      ]
+    },
+    "user_presence": {
+      "columns": [
+        "user_id",
+        "lat",
+        "lng",
+        "last_seen"
+      ]
+    },
+    "user_ratings": {
+      "columns": [
+        "id",
+        "trip_id",
+        "driver_id",
+        "user_id",
+        "rating",
+        "comment",
+        "created_at"
+      ]
+    },
+    "user_wallets": {
+      "columns": [
+        "id",
+        "balance",
+        "total_spent",
+        "total_topped_up",
+        "updated_at"
+      ]
+    },
+    "users": {
+      "columns": [
+        "id",
+        "id",
+        "name",
+        "name",
+        "phone",
+        "phone",
+        "email",
+        "email",
+        "avatar_url",
+        "avatar_url",
+        "role",
+        "role",
+        "rating",
+        "rating",
+        "total_trips",
+        "total_trips",
+        "language",
+        "language",
+        "fcm_token",
+        "fcm_token",
+        "is_active",
+        "is_active",
+        "is_admin",
+        "is_admin",
+        "created_at",
+        "created_at",
+        "updated_at",
+        "updated_at",
+        "is_blocked",
+        "is_blocked",
+        "blocked_at",
+        "blocked_at",
+        "blocked_reason",
+        "blocked_reason"
+      ]
+    },
+    "vehicle_types": {
+      "columns": [
+        "id",
+        "name",
+        "display_name",
+        "icon",
+        "base_fare",
+        "price_per_km",
+        "is_active",
+        "sort_order",
+        "created_at"
+      ]
+    },
+    "wallet_transactions": {
+      "columns": [
+        "id",
+        "wallet_id",
+        "wallet_type",
+        "type",
+        "amount",
+        "balance_before",
+        "balance_after",
+        "reference_id",
+        "reference_type",
+        "status",
+        "description",
+        "metadata",
+        "created_at"
+      ]
+    },
+    "withdrawal_requests": {
+      "columns": [
+        "id",
+        "driver_id",
+        "amount",
+        "status",
+        "idempotency_key",
+        "payment_method",
+        "account_details",
+        "admin_id",
+        "rejection_reason",
+        "admin_notes",
+        "processed_at",
+        "transaction_id",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  },
+  "enums": {
+    "route_plan_status": [
+      "draft",
+      "active",
+      "inactive",
+      "archived"
+    ],
+    "route_waypoint_role": [
+      "origin",
+      "stopover",
+      "destination"
+    ],
+    "wallet_transaction_status": [
+      "pending",
+      "completed",
+      "failed",
+      "reversed"
+    ],
+    "wallet_transaction_type": [
+      "trip_earning",
+      "trip_payment",
+      "withdrawal",
+      "withdrawal_refund",
+      "top_up",
+      "refund",
+      "bonus",
+      "penalty",
+      "adjustment",
+      "coupon_subsidy"
+    ],
+    "withdrawal_method": [
+      "bank_transfer",
+      "vodafone_cash",
+      "instapay",
+      "orange_money"
+    ],
+    "withdrawal_status": [
+      "pending",
+      "approved",
+      "processing",
+      "completed",
+      "rejected",
+      "cancelled"
+    ]
+  },
+  "functions": {},
+  "rls_policies": [],
+  "realtime_publications": []
+}

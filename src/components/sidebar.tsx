@@ -46,44 +46,44 @@ const getNavGroups = (t: any): NavGroup[] => [
     id: "people",
     label: t("sidebar.sections.people"),
     items: [
-      { href: "/dashboard/users",            label: t("common.users"),          icon: Users,                navClass: "nav-purple" },
-      { href: "/dashboard/drivers",          label: t("common.drivers"),            icon: Car,                  navClass: "nav-info" },
-      { href: "/dashboard/driver-locations", label: t("common.driverLocations"),      icon: Navigation,           navClass: "nav-cyan" },
+      { href: "/dashboard/users",            label: t("common.users"),          icon: Users,                navClass: "nav-primary" },
+      { href: "/dashboard/drivers",          label: t("common.drivers"),            icon: Car,                  navClass: "nav-primary" },
+      { href: "/dashboard/driver-locations", label: t("common.driverLocations"),      icon: Navigation,           navClass: "nav-primary" },
     ],
   },
   {
     id: "operations",
     label: t("sidebar.sections.operations"),
     items: [
-      { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               navClass: "nav-success" },
-      { href: "/dashboard/route-plans",      label: "مسارات الرحلات",               icon: Navigation,           navClass: "nav-success" },
+      { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               navClass: "nav-primary" },
+      { href: "/dashboard/route-plans",      label: "مسارات الرحلات",               icon: Navigation,           navClass: "nav-primary" },
       { href: "/dashboard/trip-offers",      label: t("common.tripOffers"),        icon: ArrowLeftRight,       navClass: "nav-primary" },
-      { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 navClass: "nav-warning" },
-      { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, navClass: "nav-error" },
-      { href: "/dashboard/service-areas",    label: t("serviceAreas.title"),       icon: Globe2,               navClass: "nav-info" },
+      { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 navClass: "nav-primary" },
+      { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, navClass: "nav-primary" },
+      { href: "/dashboard/service-areas",    label: t("serviceAreas.title"),       icon: Globe2,               navClass: "nav-primary" },
     ],
   },
   {
     id: "financial",
     label: t("sidebar.sections.financial"),
     items: [
-      { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           navClass: "nav-success" },
-      { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  navClass: "nav-pink" },
-      { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               navClass: "nav-pink" },
-      { href: "/dashboard/coupon-analytics", label: t("coupons.analytics.title"),   icon: TrendingUp,           navClass: "nav-purple" },
-      { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               navClass: "nav-success" },
-      { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             navClass: "nav-warning" },
-      { href: "/dashboard/bonuses",          label: t("bonuses.title"),            icon: Trophy,               navClass: "nav-orange" },
+      { href: "/dashboard/pricing",          label: t("common.pricing"),             icon: DollarSign,           navClass: "nav-primary" },
+      { href: "/dashboard/coupons",          label: t("common.coupons"),           icon: Tag,                  navClass: "nav-primary" },
+      { href: "/dashboard/user-coupons",     label: t("common.userCoupons"),  icon: Ticket,               navClass: "nav-primary" },
+      { href: "/dashboard/coupon-analytics", label: t("coupons.analytics.title"),   icon: TrendingUp,           navClass: "nav-primary" },
+      { href: "/dashboard/wallets",          label: t("wallets.title"),     icon: Wallet,               navClass: "nav-primary" },
+      { href: "/dashboard/withdrawals",      label: t("withdrawals.title"),         icon: Banknote,             navClass: "nav-primary" },
+      { href: "/dashboard/bonuses",          label: t("bonuses.title"),            icon: Trophy,               navClass: "nav-primary" },
     ],
   },
   {
     id: "system",
     label: t("sidebar.sections.system"),
     items: [
-      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                navClass: "nav-cyan" },
-      { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 navClass: "nav-warning" },
-      { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        navClass: "nav-info" },
-      { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               navClass: "nav-purple" },
+      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                navClass: "nav-primary" },
+      { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 navClass: "nav-primary" },
+      { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        navClass: "nav-primary" },
+      { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               navClass: "nav-primary" },
     ],
   },
   {
@@ -214,7 +214,7 @@ function NavLink({
       <div
         className={cn(
           "relative flex-shrink-0 flex items-center justify-center rounded-lg transition-all duration-200",
-          isActive ? "nav-item-icon-wrap" : "bg-[var(--sb-icon-bg)] border-[var(--sb-icon-border)] border"
+          isActive ? "nav-item-icon-wrap" : "bg-[var(--primary-surface)] border-[var(--accent-border)] border"
         )}
         style={{
           width:  collapsed ? 36 : 28,
@@ -422,11 +422,11 @@ function SidebarContent({
             >
               <LogOut
                 size={14}
-                className="transition-colors duration-200 group-hover:text-error sidebar-logout-icon"
+                className="transition-colors duration-200 group-hover:text-primary sidebar-logout-icon"
               />
             </div>
             {!collapsed && (
-              <span className="relative sidebar-logout-text transition-colors duration-200" style={{ color: "var(--error)" }}>
+              <span className="relative sidebar-logout-text transition-colors duration-200" style={{ color: "var(--primary)" }}>
                 {t("sidebar.logout")}
               </span>
             )}

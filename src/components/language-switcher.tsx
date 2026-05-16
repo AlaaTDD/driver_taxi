@@ -71,8 +71,8 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
         ref={pillRef}
         className="relative flex items-center rounded-lg overflow-hidden"
         style={{
-          background: "var(--sb-icon-bg)",
-          border: "1px solid var(--sb-nav-hover-border)",
+          background: "var(--primary-surface)",
+          border: "1px solid var(--accent-border)",
           padding: 2,
         }}
       >
@@ -87,7 +87,7 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
           data-lang-btn
           onClick={() => setLanguage("ar")}
           aria-label="العربية"
-          className={`relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold ${isAr ? 'text-primary drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.5)]' : 'text-[var(--sb-footer-text)]'}`}
+          className={`relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold ${isAr ? 'text-primary drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.5)]' : 'text-[var(--text-disabled)]'}`}
         >
           عربي
         </button>
@@ -97,7 +97,7 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
           data-lang-btn
           onClick={() => setLanguage("en")}
           aria-label="English"
-          className={`relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold tracking-wider ${!isAr ? 'text-primary drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.5)]' : 'text-[var(--sb-footer-text)]'}`}
+          className={`relative z-10 flex items-center justify-center px-2 py-1.5 rounded-md transition-all duration-200 text-[11px] font-bold tracking-wider ${!isAr ? 'text-primary drop-shadow-[0_0_4px_rgba(var(--primary-rgb),0.5)]' : 'text-[var(--text-disabled)]'}`}
         >
           EN
         </button>

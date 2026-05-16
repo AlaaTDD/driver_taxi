@@ -378,7 +378,7 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
                               : "1px solid var(--divider-strong)",
                           }}
                         >
-                          {(form as Record<string, unknown>)[item.key] && (
+                          {Boolean((form as Record<string, unknown>)[item.key]) && (
                             <Check size={10} className="text-white" />
                           )}
                         </div>
