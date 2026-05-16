@@ -9,11 +9,11 @@
      ════════════════════════════════════════════════════════════════════ */
 
   /* ── BACKGROUNDS ── */
-  --background: #F8FAFC;
-  --surface-high: #FFFFFF;
+  --background: #F0F4FA;
+  --surface-high: #EEF2F8;
   --surface: #FFFFFF;
-  --surface-elevated: #F1F5F9;
-  --surface-muted: #F8FAFC;
+  --surface-elevated: #F7F9FC;
+  --surface-muted: #F4F6FB;
   --surface-glass: rgba(255, 255, 255, 0.88);
 
   /* ── DIVIDERS ── */
@@ -43,8 +43,8 @@
   --success-surface: rgba(16, 185, 129, 0.10);
   --success-border: rgba(16, 185, 129, 0.25);
 
-  --warning: #F97316;
-  --warning-rgb: 249, 115, 22;
+  --warning: #FBBF24;
+  --warning-rgb: 251, 191, 36;
   --warning-surface: rgba(249, 115, 22, 0.10);
   --warning-border: rgba(249, 115, 22, 0.25);
 
@@ -59,6 +59,10 @@
   --info-surface: rgba(59, 130, 246, 0.09);
 
   /* ── EXTENDED PALETTE ── */
+  --color-orange: #F97316;
+  --color-orange-rgb: 249, 115, 22;
+  --warning-light: #FDE68A;
+  --info-light: #93C5FD;
   --color-purple: #8B5CF6;
   --color-purple-rgb: 139, 92, 246;
   --color-pink: #EC4899;
@@ -81,8 +85,15 @@
   --overlay: rgba(15, 23, 42, 0.55);
 
   /* ── RADIUS & SHADOWS ── */
+  --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  /* ── TRANSITIONS ── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
@@ -126,11 +137,11 @@
    ══════════════════════════════════════════════════════════════════════ */
 .dark {
   /* ── BACKGROUNDS (Obsidian Slate) ── */
-  --background: #080A0F;
-  --surface-high: #212631;
-  --surface: #12151C;
-  --surface-elevated: #1A1E28;
-  --surface-muted: #12151C;
+  --background: #070B14;
+  --surface-high: #1E2840;
+  --surface: #0F1520;
+  --surface-elevated: #182030;
+  --surface-muted: #0B1018;
   --surface-glass: rgba(18, 21, 28, 0.88);
 
   /* ── DIVIDERS (Extremely Clear Separation) ── */
@@ -160,8 +171,8 @@
   --success-surface: rgba(16, 185, 129, 0.15);
   --success-border: rgba(16, 185, 129, 0.35);
 
-  --warning: #F97316;
-  --warning-rgb: 249, 115, 22;
+  --warning: #FBBF24;
+  --warning-rgb: 251, 191, 36;
   --warning-surface: rgba(249, 115, 22, 0.15);
   --warning-border: rgba(249, 115, 22, 0.35);
 
@@ -176,6 +187,10 @@
   --info-surface: rgba(59, 130, 246, 0.15);
 
   /* ── EXTENDED PALETTE ── */
+  --color-orange: #F97316;
+  --color-orange-rgb: 249, 115, 22;
+  --warning-light: #D97706;
+  --info-light: #2563EB;
   --color-purple: #8B5CF6;
   --color-purple-rgb: 139, 92, 246;
   --color-pink: #EC4899;
@@ -200,8 +215,12 @@
   /* ── CHROME & SHELL ── */
   --chrome-control-bg: #1E232E;
   --chrome-shadow: 0 18px 42px rgba(0, 0, 0, 0.60);
-  --dashboard-content-bg: #080A0F;
-  --sidebar-chrome-shadow: inset -1px 0 0 var(--divider), 10px 0 30px rgba(0, 0, 0, 0.30);
+  --dashboard-content-bg: radial-gradient(
+    ellipse 60% 40% at 20% 0%,
+    rgba(var(--primary-rgb), 0.04) 0%,
+    transparent 50%
+  ), #070B14;
+  --sidebar-chrome-shadow: inset -1px 0 0 rgba(255,255,255,0.06), 12px 0 32px rgba(0,0,0,0.4);
 
   /* ── SHADOWS (Darker and richer) ── */
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.40);
@@ -209,7 +228,7 @@
   --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.60);
 
   /* ── SIDEBAR TOKENS — DARK ── */
-  --sb-bg-gradient: #080A0F;
+  --sb-bg-gradient: linear-gradient(180deg, #0D1420 0%, #080B14 100%);
 
   --sb-nav-text-active: #F8FAFC;
 
@@ -228,9 +247,9 @@
 
   --sb-tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.60);
 
-  --sb-noise-opacity: 0;
-  --sb-top-glow: none;
-  --sb-top-glow-opacity: 0;
+  --sb-noise-opacity: 0.03;
+  --sb-top-glow: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245,158,11,0.08), transparent);
+  --sb-top-glow-opacity: 1;
   --sb-mobile-btn-text: #F59E0B;
   --sb-backdrop: rgba(8, 10, 15, 0.80);
 }
@@ -278,6 +297,26 @@
   --color-cyan: var(--color-cyan);
   --color-white: var(--color-white);
   --color-black: var(--color-black);
+  
+  --color-info-rgb: var(--info-rgb);
+  --color-success-rgb: var(--success-rgb);
+  --color-warning-rgb: var(--warning-rgb);
+  --color-error-rgb: var(--error-rgb);
+  --color-orange: var(--color-orange);
+  --color-orange-rgb: var(--color-orange-rgb);
+  --color-warning-light: var(--warning-light);
+  --color-info-light: var(--info-light);
+  --color-primary-surface: var(--primary-surface);
+  --color-accent-surface: var(--accent-surface);
+  --color-accent-border: var(--accent-border);
+  --color-neutral-surface: var(--neutral-surface);
+  --color-neutral-border: var(--neutral-border);
+  --color-overlay: var(--overlay);
+  
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 }
 
 
@@ -285,6 +324,13 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  transition: background-color 300ms ease, 
+              border-color 300ms ease,
+              color 200ms ease;
+}
+
+button, a, [class*="btn"], svg, img {
+  transition: none;
 }
 
   /* ── SEMANTIC VARIANTS ── */
@@ -1718,6 +1764,12 @@ body {
 /* ══════════════════════════════════════════════════════════════════════════
    DASHBOARD UNIFIED CARD STYLES (theme-aware)
    ══════════════════════════════════════════════════════════════════════ */
+
+.dark .dash-card,
+.dark .dash-stat,
+.dark .dash-table-card {
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), var(--shadow-sm);
+}
 
 /* Main content card */
 .dash-card {
