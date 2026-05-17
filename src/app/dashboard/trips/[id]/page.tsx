@@ -105,18 +105,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               {formatDate(trip.created_at)}
             </div>
           </div>
-          {trip.scheduled_at && (
-            <>
-              <div className="w-px h-8 bg-[var(--divider)]" />
-              <div>
-                <p className="text-text-tertiary text-[11px] font-bold uppercase tracking-wider mb-1">تاريخ الجدولة</p>
-                <div className="flex items-center gap-1.5 text-text-secondary text-[13px] font-medium">
-                  <Clock size={13} className="text-warning" />
-                  {formatDate(trip.scheduled_at)}
-                </div>
-              </div>
-            </>
-          )}
+
           {(trip.completed_at || trip.cancelled_at) && (
             <>
               <div className="w-px h-8 bg-[var(--divider)]" />
@@ -209,15 +198,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           {/* ── Cancellation Info (Phase 2 Finding #5) ── */}
           {(trip.cancel_reason || trip.cancel_reason_category) && (
             <div className="mt-6 p-4 rounded-xl bg-error/10 border border-error/20">
-              <div className="flex items-center gap-3 mb-2">
-                <p className="text-error text-[11px] font-bold uppercase tracking-wider">سبب الإلغاء</p>
-                {trip.cancel_reason_category && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-error-light bg-error/10 px-2 py-0.5 rounded-full border border-error/20">
-                    <Tag size={10} />
-                    {trip.cancel_reason_category}
-                  </span>
-                )}
-              </div>
+
               {trip.cancel_reason && <p className="text-text-secondary text-[13px]">{trip.cancel_reason}</p>}
             </div>
           )}
@@ -243,30 +224,14 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               </div>
             )}
             
-            {(trip.driver_earnings !== null && trip.platform_commission !== null) && (
-              <>
-                <div className="flex justify-between items-center pb-2">
-                  <span className="text-text-tertiary text-[13px] font-medium">أرباح السائق</span>
-                  <span className="text-[14px] font-bold num text-text-secondary">{formatCurrency(trip.driver_earnings)}</span>
-                </div>
-                <div className="flex justify-between items-center pb-4 border-b border-divider">
-                  <span className="text-text-tertiary text-[13px] font-medium">عمولة المنصة</span>
-                  <span className="text-[14px] font-bold num text-text-secondary">{formatCurrency(trip.platform_commission)}</span>
-                </div>
-              </>
-            )}
+
 
             <div className="flex justify-between items-center">
               <span className="text-text-tertiary text-[13px] font-medium">المسافة المقدرة</span>
               <span className="text-[14px] font-bold num text-text-secondary">{Number(trip.distance_km).toFixed(1)} كم</span>
             </div>
             
-            {trip.estimated_duration_min && (
-              <div className="flex justify-between items-center">
-                <span className="text-text-tertiary text-[13px] font-medium">المدة المقدرة</span>
-                <span className="text-[14px] font-bold num text-text-secondary">{trip.estimated_duration_min} دقيقة</span>
-              </div>
-            )}
+
 
             <div className="flex justify-between items-center pt-2">
               <span className="text-text-tertiary text-[13px] font-medium">طريقة ومصدر الدفع</span>

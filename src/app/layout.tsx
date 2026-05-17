@@ -6,13 +6,27 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const cairo = {
-  variable: "--font-cairo",
-};
+import { Cairo, Inter, IBM_Plex_Mono } from "next/font/google";
 
-const inter = {
-  variable: "--font-inter",
-};
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-cairo',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const ibmPlexMono = IBM_Plex_Mono({ 
+  subsets: ['latin'], 
+  weight: ['400', '500', '700'],
+  variable: '--font-mono'
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const messages = await getMessages();
@@ -38,7 +52,7 @@ export default async function RootLayout({
       dir={isRTL ? "rtl" : "ltr"}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${cairo.variable} ${inter.variable} h-full antialiased`}
+      className={`${cairo.variable} ${inter.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className={`min-h-dvh flex flex-col bg-background text-foreground overflow-x-hidden ${isRTL ? "font-(family-name:--font-cairo)" : "font-(family-name:--font-inter)"}`} suppressHydrationWarning>
         <ThemeProvider>

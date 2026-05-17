@@ -1,12 +1,17 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { STATUS_PILL_MAP, STATUS_LABELS } from "@/lib/design-tokens";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(value: number): string {
-  return `${value.toFixed(2)} ج.م`;
+export function formatCurrency(value: number, currency = "EGP"): string {
+  return new Intl.NumberFormat("ar-EG", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+  }).format(value);
 }
 
 export function formatDate(date: string): string {
@@ -20,32 +25,15 @@ export function formatDate(date: string): string {
 }
 
 export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    searching: "status-pill-warning border",
-    accepted: "status-pill-primary border",
-    driver_arriving: "status-pill-primary border",
-    in_progress: "status-pill-primary border",
-    completed: "status-pill-success border",
-    cancelled: "status-pill-error border",
-    pending: "status-pill-warning border",
-    rejected: "status-pill-error border",
-    expired: "status-pill-muted border",
-  };
-  return colors[status] || "status-pill-muted border";
+  return STATUS_PILL_MAP[status] || "status-pill-muted border";
 }
 
 export function getStatusLabel(status: string, t?: any): string {
-  if (!t) return status;
-  // Next-intl fallback chain
-  try {
+  if (t) {
     const translation = t(`trips.statuses.${status}`);
-    // If next-intl returns the key itself because it's missing, try common
-    if (translation === `trips.statuses.${status}`) {
-      const common = t(`common.${status}`);
-      if (common !== `common.${status}`) return common;
-    }
-    return translation;
-  } catch {
-    return status;
+    if (translation !== `trips.statuses.${status}`) return translation;
+    const common = t(`common.${status}`);
+    if (common !== `common.${status}`) return common;
   }
+  return STATUS_LABELS[status] || status;
 }

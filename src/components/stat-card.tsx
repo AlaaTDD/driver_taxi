@@ -1,14 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
-
-const COLOR_MAP: Record<ColorVariant, { bg: string; border: string; text: string; var: string; rgb: string }> = {
-  primary: { bg: "bg-primary/10", border: "border-primary/20", text: "text-primary", var: "var(--primary)", rgb: "var(--primary-rgb)" },
-  info: { bg: "bg-info/10", border: "border-info/20", text: "text-info", var: "var(--info)", rgb: "var(--info-rgb)" },
-  success: { bg: "bg-success/10", border: "border-success/20", text: "text-success", var: "var(--success)", rgb: "var(--success-rgb)" },
-  warning: { bg: "bg-warning/10", border: "border-warning/20", text: "text-warning", var: "var(--warning)", rgb: "var(--warning-rgb)" },
-  error: { bg: "bg-error/10", border: "border-error/20", text: "text-error", var: "var(--error)", rgb: "var(--error-rgb)" },
-};
+import { ColorVariant, COLOR_MAP } from "@/lib/design-tokens";
 
 interface StatCardProps {
   title: string;

@@ -56,7 +56,7 @@ const getNavGroups = (t: any): NavGroup[] => [
     label: t("sidebar.sections.operations"),
     items: [
       { href: "/dashboard/trips",            label: t("common.trips"),             icon: MapPin,               navClass: "nav-primary" },
-      { href: "/dashboard/route-plans",      label: "مسارات الرحلات",               icon: Navigation,           navClass: "nav-primary" },
+      { href: "/dashboard/route-plans",      label: t("routePlans.title"),          icon: Navigation,           navClass: "nav-primary" },
       { href: "/dashboard/trip-offers",      label: t("common.tripOffers"),        icon: ArrowLeftRight,       navClass: "nav-primary" },
       { href: "/dashboard/ratings",          label: t("common.ratings"),           icon: Star,                 navClass: "nav-primary" },
       { href: "/dashboard/complaints",       label: t("common.complaints"),             icon: MessageSquareWarning, navClass: "nav-primary" },
@@ -479,13 +479,14 @@ function SidebarContent({
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { collapsed, toggle: toggleCollapse } = useSidebar();
+  const t = useTranslations();
 
   return (
     <>
       <button
         onClick={() => setMobileOpen((v) => !v)}
         className="lg:hidden fixed top-4 right-4 z-50 p-2.5 rounded-xl sidebar-mobile-toggle"
-        aria-label={mobileOpen ? "إغلاق القائمة" : "فتح القائمة"}
+        aria-label={mobileOpen ? t("common.close") : t("sidebar.expand")}
       >
         {mobileOpen ? <X size={17} /> : <Menu size={17} />}
       </button>

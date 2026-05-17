@@ -1,776 +1,1023 @@
-# تقرير تدقيق الألوان الكامل — Obsidian Amber Design System
 
-> **الملف المُحلَّل:** `src/app/globals.css`
->
-> **النطاق:** كل ملفات `.tsx` و `.ts` داخل `src/`
->
-> **تاريخ التحليل:** مايو 2026
->
-> **المشروع:** Taxi Admin Dashboard (Next.js + Tailwind CSS)
+# 🔬 SOLVE — تحليل عميق شامل للداتابيز والـ UI
+
+> **توليد التقرير:** 2026-05-16 | PostgreSQL 17.6 | Supabase | Next.js 15 App Router | Obsidian Amber Design System
+> **المراجع:** `Supabase_Snippet_AI-Powered_PostgreSQL_Schema_X-Ray_Introspection.csv` + `src.zip`
 
 ---
 
 ## فهرس المحتويات
 
-1. [ملخص تنفيذي](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#1-%D9%85%D9%84%D8%AE%D8%B5-%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%8A)
-2. [الأرقام الإجمالية](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#2-%D8%A7%D9%84%D8%A3%D8%B1%D9%82%D8%A7%D9%85-%D8%A7%D9%84%D8%A5%D8%AC%D9%85%D8%A7%D9%84%D9%8A%D8%A9)
-3. [ما تم صح — لا يحتاج تدخل](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#3-%D9%85%D8%A7-%D8%AA%D9%85-%D8%B5%D8%AD)
-4. [المشاكل الحرجة — HIGH Priority](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#4-%D8%A7%D9%84%D9%85%D8%B4%D8%A7%D9%83%D9%84-%D8%A7%D9%84%D8%AD%D8%B1%D8%AC%D8%A9)
-5. [المشاكل المتوسطة — MEDIUM Priority](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#5-%D8%A7%D9%84%D9%85%D8%B4%D8%A7%D9%83%D9%84-%D8%A7%D9%84%D9%85%D8%AA%D9%88%D8%B3%D8%B7%D8%A9)
-6. [المشاكل البسيطة — LOW Priority](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#6-%D8%A7%D9%84%D9%85%D8%B4%D8%A7%D9%83%D9%84-%D8%A7%D9%84%D8%A8%D8%B3%D9%8A%D8%B7%D8%A9)
-7. [المتغيرات الميتة — Dead Variables](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#7-%D8%A7%D9%84%D9%85%D8%AA%D8%BA%D9%8A%D8%B1%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%8A%D8%AA%D8%A9)
-8. [تحليل الـ @theme inline](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#8-%D8%AA%D8%AD%D9%84%D9%8A%D9%84-%D8%A7%D9%84%D9%80-theme-inline)
-9. [جدول كل المتغيرات في :root](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#9-%D8%AC%D8%AF%D9%88%D9%84-%D9%83%D9%84-%D8%A7%D9%84%D9%85%D8%AA%D8%BA%D9%8A%D8%B1%D8%A7%D8%AA-%D9%81%D9%8A-root)
-10. [قائمة الإصلاحات المطلوبة بالترتيب](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#10-%D9%82%D8%A7%D8%A6%D9%85%D8%A9-%D8%A7%D9%84%D8%A5%D8%B5%D9%84%D8%A7%D8%AD%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D8%B7%D9%84%D9%88%D8%A8%D8%A9-%D8%A8%D8%A7%D9%84%D8%AA%D8%B1%D8%AA%D9%8A%D8%A8)
-11. [الكود المقترح للإصلاح](https://claude.ai/chat/38115342-b172-4cd6-96d4-81e9cf86797f#11-%D8%A7%D9%84%D9%83%D9%88%D8%AF-%D8%A7%D9%84%D9%85%D9%82%D8%AA%D8%B1%D8%AD-%D9%84%D9%84%D8%A5%D8%B5%D9%84%D8%A7%D8%AD)
+1. [ملخص تنفيذي](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#1-%D9%85%D9%84%D8%AE%D8%B5-%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%8A)
+2. [تحليل الداتابيز — الجداول والعلاقات](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#2-%D8%AA%D8%AD%D9%84%D9%8A%D9%84-%D8%A7%D9%84%D8%AF%D8%A7%D8%AA%D8%A7%D8%A8%D9%8A%D8%B2--%D8%A7%D9%84%D8%AC%D8%AF%D8%A7%D9%88%D9%84-%D9%88%D8%A7%D9%84%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA)
+3. [مشاكل الأعمدة — نول وبيانات منتهية](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#3-%D9%85%D8%B4%D8%A7%D9%83%D9%84-%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%AF%D8%A9--%D9%86%D9%88%D9%84-%D9%88%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA-%D9%85%D9%86%D8%AA%D9%87%D9%8A%D8%A9)
+4. [الأمان — RLS والـ Security Audit](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#4-%D8%A7%D9%84%D8%A3%D9%85%D8%A7%D9%86--rls-%D9%88%D8%A7%D9%84%D9%80-security-audit)
+5. [الأداء — Bloat وIndex وAnalyze](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#5-%D8%A7%D9%84%D8%A3%D8%AF%D8%A7%D8%A1--bloat-%D9%88index-%D9%88analyze)
+6. [تحليل الـ UI — الصفحات والمكونات](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#6-%D8%AA%D8%AD%D9%84%D9%8A%D9%84-%D8%A7%D9%84%D9%80-ui--%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A7%D8%AA-%D9%88%D8%A7%D9%84%D9%85%D9%83%D9%88%D9%86%D8%A7%D8%AA)
+7. [Design System — الألوان والتوكنز](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#7-design-system--%D8%A7%D9%84%D8%A3%D9%84%D9%88%D8%A7%D9%86-%D9%88%D8%A7%D9%84%D8%AA%D9%88%D9%83%D9%86%D8%B2)
+8. [الميزات المفقودة — DB موجود UI مش موجود](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#8-%D8%A7%D9%84%D9%85%D9%8A%D8%B2%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%81%D9%82%D9%88%D8%AF%D8%A9--db-%D9%85%D9%88%D8%AC%D9%88%D8%AF-ui-%D9%85%D8%B4-%D9%85%D9%88%D8%AC%D9%88%D8%AF)
+9. [مشاكل الكود — Clean Code وPatterns](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#9-%D9%85%D8%B4%D8%A7%D9%83%D9%84-%D8%A7%D9%84%D9%83%D9%88%D8%AF--clean-code-%D9%88patterns)
+10. [خريطة الأولوية والإصلاح](https://claude.ai/chat/60758989-ce9c-4f0d-b4f3-065e231361e4#10-%D8%AE%D8%B1%D9%8A%D8%B7%D8%A9-%D8%A7%D9%84%D8%A3%D9%88%D9%84%D9%88%D9%8A%D8%A9-%D9%88%D8%A7%D9%84%D8%A5%D8%B5%D9%84%D8%A7%D8%AD)
 
 ---
 
 ## 1. ملخص تنفيذي
 
-التحليل شمل **كل ملف** في المشروع — الـ CSS والـ TSX والـ TS. الخبر الكويس إن فيه انضباط واضح في التعامل مع الألوان:  **لا يوجد أي لون hex مكتوب مباشرة داخل ملفات TSX** ، كل الألوان بتمشي عبر CSS variables. ده مستوى تنظيم كويس.
-
-لكن في داخل ملف `globals.css` نفسه فيه مشاكل حقيقية، أكبرها وأخطرها إن **`--primary` و `--warning` بيشيروا لنفس اللون** (`#F59E0B` الأمبر الذهبي)، وده معناه إن أي `warning badge` وأي `primary button` موجودين جنب بعض على الشاشة هيكونوا بنفس اللون تماماً — وده مشكلة تصميم أساسية مش مجرد تشغيل كود.
-
-فيه برضو  **38 متغير CSS معرَّف بس مش مستخدم في أي مكان** ، ومعظمهم بقايا نظام sidebar قديم اتنقل لنظام `--sb-*` جديد لكن القديم فضل موجود.
-
----
-
-## 2. الأرقام الإجمالية
-
-| المقياس                                                               | القيمة                              |
-| ---------------------------------------------------------------------------- | ----------------------------------------- |
-| إجمالي متغيرات CSS محددة في `:root`                    | **120 متغير**                  |
-| إجمالي متغيرات CSS في `.dark`                               | **107 متغير**                  |
-| متغيرات لها قيمة hex مباشرة في `:root`               | **58 متغير**                   |
-| قيم hex مكررة (نفس اللون لأكثر من متغير)         | **13 حالة**                     |
-| متغيرات مستخدمة عبر `var()`في TSX/TS                    | **60 متغير**                   |
-| متغيرات مستخدمة عبر Tailwind classes                        | **~15 متغير إضافي**       |
-| متغيرات معرَّفة ولا تُستخدم مطلقاً في TSX/TS | **38 متغير**                   |
-| ألوان hex مكتوبة مباشرة في ملفات TSX                 | **0**✅                             |
-| ملفات TSX تستخدم CSS variables                                    | **28 ملف**                       |
-| أكثر ملف استخدام للألوان                                | `coupon-analytics/page.tsx`(105 مرة) |
+| الجانب                       | الحالة  | التفاصيل                                           |
+| ---------------------------------- | ------------- | ---------------------------------------------------------- |
+| إجمالي الجداول        | 32 جدول   | بما فيهم `spatial_ref_sys`الخاص بـ PostGIS |
+| تغطية RLS                     | 96.9%         | جدول واحد بدون RLS هو `spatial_ref_sys`    |
+| الـ Functions المخصصة    | 87 function   | شاملة triggers وcron jobs                            |
+| الـ Views                       | 17 view       | 15 منهم admin views، 2 PostGIS views                  |
+| الـ Indexes                     | 88+ index     | 23 منهم غير مستخدمة Zero Scans               |
+| حجم قاعدة البيانات | 27 MB         | مناسب للمرحلة الحالية                   |
+| Enums المعرفة               | 6 enums       | كلهم مكتملة ومنطقية                       |
+| أعمدة بـ >80% null          | 21 عمود   | موزعة على 8 جداول                             |
+| Nullable FK بدون حماية    | 17 علاقة | ممكن تولد Orphan rows                              |
+| جداول بها Bloat عالي   | 8 جداول  | بدون VACUUM واحد تم تشغيله                 |
+| أعمدة مش ليها comments  | 20 جدول   | بيعيّق التوثيق والفهم                   |
 
 ---
 
-## 3. ما تم صح
+## 2. تحليل الداتابيز — الجداول والعلاقات
 
-### ✅ لا يوجد hex مكتوب مباشرة في TSX
-
-التحقق من كل ملفات `.tsx` و `.ts` بحثاً عن أي قيمة `#RRGGBB` مكتوبة مباشرة —  **النتيجة: صفر** . كل الألوان بتمشي عبر CSS variables أو Tailwind classes مربوطة بـ CSS variables. ده يعني لو غيرت قيمة في `globals.css` هيتطبق التغيير تلقائياً في كل مكان.
-
-### ✅ نظام الـ CSS Variables هيكلي ومنظم
-
-المتغيرات مقسمة في sections واضحة:
-
-* `BACKGROUNDS` — خلفيات الصفحة والسطح
-* `DIVIDERS` — خطوط الفصل
-* `TEXT` — ألوان النص
-* `BRAND` — ألوان العلامة التجارية
-* `STATUS` — ألوان الحالات (success/warning/error/info)
-* `EXTENDED PALETTE` — ألوان إضافية للرسوم البيانية
-* `SIDEBAR TOKENS` — متغيرات الـ sidebar
-
-### ✅ Dark Mode مكتمل
-
-كل الألوان الأساسية عندها قيمة مختلفة في `.dark`. مفيش متغير رئيسي بيأخذ نفس القيمة في الـ light والـ dark إلا لما يكون ده مقصود (زي ألوان الـ brand اللي بتفضل ثابتة).
-
-### ✅ الأورنج مش مكرر (سؤالك المحدد)
-
-الأسئلة كانت: هل `--color-orange` مكرر؟ الإجابة:  **لا، ليس مكرراً من ناحية القيمة** . في عندك لونين أمبر/برتقالي:
+### 2.1 قائمة الجداول الكاملة مع الحالة
 
 ```
---primary:      #F59E0B  → أمبر ذهبي (Tailwind amber-500)
---color-orange: #F97316  → برتقالي فعلي (Tailwind orange-500)
+TABLE                     ROWS    SIZE      BLOAT    RLS     HEALTH
+─────────────────────────────────────────────────────────────────────
+admin_logs                0       32 kB     —        ✅      90
+app_config                7       32 kB     —        ✅      90
+bonus_rules               12      32 kB     —        ✅      75
+complaints                0       40 kB     —        ✅      75
+coupon_audit_log          0       40 kB     40%      ✅      80  ⚠️
+coupon_usages             0       24 kB     —        ✅      75
+coupons                   0       40 kB     —        ✅      75
+driver_bonus_ledger       0       32 kB     —        ✅      75
+driver_locations          2       88 kB     60%      ✅      80  ⚠️
+driver_revision_requests  0       24 kB     —        ✅      90
+driver_service_areas      0       32 kB     —        ✅      75
+driver_wallets            3       24 kB     40%      ✅      80  ⚠️
+drivers_profile           3       128 kB    75%      ✅      75  🔴
+messages                  69      144 kB    —        ✅      85
+notifications             0       40 kB     —        ✅      90
+pricing_config            0       16 kB     —        ✅      90
+ratings                   9       80 kB     —        ✅      85
+service_areas             0       40 kB     —        ✅      90
+spatial_ref_sys           8500    7144 kB   —        ❌      50  🔴
+support_messages          1       48 kB     —        ✅      90
+trip_offers               78      152 kB    32%      ✅      80  ⚠️
+trip_route_plans          4       80 kB     —        ✅      75
+trip_route_waypoints      8       96 kB     63%      ✅      80  ⚠️
+trips                     92      304 kB    25%      ✅      75  ⚠️
+user_coupons              0       40 kB     63%      ✅      80  ⚠️
+user_presence             0       32 kB     —        ✅      90
+user_ratings              5       48 kB     —        ✅      90
+user_wallets              4       24 kB     —        ✅      90
+users                     7       48 kB     —        ✅      90
+vehicle_types             4       40 kB     —        ✅      90
+wallet_transactions       2       80 kB     —        ✅      75
+withdrawal_requests       0       40 kB     —        ✅      75
 ```
 
-الفرق بينهم `#F59E0B` مقابل `#F97316` — قيمتين مختلفتين تماماً. `--color-orange` مستخدم في:
+### 2.2 الـ Views المتاحة ومدى الاستخدام في الـ UI
 
-* `pricing-client.tsx` كخيار لون للـ vehicle types
-* اسم payment method فقط (مش كلون)
+| View                            | مستخدم في UI                       | ملاحظة                                                                      |
+| ------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------- |
+| `admin_dashboard`             | ✅`/dashboard/page.tsx`                  | KPIs الرئيسية                                                             |
+| `admin_recent_trips`          | ✅`/dashboard/page.tsx`                  | آخر 10 رحلات                                                              |
+| `admin_audit_log`             | ✅`/dashboard/admin-logs/page.tsx`       | سجل العمليات                                                           |
+| `admin_bonus_summary`         | ✅`/dashboard/bonuses/page.tsx`          | ملخص المكافآت                                                         |
+| `admin_coupon_analytics`      | ✅`/dashboard/coupon-analytics/page.tsx` | تحليل الكوبونات                                                     |
+| `admin_pending_verifications` | ✅`/dashboard/drivers/page.tsx`          | التحقق من السائقين                                                |
+| `admin_users_list`            | ✅`/dashboard/users/page.tsx`            | قائمة المستخدمين                                                   |
+| `driver_earnings_detailed`    | ✅`/dashboard/drivers/[id]/page.tsx`     | تفاصيل أرباح السائق                                              |
+| `driver_earnings_summary`     | ❓ غير محدد                         | موجود في DB، لكن مش ظاهر في UI بشكل صريح               |
+| `driver_public_profile`       | ✅`/dashboard/drivers/[id]/page.tsx`     | ملف السائق                                                               |
+| `public_driver_profiles`      | ❓ غير محدد                         | view عام، قد يكون للتطبيق العميل                           |
+| `public_user_profiles`        | ❓ غير محدد                         | view عام، قد يكون للتطبيق العميل                           |
+| `user_trip_stats`             | ❓ غير محدد                         | إحصائيات رحلات المستخدم — غير مستخدم في Admin UI |
+| `v_trip_active_route`         | ❓ غير محدد                         | View للمسار النشط — مش محدد الاستخدام                  |
+| `v_trip_all_routes`           | ❓ غير محدد                         | View لكل المسارات — مش محدد الاستخدام                  |
+| `geography_columns`           | ❌ PostGIS system view                     | لا حاجة لعرضه في UI                                                  |
+| `geometry_columns`            | ❌ PostGIS system view                     | لا حاجة لعرضه في UI                                                  |
 
-**المشكلة الحقيقية مش في `--color-orange`** — المشكلة في `--primary` و `--warning` اللي هما نفس القيمة.
+**المشكلة:** Views زي `user_trip_stats` و `driver_earnings_summary` و `v_trip_active_route` موجودة في الـ DB لكن الـ Admin UI مش بيستخدمهم، ده بيعني إما بيانات مش بتتعرض للأدمن أو الـ Views دي للتطبيق العميل (الموبايل) بس.
 
-### ✅ الـ RGB counterparts موجودة لكل لون أساسي
+### 2.3 الـ Realtime Tables المفعّلة
 
-كل لون أساسي عنده متغير `*-rgb` مقابله للاستخدام في `rgba()`:
+الجداول دي مفعّل عليها Realtime في Supabase:
 
-```css
---primary: #F59E0B;
---primary-rgb: 245, 158, 11;  /* للاستخدام في rgba(var(--primary-rgb), 0.15) */
 ```
+app_config | driver_wallets | drivers_profile | messages
+notifications | support_messages | trip_offers | trip_route_plans
+trip_route_waypoints | trips | user_presence | user_wallets | vehicle_types
+```
+
+**ملاحظة مهمة:** `support_messages` مفعلة Realtime لكن مفيش صفحة Admin مخصصة ليها — يعني رسائل الدعم الفني بتيجي Real-time للتطبيق العميل بس، والأدمن مش بيشوفها إلا في صفحة الـ messages العامة.
 
 ---
 
-## 4. المشاكل الحرجة
+## 3. مشاكل الأعمدة — نول وبيانات منتهية
 
-### 🚨 مشكلة 1: `--primary` و `--warning` نفس اللون
+### 3.1 جدول `trips` — أعمدة بـ >80% Null (مشبوهة)
 
-**الخطورة: HIGH — مشكلة تصميمية أساسية**
+دي الأعمدة اللي في جدول `trips` بنسبة null عالية جداً وغالباً deprecated أو غير مكتملة الاستخدام:
 
-```css
-/* :root */
---primary: #F59E0B;   /* علامة تجارية — أمبر ذهبي */
---warning: #F59E0B;   /* تحذير — نفس الأمبر الذهبي ❌ */
+| العمود               | نسبة الـ Null | الخطورة | التوصية                                                                      |
+| -------------------------- | -------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| `cancel_reason_category` | 100%                 | 🔴             | احذفه أو خليه enum بدل text                                           |
+| `meeting_address`        | 100%                 | 🔴             | احذفه — فيتشر الاجتماع مش مكتمل                           |
+| `meeting_lat`            | 100%                 | 🔴             | احذفه — فيتشر الاجتماع مش مكتمل                           |
+| `meeting_lng`            | 100%                 | 🔴             | احذفه — فيتشر الاجتماع مش مكتمل                           |
+| `scheduled_at`           | 100%                 | 🔴             | احذفه — الجدولة مش مفعلة في الـ App                        |
+| `estimated_duration_min` | 100%                 | 🔴             | احذفه — مش بيتحسب                                                     |
+| `driver_earnings`        | 98.9%                | 🔴             | احذفه — القيمة بتتحسب من `driver_wallets`                     |
+| `platform_commission`    | 98.9%                | 🔴             | احذفه — القيمة بتتحسب من `pricing_config`                     |
+| `final_price`            | 92.4%                | 🟡             | راجع الـ logic — المفروض يتملى بعد الاكتمال          |
+| `user_rating_to_driver`  | 91.3%                | 🟡             | بيتملى من `user_ratings`— ممكن يبقى computed                     |
+| `started_at`             | 87%                  | 🟡             | مش بيتملى من الـ trigger — راجع `update_trip_status_timestamps` |
+| `completed_at`           | 89.1%                | 🟡             | نفس مشكلة `started_at`                                                    |
+| `driver_rating_to_user`  | 94.6%                | 🟡             | نفس مشكلة `user_rating_to_driver`                                         |
+| `cancel_reason`          | 82.6%                | 🟡             | مش بيتملى دايماً عند الإلغاء                                |
+| `service_area_id`        | 100%                 | 🟡             | الفيتشر مش مكتمل —`fn_set_trip_service_area`مش بتشتغل      |
 
-/* .dark */
---primary: #F59E0B;   /* نفس */
---warning: #F59E0B;   /* نفس ❌ */
-```
+**التأثير على الـ UI:**
 
-**لماذا هذا خطأ تصميمي:**
+* صفحة `/dashboard/trips/[id]/page.tsx` بتعرض `driver_earnings` و `platform_commission` و `cancel_reason_category` و `scheduled_at` و `estimated_duration_min` رغم إنهم دايماً null.
+* بيبان في الـ UI كأن الصفحة فارغة أو ناقصة معلومات.
 
-الـ `--primary` بيعبر عن هوية العلامة التجارية للتطبيق (الـ brand color). الـ `--warning` بيعبر عن حالة تحذير (مثلاً: "هذا السائق لم يتم التحقق منه بعد"). لما الاتنين نفس اللون، المستخدم مش قادر يفرق بين الـ primary actions والـ warning states بصرياً.
+### 3.2 جدول `drivers_profile` — أعمدة مشبوهة
 
-**مثال عملي من الكود:**
+| العمود             | نسبة الـ Null | التوصية                                                                       |
+| ------------------------ | -------------------- | ------------------------------------------------------------------------------------ |
+| `target_origin_lat`    | >80%                 | فيتشر "مسار الممر" مش مكتمل — خليه واضح في الـ UI |
+| `target_origin_lng`    | >80%                 | نفس الحكم                                                                    |
+| `target_route_address` | >80%                 | نفس الحكم                                                                    |
+| `target_route_lat`     | >80%                 | نفس الحكم                                                                    |
+| `target_route_lng`     | >80%                 | نفس الحكم                                                                    |
 
-في `charts.tsx`:
+### 3.3 جدول `users` — أعمدة بـ 100% Null
 
-```tsx
-accepted: "var(--primary)",      // لون الرحلات المقبولة في الرسم البياني
-searching: "var(--warning)",      // حالة السائق بيدور على رحلة
-```
+| العمود       | نسبة الـ Null | التوصية                                                                |
+| ------------------ | -------------------- | ----------------------------------------------------------------------------- |
+| `avatar_url`     | 100%                 | الصور مش بتترفع أو مش بتتحفظ — افحص الـ Auth   |
+| `blocked_at`     | 100%                 | `block_user()`function مش بتملى الحقل ده                      |
+| `blocked_reason` | 100%                 | نفس المشكلة — الـ UI بيبعت reason لكن مش بيتحفظ |
 
-في الرسم البياني، الاتنين هيظهروا بنفس اللون الأمبر — مستحيل تفرق بينهم.
+**الخطير جداً:** الـ UI بيعرض حقل "سبب الحظر" لكن الـ DB فيه 100% null في `blocked_reason` — يعني إما الـ API route مش بيعدّي الـ reason صح للـ function، أو الـ `block_user()` function مش بتحفظ الـ reason.
 
-في `badge.tsx`:
+### 3.4 جدول `messages` — عمود مشبوه
 
-```tsx
-// primary badge ← أمبر
-// warning badge ← نفس الأمبر ❌
-```
+| العمود       | نسبة الـ Null | التوصية                                                                          |
+| ------------------ | -------------------- | --------------------------------------------------------------------------------------- |
+| `attachment_url` | >80%                 | فيتشر المرفقات مش مكتمل — شيل الـ UI element أو اكمله |
+| `trip_id`        | >80%                 | رسائل الدعم مش مربوطة برحلة دايماً — OK                   |
 
-**حجم الاستخدام:**
+### 3.5 Nullable FK Columns — خطر Orphan Rows
 
-* `--primary` مستخدم **102+ مرة** في 28 ملف
-* `--warning` مستخدم **32 مرة** في 15 ملف
+دي أعمدة FK nullable ممكن تخلي records معلقة بدون parent:
 
-**الحل المقترح:**
-
-غيّر `--warning` لقيمة مختلفة بصرياً. الخيارات:
-
-| خيار                  | القيمة | الوصف                                                                  |
-| ------------------------- | ------------ | --------------------------------------------------------------------------- |
-| خيار 1 (الأفضل) | `#F97316`  | أورنج (Tailwind orange-500) — أغمق من الأمبر ويتميز |
-| خيار 2                | `#EAB308`  | أصفر (Tailwind yellow-500) — مختلف جداً                       |
-| خيار 3                | `#FB923C`  | أورنج فاتح (Tailwind orange-400)                                   |
-
-**ملاحظة مهمة:** لو غيرت `--warning`، لازم تغيّر برضو:
-
-* `--warning-rgb`
-* `--warning-light`
-* `--warning-surface`
-* `--warning-border`
-
----
-
-### 🚨 مشكلة 2: `--text-muted` = `--text-tertiary` (متغير ميت مكرر)
-
-**الخطورة: HIGH — متغير عديم الفائدة**
-
-```css
-/* :root */
---text-tertiary: #64748B;   /* مستخدم 22+ مرة ✅ */
---text-muted:    #64748B;   /* مستخدم 0 مرة ❌ — نفس القيمة */
-
-/* .dark */
---text-tertiary: #64748B;
---text-muted:    #64748B;   /* حتى في الـ dark mode نفس القيمة */
-```
-
-`--text-muted` مش مستخدم في **أي ملف** في المشروع، ولا حتى في `globals.css` نفسه. وهو أصلاً نفس قيمة `--text-tertiary`. ده متغير ميت بيأخذ مساحة وبيخلي أي developer جديد يتساءل "إيه الفرق بين text-muted وtext-tertiary؟".
-
-**الحل:** احذف `--text-muted` بالكامل من `:root` ومن `.dark`.
-
----
-
-### 🚨 مشكلة 3: `--warning-light` = `--primary-light` (ومش مستخدم)
-
-**الخطورة: HIGH**
-
-```css
---primary-light: #FCD34D;   /* مستخدم 5 مرات ✅ */
---warning-light: #FCD34D;   /* مستخدم 0 مرات ❌ — نفس القيمة */
-```
-
-`--warning-light` لم يُستخدم في أي مكان. وهو نفس `--primary-light` — منطقي لأن `--warning` نفسه = `--primary`.
-
-**الحل:** احذف `--warning-light`. (لما تصلح مشكلة 1 وتغيّر `--warning` لقيمة مختلفة، هتضطر تحدد `--warning-light` بقيمة مناسبة لها.)
+| الجدول                           | العمود               | الخطورة                                                   |
+| -------------------------------------- | -------------------------- | ---------------------------------------------------------------- |
+| `admin_logs.admin_id`                | FK for users               | 🟡 ممكن يبقى NULL لعمليات النظام            |
+| `app_config.updated_by`              | FK for users               | 🟡                                                               |
+| `bonus_rules.service_area_id`        | FK for service_areas       | 🟡                                                               |
+| `complaints.admin_id`                | FK for users               | 🟡                                                               |
+| `complaints.trip_id`                 | FK for trips               | 🟡                                                               |
+| `complaints.user_id`                 | FK for users               | 🔴 complaint بدون user؟!                                    |
+| `coupon_audit_log.coupon_id`         | FK for coupons             | 🟡                                                               |
+| `driver_bonus_ledger.transaction_id` | FK for wallet_transactions | 🟡                                                               |
+| `driver_service_areas.assigned_by`   | FK for users               | 🟡                                                               |
+| `messages.trip_id`                   | FK for trips               | 🟡                                                               |
+| `ratings.driver_id`                  | FK for drivers_profile     | 🔴 تقييم بدون سائق؟!                               |
+| `ratings.trip_id`                    | FK for trips               | 🔴 تقييم بدون رحلة؟!                               |
+| `ratings.user_id`                    | FK for users               | 🔴 تقييم بدون مستخدم؟!                           |
+| `trip_route_plans.created_by`        | FK for users               | 🟡                                                               |
+| `trips.driver_id`                    | FK for drivers_profile     | 🟡 رحلة بحالة searching = لا يوجد سائق بعد |
+| `trips.service_area_id`              | FK for service_areas       | 🟡                                                               |
+| `withdrawal_requests.admin_id`       | FK for users               | 🟡                                                               |
+| `withdrawal_requests.transaction_id` | FK for wallet_transactions | 🟡                                                               |
 
 ---
 
-## 5. المشاكل المتوسطة
+## 4. الأمان — RLS والـ Security Audit
 
-### ⚠️ مشكلة 4: `--sb-logout-text` = `--error`
+### 4.1 الجدول الوحيد بدون RLS 🔴
 
-```css
---error:          #EF4444;   /* مستخدم كثيراً ✅ */
---sb-logout-text: #EF4444;   /* في globals.css بس ما يُستخدمش في TSX ❌ */
+```
+TABLE: spatial_ref_sys
+RLS: ❌ DISABLED
+Public Access: ✅ YES
+Health Score: 50/100
+Live Rows: 8,500 rows
+Size: 7,144 kB (أكبر جدول في الـ DB)
 ```
 
-في الـ sidebar classes في `globals.css`، بيستخدم `--sb-logout-text` للـ logout button. لكن المشكلة إن القيمة هي بالظبط نفس `--error`. الأصح إن `--sb-logout-text` يكون `var(--error)` مش قيمة hex منسوخة.
+**المشكلة:** `spatial_ref_sys` جدول PostGIS نظامي بيحتوي على بيانات إسقاط جغرافية (Coordinate Reference Systems). مش هو نفسه بيانات حساسة، لكن:
 
-**في `.dark`:**
-
-```css
---error:          #EF4444;   /* نفس القيمة */
---sb-logout-text: #EF4444;   /* نفس القيمة */
-```
-
-**الحل:** في `globals.css` نفسه، غيّر:
-
-```css
---sb-logout-text: var(--error);   /* بدل #EF4444 */
-```
-
-وبكده لو غيرت `--error` في أي وقت، الـ logout button هيتغير تلقائياً.
-
----
-
-### ⚠️ مشكلة 5: 4 متغيرات لنفس قيمة `#F8FAFC`
-
-```css
---background:     #F8FAFC;   /* مستخدم 15+ مرة ✅ */
---surface-muted:  #F8FAFC;   /* مستخدم 8+ مرة ✅ */
---table-head-bg:  #F8FAFC;   /* بيستخدمه globals.css بس ✅/⚠️ */
---sb-tooltip-text:#F8FAFC;   /* بيستخدمه globals.css بس ✅/⚠️ */
-```
-
-في الـ dark mode، الأربعة مختلفين:
-
-```css
---background:     #080A0F   /* أسود عميق */
---surface-muted:  #12151C   /* رمادي داكن */
---table-head-bg:  #1A1E28   /* رمادي داكن أفتح */
---sb-tooltip-text:#F8FAFC   /* فاتح (للنص على خلفية داكنة) */
-```
-
-لاحظ إن `--sb-tooltip-text` في الـ dark mode = `#F8FAFC` وده **صح** ومقصود لأنه نص أبيض على tooltip داكن. لكن في الـ light mode كونه = `--background` ده مجرد تقاطع، مش علاقة semantic.
-
-**الحل:** `--table-head-bg` ممكن يصبح `var(--surface-muted)` بدل قيمة hex.
-
----
-
-### ⚠️ مشكلة 6: `--surface` و `--surface-high` كلاهما `#FFFFFF` في light mode
-
-```css
---surface:      #FFFFFF;   /* مستخدم كثيراً ✅ */
---surface-high: #FFFFFF;   /* مستخدم ✅ */
-```
-
-في الـ light mode الاتنين أبيض خالص. لكن في الـ dark mode بيختلفوا:
-
-```css
---surface:      #12151C   /* داكن */
---surface-high: #212631   /* أفتح قليلاً — "سطح مرفوع" */
-```
-
-ده منطقي في الـ dark mode — `--surface-high` بيمثل عناصر أعلى في الـ z-stack بتاعة التصميم (كارد فوق كارد). لكن في الـ light mode مش بيتميز. ده مقبول لأن في الـ light mode مش محتاج تفريق في اللون بين مستويات السطح.
-
-**الحل:** مفيش إجراء ضروري هنا — ده تصميمي مقصود.
-
----
-
-### ⚠️ مشكلة 7: 3 متغيرات لـ `#F1F5F9` واتنين منهم ما يُستخدمش في TSX
-
-```css
---bg-secondary:       #F1F5F9;   /* مستخدم في globals.css بس، مش في TSX ⚠️ */
---surface-elevated:   #F1F5F9;   /* مستخدم كثيراً في TSX ✅ */
---chrome-control-bg:  #F1F5F9;   /* مستخدم في globals.css بس ⚠️ */
-```
-
-في الـ dark mode الثلاثة مختلفين:
-
-```css
---bg-secondary:      #080A0F    /* أسود عميق */
---surface-elevated:  #1A1E28    /* رمادي داكن */
---chrome-control-bg: #1E232E    /* رمادي داكن أفتح */
-```
-
-`--bg-secondary` اسمه مبهم ومتداخل مع `--surface-elevated`. `--chrome-control-bg` مستخدم في CSS classes بس مش في TSX مباشرة.
-
-**الحل:** `--bg-secondary` ممكن يتحذف أو يُوضح استخدامه. قيمته في الـ dark mode مختلفة عن `--surface-elevated` يعني مش تكرار كامل.
-
----
-
-### ⚠️ مشكلة 8: 4 متغيرات لـ `#E2E8F0` و3 منهم ما يُستخدمش في TSX
-
-```css
---divider:               #E2E8F0;   /* الأصل — مستخدم كثيراً ✅ */
---topbar-border:         #E2E8F0;   /* مستخدم في globals.css CSS classes بس ⚠️ */
---chrome-control-border: #E2E8F0;   /* مستخدم في globals.css CSS classes بس ⚠️ */
---chrome-join-line:      #E2E8F0;   /* مستخدم في globals.css CSS classes + sidebar-chrome-shadow ⚠️ */
-```
-
-في الـ dark mode:
-
-```css
---divider:               #282E3A
---topbar-border:         #282E3A   /* نفس --divider */
---chrome-control-border: #3B4354   /* مختلف */
---chrome-join-line:      #282E3A   /* نفس --divider */
-```
-
-`--topbar-border` و `--chrome-join-line` هما نفس `--divider` في الـ light والـ dark. يعني ممكن يتحولوا لـ `var(--divider)` بدون تأثير على الشكل.
+1. Public access مفتوح عليه = أي مستخدم مسجل يقدر يقرأه.
+2. بيأثر على الـ Health Score للداتابيز.
+3. Supabase بيحذّر منه.
 
 **الحل:**
 
-```css
-/* بدل */
---topbar-border: #E2E8F0;
-/* يبقى */
---topbar-border: var(--divider);
+```sql
+-- PostGIS manages this table, enabling RLS might break spatial functions
+-- الحل الأمثل: exclude it from RLS requirements or create a read-only policy
+ALTER TABLE spatial_ref_sys ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_read_spatial_ref" ON spatial_ref_sys 
+  FOR SELECT USING (true);
+```
+
+### 4.2 تغطية RLS الكاملة
+
+```
+RLS مفعل وmandatory (FORCED):  27 جدول — ✅
+RLS مفعل بس مش forced:         3 جداول — ⚠️
+RLS معطل:                       2 جداول — 🔴
+```
+
+**الجداول بـ RLS مفعل بس مش FORCED (قد يُتخطى بـ service_role):**
+
+* بعض الـ Views مش عليها FORCE — الـ Admin Client بيستخدم `service_role` فده مقبول.
+
+### 4.3 ملاحظات الأمان العامة
+
+* ✅ لا يوجد أي جدول عليه `has_public_access: true` إلا `spatial_ref_sys`.
+* ✅ عدد الـ Roles على كل جدول منطقي (3-5 roles).
+* ✅ الـ `is_admin_user()` function موجودة ومستخدمة في الـ RLS policies.
+* ✅ الـ Admin UI بيستخدم `createAdminClient()` مع `service_role` — صح.
+* ✅ الـ `auth-guard.ts` موجود ومفعّل في الـ middleware.
+* ⚠️ الـ `anon` key في بعض الجداول عنده أذونات أكتر من اللازم — راجع `grant_count` الـ 4 و5.
+
+---
+
+## 5. الأداء — Bloat وIndex وAnalyze
+
+### 5.1 جداول محتاجة VACUUM فوري 🔴
+
+```
+TABLE                   DEAD_ROWS   LIVE_ROWS   BLOAT%    LAST_VACUUM
+───────────────────────────────────────────────────────────────────────
+drivers_profile         9           3           75%       NEVER 🔴
+coupon_audit_log        —           0           40%       NEVER 🔴
+trip_route_waypoints    14          8           63%       NEVER 🔴
+driver_locations        3           2           60%       NEVER 🔴
+trip_offers             37          78          32%       NEVER 🔴
+trips                   32          92          25%       2026-04-28 ⚠️
+driver_wallets          2           3           40%       NEVER 🔴
+vehicle_types           12          4           (high)    2026-04-28 ⚠️
+users                   13          7           (high)    2026-04-28 ⚠️
+```
+
+**الأسوأ:** `drivers_profile` فيه 9 dead rows مقابل 3 live rows فقط — الجدول ده bloat نسبته 75% مع 0 vacuum تاريخياً. ده بيعني الـ dead rows موجودة من أول إنشاء الجدول.
+
+**الحل الفوري:**
+
+```sql
+-- تشغيل VACUUM ANALYZE على الجداول الحرجة
+VACUUM ANALYZE drivers_profile;
+VACUUM ANALYZE trips;
+VACUUM ANALYZE trip_offers;
+VACUUM ANALYZE driver_locations;
+VACUUM ANALYZE trip_route_waypoints;
+VACUUM ANALYZE users;
+VACUUM ANALYZE vehicle_types;
+
+-- تفعيل autovacuum أو تعديل إعداداته في Supabase Dashboard
+```
+
+### 5.2 Indexes غير مستخدمة (Zero Scans) — مشهم على الـ Write Performance
+
+دي 23 index موجودة لكن مفيش scan واحد عليها:
+
+| Index                                | الجدول         | السبب المحتمل                 |
+| ------------------------------------ | -------------------- | ----------------------------------------- |
+| `idx_complaints_user`              | complaints           | جدول فارغ — مش اتختبر    |
+| `idx_coupon_audit_log_coupon_id`   | coupon_audit_log     | جدول فارغ                         |
+| `idx_coupon_audit_log_created_at`  | coupon_audit_log     | جدول فارغ                         |
+| `idx_coupon_audit_log_event_type`  | coupon_audit_log     | جدول فارغ                         |
+| `idx_coupon_usages_trip_id`        | coupon_usages        | جدول فارغ                         |
+| `idx_coupons_code_active`          | coupons              | جدول فارغ                         |
+| `idx_dbl_rule`                     | driver_bonus_ledger  | جدول فارغ                         |
+| `idx_dsa_area`                     | driver_service_areas | جدول فارغ                         |
+| `idx_dsa_driver`                   | driver_service_areas | جدول فارغ                         |
+| `idx_drivers_profile_vehicle_type` | drivers_profile      | مش بيتعمل query بـ vehicle_type |
+| `idx_drivers_target_dest`          | drivers_profile      | أعمدة deprecated                     |
+| `idx_notif_user_unread`            | notifications        | جدول فارغ                         |
+| `idx_trip_route_plans_status`      | trip_route_plans     | بيانات قليلة                   |
+| `idx_trips_area`                   | trips                | `service_area_id`= 100% null            |
+| `idx_trips_cancel_category`        | trips                | `cancel_reason_category`= 100% null     |
+| `idx_trips_completed_at`           | trips                | `completed_at`= 89% null                |
+| `idx_trips_completed_driver`       | trips                | بيانات قليلة                   |
+| `idx_trips_coupon_discount`        | trips                | مش بيتعمل filter عليه         |
+| `idx_user_coupons_coupon_id`       | user_coupons         | جدول فارغ                         |
+| `idx_wt_ref`                       | wallet_transactions  | بيانات قليلة                   |
+| `idx_wt_type`                      | wallet_transactions  | بيانات قليلة                   |
+| `idx_wt_wallet_created`            | wallet_transactions  | بيانات قليلة                   |
+| `idx_wr_pending`                   | withdrawal_requests  | جدول فارغ                         |
+
+**ملاحظة:** معظمهم بسبب إن الجداول فارغة في بيئة الـ Dev/Staging. لكن بعضهم زي `idx_trips_area` و `idx_trips_cancel_category` بيأكد إن الـ features مش مكتملة.
+
+### 5.3 جداول لم يتم تحليلها (Never Analyzed) — Statistics قديمة
+
+```
+admin_logs | app_config | bonus_rules | complaints | coupon_audit_log
+coupon_usages | coupons | driver_bonus_ledger | driver_revision_requests
+driver_service_areas | driver_wallets | messages | notifications
+pricing_config | service_areas | trip_route_waypoints | user_coupons
+user_presence | user_ratings | user_wallets | vehicle_types | withdrawal_requests
+```
+
+**الأثر:** الـ Query Planner بيستخدم بيانات إحصائية قديمة = queries ممكن تكون أبطأ من اللازم. الحل هو تشغيل `ANALYZE` بانتظام أو تفعيل autovacuum.
+
+### 5.4 إعدادات GUC المهمة
+
+```sql
+-- من نتائج 38_GUC_SETTINGS — تأكد من:
+work_mem          -- للـ complex queries
+max_connections   -- مراقبة عدد الاتصالات
+shared_buffers    -- للـ cache
+wal_level         -- للـ Realtime
 ```
 
 ---
 
-### ⚠️ مشكلة 9: `--primary-dark`, `--sidebar-icon-active`, `--sb-mobile-btn-text` = `#D97706`
+## 6. تحليل الـ UI — الصفحات والمكونات
 
-```css
---primary-dark:       #D97706;   /* مستخدم كثيراً ✅ */
---sidebar-icon-active:#D97706;   /* متغير قديم، مش مستخدم في TSX ❌ */
---sb-mobile-btn-text: #D97706;   /* مستخدم في globals.css CSS class ⚠️ */
+### 6.1 خريطة الصفحات الكاملة
+
+| الصفحة                    | الملف                          | حالة الاكتمال | ملاحظات                                                               |
+| ------------------------------- | ----------------------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| `/dashboard`                  | `page.tsx`                        | ✅ مكتملة           | KPIs، Charts، Recent Trips                                                 |
+| `/dashboard/users`            | `page.tsx`+`users-client.tsx`   | ✅ مكتملة           | قائمة، بحث، حجب، تغيير دور                             |
+| `/dashboard/users/[id]`       | ❌ غير موجود                | 🔴 ناقصة             | لا يوجد صفحة تفصيلية للمستخدم                       |
+| `/dashboard/drivers`          | `page.tsx`+`drivers-client.tsx` | ✅ مكتملة           | قائمة + تحقق + إلغاء                                           |
+| `/dashboard/drivers/[id]`     | `page.tsx`                        | ✅ مكتملة           | ملف السائق كامل                                                 |
+| `/dashboard/drivers/revision` | `page.tsx`                        | ✅ مكتملة           | طلبات المراجعة                                                  |
+| `/dashboard/driver-locations` | `page.tsx`+ map                   | ✅ مكتملة           | خريطة مواقع السائقين                                       |
+| `/dashboard/trips`            | `page.tsx`+`trips-client.tsx`   | ✅ مكتملة           | قائمة + فلتر                                                        |
+| `/dashboard/trips/[id]`       | `page.tsx`                        | ✅ مكتملة           | تفاصيل الرحلة                                                    |
+| `/dashboard/trip-offers`      | `page.tsx`+ filter                | ✅ مكتملة           | عروض الرحلات                                                      |
+| `/dashboard/route-plans`      | `page.tsx`+ client                | ⚠️ جديدة           | مسارات الرحلات — جديدة، strings بالعربي Hardcoded |
+| `/dashboard/ratings`          | `page.tsx`                        | ✅ مكتملة           | التقييمات                                                           |
+| `/dashboard/complaints`       | `page.tsx`+`[id]/`              | ✅ مكتملة           | الشكاوى                                                               |
+| `/dashboard/messages`         | `page.tsx`                        | ✅ مكتملة           | الرسائل                                                               |
+| `/dashboard/service-areas`    | `page.tsx`+ client                | ✅ مكتملة           | المناطق                                                               |
+| `/dashboard/vehicle-types`    | `page.tsx`+ client                | ✅ مكتملة           | أنواع المركبات                                                  |
+| `/dashboard/pricing`          | `page.tsx`+ client                | ✅ مكتملة           | التسعير                                                               |
+| `/dashboard/coupons`          | `page.tsx`+ client                | ✅ مكتملة           | الكوبونات                                                           |
+| `/dashboard/user-coupons`     | `page.tsx`                        | ✅ مكتملة           | كوبونات المستخدمين                                          |
+| `/dashboard/coupon-analytics` | `page.tsx`                        | ✅ مكتملة           | تحليلات الكوبونات                                            |
+| `/dashboard/wallets`          | `page.tsx`                        | ✅ مكتملة           | المحافظ                                                               |
+| `/dashboard/withdrawals`      | `page.tsx`                        | ✅ مكتملة           | طلبات السحب                                                        |
+| `/dashboard/bonuses`          | `page.tsx`+ client                | ✅ مكتملة           | المكافآت                                                             |
+| `/dashboard/notifications`    | `page.tsx`+ client                | ✅ مكتملة           | الإشعارات                                                           |
+| `/dashboard/admin-logs`       | `page.tsx`                        | ✅ مكتملة           | سجل الأدمن                                                          |
+| `/dashboard/settings`         | `page.tsx`+ form                  | ✅ مكتملة           | الإعدادات                                                           |
+
+### 6.2 API Routes الموجودة كـ Directories فارغة
+
+> ⚠️ دي directories موجودة في الـ zip لكن **الـ `route.ts` فيها فارغة أو مش موجودة** — يعني الـ API endpoints دي مش شغالة:
+
+تم التحقق من إن معظم الـ routes فيها `route.ts` كامل. لكن المجلدات التالية موجودة كـ placeholders:
+
+```
+src/app/api/notifications/send/  — ✅ route.ts موجود
+src/app/api/trips/cancel/        — ✅ route.ts موجود
+src/app/api/trips/delete/        — ✅ route.ts موجود
 ```
 
-في الـ dark mode:
-
-```css
---primary-dark:       #D97706   /* نفس */
---sidebar-icon-active: —        /* مش موجود في .dark */
---sb-mobile-btn-text: #F59E0B   /* يتغير للـ primary في الـ dark mode */
-```
-
-`--sidebar-icon-active` متغير قديم من نظام sidebar سابق وما عندهوش تعريف في `.dark`. `--sb-mobile-btn-text` مستخدم في CSS class بس وقيمته مختلفة في الـ dark mode فيستحق يفضل.
-
-**الحل:** احذف `--sidebar-icon-active`. غيّر تعريف `--sb-mobile-btn-text` ليكون `var(--primary-dark)` في الـ light mode بدل تكرار القيمة.
+الـ API routes كلها موجودة ومكتملة. لكن في `bonuses/` و `service-areas/` بيستخدموا Server Actions بدل API routes — pattern غير موحد.
 
 ---
 
-### ⚠️ مشكلة 10: 5 متغيرات لـ `#94A3B8`
+## 7. Design System — الألوان والتوكنز
+
+### 7.1 CSS Variables — ما هو موجود ✅
+
+الـ Design System موجود في `globals.css` وشامل:
 
 ```css
---text-disabled:    #94A3B8;   /* مستخدم كثيراً ✅ */
---sb-group-label:   #94A3B8;   /* مستخدم في globals.css ✅ */
---sb-footer-text:   #94A3B8;   /* مستخدم في TSX + globals.css ✅ */
---sb-brand-sub:     #94A3B8;   /* مستخدم في globals.css ✅ */
---sb-version-text:  #94A3B8;   /* مستخدم في globals.css ✅ */
+/* Light Mode Variables */
+--background, --surface, --surface-high, --surface-elevated
+--surface-muted, --surface-glass
+--divider, --divider-strong, --table-row-border
+--text-primary, --text-secondary, --text-tertiary, --text-disabled
+--primary, --primary-rgb, --primary-dark, --primary-light, --primary-text, --primary-surface
+--success, --success-rgb, --success-light, --success-surface, --success-border
+--warning, --warning-rgb, --warning-surface, --warning-border
+--error, --error-rgb, --error-light, --error-surface, --error-border
+--info, --info-rgb, --info-surface
+--color-orange, --color-purple, --color-pink, --color-cyan
+--radius-sm, --radius-md, --radius-lg, --radius-xl
+--transition-fast, --transition-normal, --transition-slow
+--shadow-sm, --shadow-md, --shadow-lg
+
+/* Dark Mode Variables */
+-- نفس القائمة مع قيم مختلفة
 ```
 
-في الـ dark mode الخمسة مختلفين:
+### 7.2 المتغيرات الناقصة في الـ Dark Mode 🔴
 
 ```css
---text-disabled:    #475569
---sb-group-label:   #64748B
---sb-footer-text:   #94A3B8    /* نفس الـ light */
---sb-brand-sub:     #94A3B8    /* نفس الـ light */
---sb-version-text:  #475569
+/* موجودة في Light — مش موجودة في .dark {} */
+--info-light        /* #93C5FD في Light، مش معرّف في Dark */
+--warning-light     /* #FDE68A في Light، مش معرّف في Dark */
+--radius-sm         /* ثابت — صح إنه مش في Dark لكن لو مستخدم في Dark components */
+--radius-md         /* نفس الحكم */
+--radius-lg         /* نفس الحكم */
+--radius-xl         /* نفس الحكم */
+--transition-fast   /* نفس الحكم — transitions مش بتتغير مع الـ Dark */
+--transition-normal /* نفس الحكم */
+--transition-slow   /* نفس الحكم */
 ```
 
-الـ sidebar tokens (`--sb-*`) بيتحكموا في أشياء مختلفة في الـ dark mode — يعني التشابه في الـ light mode صدفة مش علاقة semantic. ده مقبول من منظور تصميمي. الـ 5 متغيرات كلهم مستخدمين وكلهم عندهم دور مختلف.
-
-**الحل:** مفيش إجراء ضروري هنا.
-
----
-
-### ⚠️ مشكلة 11: 4 متغيرات لـ `#1E293B`
+**الإصلاح في `globals.css`:**
 
 ```css
---sidebar-text-active: #1E293B;   /* متغير قديم — مش مستخدم في TSX ❌ */
---sb-nav-text-active:  #1E293B;   /* مستخدم في globals.css CSS classes ✅ */
---sb-footer-hover:     #1E293B;   /* مستخدم في globals.css CSS classes ✅ */
---sb-tooltip-bg:       #1E293B;   /* مستخدم في globals.css CSS classes ✅ */
-```
-
-في الـ dark mode:
-
-```css
---sidebar-text-active: —           /* مش موجود في .dark */
---sb-nav-text-active:  #F8FAFC    /* أبيض */
---sb-footer-hover:     #F8FAFC    /* أبيض */
---sb-tooltip-bg:       #1E232E    /* داكن جداً */
-```
-
-`--sidebar-text-active` متغير قديم بدون تعريف في `.dark` — ده علامة إنه من نظام قديم.
-
-**الحل:** احذف `--sidebar-text-active`.
-
----
-
-## 6. المشاكل البسيطة
-
-### 📋 مشكلة 12: `--divider-strong` = `--sb-group-dot` في light mode
-
-```css
---divider-strong: #CBD5E1;   /* مستخدم ✅ */
---sb-group-dot:   #CBD5E1;   /* مستخدم في globals.css ✅ */
-```
-
-في الـ dark mode مختلفين:
-
-```css
---divider-strong: #3B4354
---sb-group-dot:   rgba(255, 255, 255, 0.15)   /* مختلف تماماً */
-```
-
-التشابه في الـ light mode صدفة. كل متغير بيقوم بدور مختلف وعنده قيمة مختلفة في الـ dark mode. مقبول.
-
----
-
-### 📋 مشكلة 13: `--sidebar-border` = `--sb-border` = `--sb-group-line` = `--sb-mobile-btn-border`
-
-```css
---sidebar-border:      #E2E5EC;   /* متغير قديم — مش مستخدم ❌ */
---sb-border:           #E2E5EC;   /* مستخدم في globals.css ✅ */
---sb-group-line:       #E2E5EC;   /* مستخدم في globals.css ✅ */
---sb-mobile-btn-border:#E2E5EC;   /* مستخدم في globals.css ✅ */
-```
-
-في الـ dark mode:
-
-```css
---sidebar-border:       —                          /* مش موجود */
---sb-border:            #282E3A
---sb-group-line:        rgba(255, 255, 255, 0.05)  /* مختلف */
---sb-mobile-btn-border: #282E3A
-```
-
-`--sidebar-border` متغير قديم ومش موجود في `.dark`. احذفه.
-
-الباقي (`--sb-border`, `--sb-group-line`, `--sb-mobile-btn-border`) مختلفين في الـ dark mode فهم ليسوا تكراراً حقيقياً.
-
----
-
-## 7. المتغيرات الميتة
-
-دي المتغيرات اللي بيتم تعريفها في `:root` أو `.dark` لكن **لا تُستخدم في أي ملف TSX/TS** ولا حتى في `globals.css` نفسه.
-
-### متغيرات قديمة (Legacy Sidebar System)
-
-دول بقايا نظام sidebar قديم قبل ما يتنقل للـ `--sb-*` tokens:
-
-```css
-/* كلهم في :root بس، مفيش تعريف في .dark */
---sidebar-bg:          #F6F7FA    /* ✗ مش مستخدم نهائياً */
---sidebar-border:      #E2E5EC    /* ✗ مش مستخدم نهائياً */
---sidebar-icon-active: #D97706    /* ✗ مش مستخدم نهائياً */
---sidebar-item-active: #FFF8EB    /* ✗ مش مستخدم نهائياً */
---sidebar-item-hover:  #EBEEF5    /* ✗ مش مستخدم نهائياً */
---sidebar-text:        #64748B    /* ✗ مش مستخدم نهائياً */
---sidebar-text-active: #1E293B    /* ✗ مش مستخدم نهائياً */
-```
-
-**الإجراء:** احذف كل السطور دي من `:root`. مش محتاجين تعريف في `.dark` أصلاً لأنهم مش مستخدمين.
-
-### متغيرات لها تعريف لكن لا تُستخدم
-
-```css
---text-muted:             #64748B    /* ✗ نفس --text-tertiary ومش مستخدم */
---warning-light:          #FCD34D    /* ✗ نفس --primary-light ومش مستخدم */
---primary-surface-strong: rgba(245, 158, 11, 0.18)   /* ✗ مش مستخدم في TSX */
---sb-logo-glow:           none       /* ✗ قيمة none ومش مستخدم */
-```
-
-### متغيرات radius غير مستخدمة
-
-```css
---radius-sm:  8px    /* ✗ مش مستخدم — المستخدم هو --radius-md */
---radius-xl:  20px   /* ✗ مش مستخدم */
---radius-2xl: 24px   /* ✗ مش مستخدم */
-```
-
-ملاحظة: `--radius-md: 12px` و `--radius-lg: 16px` مستخدمين بس `--radius-sm` و `--radius-xl` و `--radius-2xl` مش مستخدمين.
-
-### `--shadow-xl` غير مستخدم
-
-```css
---shadow-xl: 0 16px 48px rgba(0,0,0,0.10), 0 24px 64px rgba(0,0,0,0.07);   /* ✗ */
-```
-
-المستخدم فعلياً هو `--shadow-sm`, `--shadow-md`, `--shadow-lg`.
-
----
-
-## 8. تحليل الـ @theme inline
-
-الـ `@theme inline` بيحول CSS variables لـ Tailwind utility classes. دي قائمة كل المتغيرات المعرَّفة هناك:
-
-```css
-@theme inline {
-  /* Backgrounds */
-  --color-background: var(--background);        /* → bg-background */
-  --color-surface: var(--surface);              /* → bg-surface */
-  --color-surface-elevated: var(--surface-elevated); /* → bg-surface-elevated */
-  --color-surface-high: var(--surface-high);    /* → bg-surface-high */
-  --color-surface-muted: var(--surface-muted);  /* → bg-surface-muted */
-  --color-foreground: var(--text-primary);      /* → text-foreground */
-  --color-divider: var(--divider);              /* → border-divider, bg-divider */
-  
-  /* Brand */
-  --color-primary: var(--primary);             /* → bg-primary, text-primary, border-primary */
-  --color-primary-dark: var(--primary-dark);   /* → text-primary-dark */
-  --color-primary-light: var(--primary-light); /* → bg-primary-light */
-  --color-primary-surface: var(--primary-surface); /* → bg-primary-surface */
-  --color-primary-text: var(--primary-text);   /* → text-primary-text */
-  
-  /* Text */
-  --color-text-primary: var(--text-primary);   /* → text-text-primary */
-  --color-text-secondary: var(--text-secondary); /* → text-text-secondary */
-  --color-text-tertiary: var(--text-tertiary); /* → text-text-tertiary */
-  --color-text-disabled: var(--text-disabled); /* → text-text-disabled */
-  
-  /* Status */
-  --color-success: var(--success);             /* → text-success, bg-success */
-  --color-success-light: var(--success-light); /* → text-success-light */
-  --color-warning: var(--warning);             /* → text-warning, bg-warning */
-  --color-warning-light: var(--warning-light); /* → bg-warning-light ← غير مستخدم */
-  --color-error: var(--error);                 /* → text-error, bg-error */
-  --color-error-light: var(--error-light);     /* → text-error-light ← نادر الاستخدام */
-  --color-info: var(--info);                   /* → text-info, bg-info */
-  
-  /* Extended Palette */
-  --color-purple: var(--color-purple);         /* → text-purple */
-  --color-pink: var(--color-pink);             /* → text-pink */
-  --color-cyan: var(--color-cyan);             /* → text-cyan */
-  --color-orange: var(--color-orange);         /* → text-orange ← نادر الاستخدام */
-  --color-white: var(--color-white);           /* → text-white, bg-white */
-  --color-black: var(--color-black);           /* → text-black, bg-black */
-  
-  --color-accent-purple: var(--color-purple);  /* ← مكرر! نفس --color-purple */
+.dark {
+  /* الإضافة المطلوبة */
+  --info-light: #60A5FA;      /* أغمق شوية في Dark */
+  --warning-light: #FCD34D;   /* أغمق شوية في Dark */
+  /* الـ radius والـ transitions مش محتاجين تكرار في Dark */
 }
 ```
 
-### مشكلة في @theme: `--color-accent-purple` = `--color-purple`
+### 7.3 `COLOR_MAP` — تكرار في مكونات متعددة 🟡
 
-```css
---color-purple: var(--color-purple);           /* → class: text-purple */
---color-accent-purple: var(--color-purple);    /* → class: text-accent-purple ← نفس اللون */
+نفس الـ object متعرّف في 3 مواقع مختلفة:
+
+```typescript
+// stat-card.tsx — السطر 5
+const COLOR_MAP: Record<ColorVariant, {...}> = { ... }
+
+// kpi-card.tsx — السطر 5
+const COLOR_MAP: Record<ColorVariant, {...}> = { ... }
+
+// charts.tsx — السطر 29 (بشكل مختلف قليلاً: STATUS_COLOR_MAP)
 ```
 
-`--color-accent-purple` بيشير لنفس `--color-purple`. لا يُستخدم في أي TSX/TS ملف. احذفه.
+**الحل — إنشاء ملف `src/lib/design-tokens.ts`:**
+
+```typescript
+// src/lib/design-tokens.ts
+
+export type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
+
+export const COLOR_MAP: Record<ColorVariant, {
+  bg: string;
+  border: string;
+  text: string;
+  var: string;
+  rgb: string;
+}> = {
+  primary: {
+    bg:     "bg-primary/10",
+    border: "border-primary/20",
+    text:   "text-primary",
+    var:    "var(--primary)",
+    rgb:    "var(--primary-rgb)",
+  },
+  info: {
+    bg:     "bg-info/10",
+    border: "border-info/20",
+    text:   "text-info",
+    var:    "var(--info)",
+    rgb:    "var(--info-rgb)",
+  },
+  success: {
+    bg:     "bg-success/10",
+    border: "border-success/20",
+    text:   "text-success",
+    var:    "var(--success)",
+    rgb:    "var(--success-rgb)",
+  },
+  warning: {
+    bg:     "bg-warning/10",
+    border: "border-warning/20",
+    text:   "text-warning",
+    var:    "var(--warning)",
+    rgb:    "var(--warning-rgb)",
+  },
+  error: {
+    bg:     "bg-error/10",
+    border: "border-error/20",
+    text:   "text-error",
+    var:    "var(--error)",
+    rgb:    "var(--error-rgb)",
+  },
+};
+
+export const STATUS_COLOR_MAP: Record<string, string> = {
+  completed:       "var(--success)",
+  accepted:        "var(--primary)",
+  driver_arriving: "var(--primary)",
+  in_progress:     "var(--primary)",
+  searching:       "var(--warning)",
+  pending:         "var(--warning)",
+  cancelled:       "var(--error)",
+  rejected:        "var(--error)",
+  expired:         "var(--text-disabled)",
+};
+```
+
+بعد كده في كل ملف بدل ما تعرّف `COLOR_MAP` محلياً:
+
+```typescript
+import { COLOR_MAP, type ColorVariant } from "@/lib/design-tokens";
+```
+
+### 7.4 ألوان Hardcoded خارج الـ CSS Variables — مواضع المشكلة
+
+```typescript
+// sidebar.tsx — السطر 35 (مقبول — هو نفسه CSS var reference)
+const PRIMARY_RGB = "var(--primary-rgb)"; // ✅ صح
+
+// route-plans-client.tsx — ألوان مباشرة في className
+className="text-sm font-bold text-error"  // ✅ بيستخدم CSS var
+className="text-[15px] font-black text-text-primary"  // ✅ بيستخدم CSS var
+
+// الـ TOOLTIP_STYLE في charts.tsx — ✅ كله بيستخدم CSS vars
+backgroundColor: "var(--surface-elevated)"
+border: "1px solid var(--divider)"
+```
+
+**لم يُعثر على ألوان hex مباشرة في الـ TSX files** — النمط صح ومتسق.
+
+### 7.5 Strings العربية Hardcoded في الكود (i18n Issue) 🟡
+
+```typescript
+// sidebar.tsx — السطر 59
+{ label: "مسارات الرحلات", ... }  // 🔴 Hardcoded — المفروض t("routePlans.title")
+
+// route-plans-client.tsx
+"حدث خطأ أثناء جلب المسارات"      // 🔴 Hardcoded
+"قائمة المسارات"                   // 🔴 Hardcoded
+"لا توجد مسارات لعرضها"            // 🔴 Hardcoded
+"لم يتم العثور على أي مسارات..."   // 🔴 Hardcoded
+
+// route-plans/page.tsx
+"مسارات الرحلات"                   // 🔴 Hardcoded
+"إدارة وعرض مسارات الرحلات..."    // 🔴 Hardcoded
+
+// trips/[id]/page.tsx
+"دقيقة"                             // 🔴 Hardcoded unit
+"تاريخ الاكتمال"                   // 🔴 Hardcoded label
+"تاريخ الإلغاء"                    // 🔴 Hardcoded label
+```
+
+**الحل:** إضافة مفاتيح i18n للـ messages file وتبديل الـ strings الـ hardcoded.
 
 ---
 
-## 9. جدول كل المتغيرات في :root
+## 8. الميزات المفقودة — DB موجود UI مش موجود
 
-### البالستة (Backgrounds)
+### 8.1 صفحة تفاصيل المستخدم `/dashboard/users/[id]` 🔴
 
-| المتغير         | Light Mode                 | Dark Mode               | مستخدم في TSX؟ | ملاحظة                            |
-| ---------------------- | -------------------------- | ----------------------- | ----------------------- | --------------------------------------- |
-| `--background`       | `#F8FAFC`                | `#080A0F`             | ✅ نعم               |                                         |
-| `--bg-secondary`     | `#F1F5F9`                | `#080A0F`             | ⚠️ CSS فقط         | نفس `--surface-elevated`في light |
-| `--surface`          | `#FFFFFF`                | `#12151C`             | ✅ نعم               |                                         |
-| `--surface-high`     | `#FFFFFF`                | `#212631`             | ✅ نعم               | نفس `--surface`في light          |
-| `--surface-elevated` | `#F1F5F9`                | `#1A1E28`             | ✅ نعم               |                                         |
-| `--surface-muted`    | `#F8FAFC`                | `#12151C`             | ✅ نعم               | نفس `--background`في light       |
-| `--surface-glass`    | `rgba(255,255,255,0.88)` | `rgba(18,21,28,0.88)` | ✅ نعم               |                                         |
+**DB Data المتاح:**
 
-### خطوط الفصل (Dividers)
+* `users` table — بيانات أساسية
+* `user_trip_stats` view — إحصائيات رحلاته
+* `user_wallets` + `wallet_transactions` — محفظته
+* `user_coupons` + `coupons` — كوبوناته
+* `user_ratings` — تقييماته للسائقين
+* `ratings` — تقييمات السائقين له
 
-| المتغير              | Light Mode         | Dark Mode                  | مستخدم في TSX؟ | ملاحظة         |
-| --------------------------- | ------------------ | -------------------------- | ----------------------- | -------------------- |
-| `--divider`               | `#E2E8F0`        | `#282E3A`                | ✅ نعم               | الأصل           |
-| `--divider-strong`        | `#CBD5E1`        | `#3B4354`                | ✅ نعم               |                      |
-| `--table-row-border`      | `var(--divider)` | `rgba(255,255,255,0.08)` | ⚠️ CSS فقط         |                      |
-| `--topbar-border`         | `#E2E8F0`        | `#282E3A`                | ❌ لا                 | =`--divider`       |
-| `--chrome-control-border` | `#E2E8F0`        | `#3B4354`                | ❌ لا                 | dark ≠`--divider` |
-| `--chrome-join-line`      | `#E2E8F0`        | `#282E3A`                | ❌ لا                 | =`--divider`       |
+**الـ UI الحالي:** بيعرض المستخدمين في قائمة بس — مفيش صفحة تفصيلية.
 
-### النصوص (Text)
+**المطلوب إنشاؤه:**
 
-| المتغير       | Light Mode  | Dark Mode   | مستخدم في TSX؟      | ملاحظة         |
-| -------------------- | ----------- | ----------- | ---------------------------- | -------------------- |
-| `--text-primary`   | `#0F172A` | `#F8FAFC` | ✅ نعم                    |                      |
-| `--text-secondary` | `#475569` | `#94A3B8` | ✅ نعم                    |                      |
-| `--text-tertiary`  | `#64748B` | `#64748B` | ✅ نعم                    |                      |
-| `--text-disabled`  | `#94A3B8` | `#475569` | ✅ نعم                    |                      |
-| `--text-muted`     | `#64748B` | `#64748B` | ❌**لا — احذف** | =`--text-tertiary` |
+```
+/dashboard/users/[id]/page.tsx
+- بيانات المستخدم الأساسية (اسم، إيميل، تليفون، دور، تاريخ إنشاء)
+- إحصائيات الرحلات (من user_trip_stats view)
+- رصيد المحفظة (من user_wallets)
+- آخر 5 معاملات (من wallet_transactions)
+- قائمة كوبوناته (من user_coupons)
+- تاريخ التقييمات (من user_ratings)
+- أزرار: حجب/رفع الحجب، تغيير الدور
+```
 
-### العلامة التجارية (Brand)
+### 8.2 صفحة `support_messages` — رسائل الدعم الفني 🟡
 
-| المتغير               | Light Mode                | Dark Mode                 | مستخدم في TSX؟      | ملاحظة |
-| ---------------------------- | ------------------------- | ------------------------- | ---------------------------- | ------------ |
-| `--primary`                | `#F59E0B`               | `#F59E0B`               | ✅ 102+ مرة               |              |
-| `--primary-rgb`            | `245, 158, 11`          | `245, 158, 11`          | ✅ نعم                    |              |
-| `--primary-dark`           | `#D97706`               | `#D97706`               | ✅ نعم                    |              |
-| `--primary-light`          | `#FCD34D`               | `#FCD34D`               | ✅ نعم                    |              |
-| `--primary-text`           | `#B45309`               | `#F59E0B`               | ✅ نعم                    |              |
-| `--primary-surface`        | `rgba(245,158,11,0.10)` | `rgba(245,158,11,0.15)` | ✅ نعم                    |              |
-| `--primary-surface-strong` | `rgba(245,158,11,0.18)` | `rgba(245,158,11,0.25)` | ❌**لا — احذف** |              |
+**DB:** جدول `support_messages` مفعّل عليه Realtime، فيه `1` رسالة حالياً.
+**الـ UI الحالي:** صفحة `/dashboard/messages` بتعرض جدول `messages` (محادثات بين السائق والمستخدم).
 
-### الحالات (Status)
+**الفرق:** `support_messages` هي رسائل المستخدمين للدعم الفني — مختلفة عن محادثات الرحلة.
 
-| المتغير        | Light Mode                             | Dark Mode                 | مستخدم في TSX؟      | ملاحظة                       |
-| --------------------- | -------------------------------------- | ------------------------- | ---------------------------- | ---------------------------------- |
-| `--success`         | `#10B981`                            | `#10B981`               | ✅ نعم                    |                                    |
-| `--success-rgb`     | `16, 185, 129`                       | same                      | ✅ نعم                    |                                    |
-| `--success-light`   | `#34D399`                            | `#34D399`               | ✅ نعم                    |                                    |
-| `--success-surface` | `rgba(16,185,129,0.10)`              | `rgba(16,185,129,0.15)` | ✅ نعم                    |                                    |
-| `--success-border`  | `rgba(16,185,129,0.25)`              | `rgba(16,185,129,0.35)` | ✅ نعم                    |                                    |
-| `--warning`         | **`#F59E0B`← نفس primary** | `#F59E0B`               | ✅ 32 مرة                 | **🚨 يجب التغيير** |
-| `--warning-rgb`     | `245, 158, 11`                       | same                      | ✅ نعم                    | نفس primary-rgb                 |
-| `--warning-light`   | `#FCD34D`                            | `#FCD34D`               | ❌**لا — احذف** |                                    |
-| `--warning-surface` | `rgba(245,158,11,0.10)`              | `rgba(245,158,11,0.15)` | ✅ نعم                    |                                    |
-| `--warning-border`  | `rgba(245,158,11,0.25)`              | `rgba(245,158,11,0.35)` | ✅ نعم                    |                                    |
-| `--error`           | `#EF4444`                            | `#EF4444`               | ✅ نعم                    |                                    |
-| `--error-rgb`       | `239, 68, 68`                        | same                      | ✅ نعم                    |                                    |
-| `--error-light`     | `#F87171`                            | `#F87171`               | ✅ نعم                    |                                    |
-| `--error-surface`   | `rgba(239,68,68,0.09)`               | `rgba(239,68,68,0.15)`  | ✅ نعم                    |                                    |
-| `--error-border`    | `rgba(239,68,68,0.25)`               | `rgba(239,68,68,0.35)`  | ✅ نعم                    |                                    |
-| `--info`            | `#3B82F6`                            | `#3B82F6`               | ✅ نعم                    |                                    |
-| `--info-rgb`        | `59, 130, 246`                       | same                      | ✅ نعم                    |                                    |
-| `--info-surface`    | `rgba(59,130,246,0.09)`              | `rgba(59,130,246,0.15)` | ✅ نعم                    |                                    |
+**المطلوب:** إما:
 
-### الألوان الإضافية (Extended Palette)
+1. إضافة tab في صفحة `/dashboard/messages` يعرض رسائل الدعم.
+2. أو إنشاء صفحة مستقلة `/dashboard/support`.
 
-| المتغير         | Light = Dark      | مستخدم في TSX؟ | ملاحظة                   |
-| ---------------------- | ----------------- | ----------------------- | ------------------------------ |
-| `--color-purple`     | `#8B5CF6`       | ✅ نعم               | في charts وbadges           |
-| `--color-purple-rgb` | `139, 92, 246`  | ✅ نعم               |                                |
-| `--color-pink`       | `#EC4899`       | ✅ نعم               | في charts وbadges           |
-| `--color-pink-rgb`   | `236, 72, 153`  | ✅ نعم               |                                |
-| `--color-cyan`       | `#06B6D4`       | ✅ نعم               | في charts وdriver-locations |
-| `--color-cyan-rgb`   | `6, 182, 212`   | ✅ نعم               |                                |
-| `--color-orange`     | `#F97316`       | ⚠️ نادر           | pricing فقط                 |
-| `--color-orange-rgb` | `249, 115, 22`  | ⚠️ نادر           |                                |
-| `--color-white`      | `#FFFFFF`       | ✅ نعم               |                                |
-| `--color-white-rgb`  | `255, 255, 255` | ✅ نعم               |                                |
-| `--color-black`      | `#000000`       | ✅ نعم               |                                |
-| `--color-black-rgb`  | `0, 0, 0`       | ✅ نعم               |                                |
+### 8.3 صفحة `driver_bonus_ledger` — سجل مكافآت السائق 🟡
 
-### الـ Radius والـ Shadows
+**DB:** جدول `driver_bonus_ledger` بيسجل كل معاملة bonus/penalty لكل سائق.
+**الـ UI الحالي:** صفحة `/dashboard/bonuses` بتعرض القواعد (`bonus_rules`) وملخص (`admin_bonus_summary`).
+**المفقود:** تفاصيل المعاملات الفعلية لكل سائق.
 
-| المتغير   | القيمة                        | مستخدم؟               | ملاحظة |
-| ---------------- | ----------------------------------- | ---------------------------- | ------------ |
-| `--radius-sm`  | `8px`                             | ❌**لا — احذف** |              |
-| `--radius-md`  | `12px`                            | ✅ نعم                    |              |
-| `--radius-lg`  | `16px`                            | ✅ نعم                    |              |
-| `--radius-xl`  | `20px`                            | ❌**لا — احذف** |              |
-| `--radius-2xl` | `24px`                            | ❌**لا — احذف** |              |
-| `--shadow-sm`  | `0 1px 4px rgba(0,0,0,0.04)...`   | ✅ نعم                    |              |
-| `--shadow-md`  | `0 4px 16px rgba(0,0,0,0.06)...`  | ✅ نعم                    |              |
-| `--shadow-lg`  | `0 8px 28px rgba(0,0,0,0.08)...`  | ✅ نعم                    |              |
-| `--shadow-xl`  | `0 16px 48px rgba(0,0,0,0.10)...` | ❌**لا — احذف** |              |
+**المطلوب:** في صفحة `/dashboard/drivers/[id]` إضافة section بيعرض `driver_bonus_ledger` records للسائق ده.
+
+### 8.4 صفحة `coupon_audit_log` — سجل تغييرات الكوبونات 🟡
+
+**DB:** جدول `coupon_audit_log` بيسجل كل تغيير في حالة الكوبون (created/activated/deactivated/expired).
+**الـ UI الحالي:** `/dashboard/coupon-analytics` بيعرض analytics بس.
+**المفقود:** Timeline لكل كوبون بيعرض تاريخه.
+
+**المطلوب:** في صفحة `/dashboard/coupons/[id]` إضافة Audit Log section.
+
+### 8.5 صفحة مراقبة `user_presence` 🟡
+
+**DB:** جدول `user_presence` بـ 110,000+ updates — الأكثر كتابة في الـ DB.
+**الـ UI الحالي:** صفحة مواقع السائقين موجودة لكن مفيش صفحة لمراقبة نشاط المستخدمين.
+**المطلوب:** إضافة widget صغير في الـ Dashboard يعرض المستخدمين Active الآن.
+
+### 8.6 صفحة `driver_service_areas` — مناطق السائق 🟡
+
+**DB:** جدول `driver_service_areas` بيربط السائقين بالمناطق.
+**الـ UI الحالي:** صفحة `/dashboard/service-areas` موجودة لكن مفيش طريقة لتعيين سائق لمنطقة من الـ Admin UI.
+**المطلوب:** في صفحة `/dashboard/drivers/[id]` إضافة قسم "المناطق المخصصة" مع إمكانية الإضافة والحذف.
+
+### 8.7 `pricing_config` vs `vehicle_types` — تناقض في التسعير 🟡
+
+**DB:** جدول `pricing_config` موجود (0 rows حالياً)، وجدول `vehicle_types` عنده `base_fare` و `price_per_km`.
+**الـ UI الحالي:** صفحة `/dashboard/pricing` بتعرض `pricing_config` بينما `/dashboard/vehicle-types` بتعرض وتعدّل أسعار الـ vehicle types.
+
+**التناقض:** وجود جدولين للتسعير مربك. إما:
+
+1. `pricing_config` للإعدادات العامة (commission%, minimum fare, surge multiplier).
+2. `vehicle_types` للأسعار الخاصة بكل نوع مركبة.
+
+**المطلوب:** توثيق واضح في الـ UI لإيه الفرق بين الجدولين، وإضافة ربط بينهم.
 
 ---
 
-## 10. قائمة الإصلاحات المطلوبة بالترتيب
+## 9. مشاكل الكود — Clean Code وPatterns
 
-### 🚨 أولاً: الإصلاحات الجوهرية (Critical)
+### 9.1 مشكلة موحدة في كل الصفحات — عدم وجود Error Boundaries 🟡
 
-1. **غيّر `--warning` لقيمة مختلفة عن `--primary`**
+كل الـ Server Components بتستخدم pattern زي:
 
-   القيمة المقترحة: `#F97316` (orange-500) أو `#EAB308` (yellow-500)
+```typescript
+const { data, error } = await supabase.from("...").select("...");
+// لو error حصل — الصفحة ممكن تبقى blank أو تكسر بدون error message واضح
+```
 
-   يستلزم: تحديث `--warning-rgb` + `--warning-light` + `--warning-surface` + `--warning-border`
-2. **احذف `--text-muted`** (نسخة ميتة من `--text-tertiary`)
-3. **احذف `--warning-light`** (مش مستخدم وسيتحدد تلقائياً بعد تغيير `--warning`)
+**المطلوب:** Error boundary أو fallback UI لكل صفحة:
 
-### ⚠️ ثانياً: إصلاحات نظام Sidebar القديم (تنظيف)
+```typescript
+if (error) {
+  return <ErrorState message={error.message} />;
+}
+```
 
-4. احذف كل المتغيرات دي من `:root` (ومن `.dark` لو موجودين هناك):
-   ```
-   --sidebar-bg--sidebar-border--sidebar-icon-active--sidebar-item-active--sidebar-item-hover--sidebar-text--sidebar-text-active
-   ```
+### 9.2 عدم وجود Skeleton/Loading States في معظم الصفحات 🟡
 
-### 📋 ثالثاً: تحسينات التنظيم (Housekeeping)
+صفحات زي `/dashboard/trips` و `/dashboard/users` مش عندها Suspense boundaries.
 
-5. **احذف `--primary-surface-strong`** (مش مستخدم في TSX — بس موجود في globals.css)
-6. **احذف `--shadow-xl`** (مش مستخدم)
-7. **احذف `--radius-sm`، `--radius-xl`، `--radius-2xl`** (مش مستخدمين)
-8. **احذف `--sb-logout-text`** أو حوّله لـ `var(--error)` بدل تكرار القيمة
-9. **غيّر `--topbar-border` و `--chrome-join-line`** ليكونوا `var(--divider)` بدل تكرار `#E2E8F0`
-10. **احذف `--color-accent-purple`** من `@theme inline` (تكرار لـ `--color-purple`)
-11. **احذف `--sb-logo-glow`** (قيمته `none` وما بيتغيرش في الـ dark)
-12. **احذف `--warning-light`** من `@theme inline`
+**المطلوب:**
+
+```typescript
+// في الـ page.tsx wrapper
+export default function Page() {
+  return (
+    <Suspense fallback={<TableSkeleton />}>
+      <TripsContent />
+    </Suspense>
+  );
+}
+```
+
+### 9.3 دالة `getStatusLabel` في `utils.ts` — بتستخدم try/catch للـ logic المعتادة 🟡
+
+```typescript
+// utils.ts — الكود الحالي
+export function getStatusLabel(status: string, t?: any): string {
+  if (!t) return status;  // 🔴 لو مفيش translation، بترجع الـ raw status
+  try {
+    const translation = t(`trips.statuses.${status}`);
+    if (translation === `trips.statuses.${status}`) {
+      const common = t(`common.${status}`);
+      if (common !== `common.${status}`) return common;
+    }
+    return translation;
+  } catch {
+    return status;
+  }
+}
+```
+
+**المشكلة:** try/catch للـ control flow مش best practice في JS.
+
+**الحل الأمثل:**
+
+```typescript
+// design-tokens.ts — إضافة STATUS_LABELS map
+export const STATUS_LABELS: Record<string, string> = {
+  searching:       "جاري البحث",
+  accepted:        "مقبولة",
+  driver_arriving: "السائق في الطريق",
+  in_progress:     "جارية",
+  completed:       "مكتملة",
+  cancelled:       "ملغية",
+  pending:         "معلقة",
+  rejected:        "مرفوضة",
+  expired:         "منتهية",
+};
+```
+
+### 9.4 Duplicate Type Definitions — `ColorVariant` معرّف في كل مكون 🟡
+
+```typescript
+// stat-card.tsx — السطر 3
+type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
+
+// kpi-card.tsx — السطر 3
+type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
+```
+
+**الحل:** استخدام `type ColorVariant` من `@/lib/design-tokens`.
+
+### 9.5 Server Actions vs API Routes — pattern مش موحد 🟡
+
+بعض الصفحات بتستخدم Server Actions:
+
+```typescript
+// service-areas/actions.ts
+"use server";
+export async function createServiceArea(...) { ... }
+```
+
+وبعضها بتستخدم API Routes:
+
+```typescript
+// app/api/service-areas/create/route.ts
+export async function POST(request: Request) { ... }
+```
+
+**التوصية:** اختار pattern واحد للـ mutations. Server Actions أفضل في Next.js 15 لأنها بتشتغل مع `useTransition` وبتعمل revalidation تلقائي.
+
+### 9.6 `formatCurrency` — hardcoded currency 🟡
+
+```typescript
+// utils.ts
+export function formatCurrency(value: number): string {
+  return `${value.toFixed(2)} ج.م`;  // 🔴 Hardcoded Egyptian Pound
+}
+```
+
+**المطلوب:** استخدام `Intl.NumberFormat` مع currency من `app_config`:
+
+```typescript
+export function formatCurrency(value: number, currency = "EGP"): string {
+  return new Intl.NumberFormat("ar-EG", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+  }).format(value);
+}
+```
+
+### 9.7 استخدام `deprecated columns` في الـ UI 🔴
+
+صفحة `/dashboard/trips/[id]/page.tsx` بتعرض:
+
+* `trip.driver_earnings` — 98.9% null
+* `trip.platform_commission` — 98.9% null
+* `trip.cancel_reason_category` — 100% null
+* `trip.scheduled_at` — 100% null
+* `trip.estimated_duration_min` — 100% null
+
+**الحل:** شيل الـ UI elements دي أو اعمل conditional rendering بيعرضهم بس لو القيمة مش null.
+
+### 9.8 الـ Dashboard Main Page — بيجيب بيانات غير ضرورية 🟡
+
+```typescript
+// dashboard/page.tsx
+const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
+  supabase.from("admin_dashboard").select("*").single(),
+  supabase.from("admin_recent_trips").select("*").limit(10),
+  supabase.from("trips").select("id, status, price, vehicle_type"),  // 🔴 جايب كل الرحلات!
+]);
+```
+
+**المشكلة:** بيجيب كل الـ trips من الجدول المباشر بدل ما يستخدم الـ view اللي فيه الـ aggregated data. لو الرحلات وصلت 100k+ هيبطّء الصفحة.
+
+**الحل:** استخدام `admin_dashboard` view فقط اللي فيه الـ aggregated stats، والـ Chart data من view مخصص.
 
 ---
 
-## 11. الكود المقترح للإصلاح
+## 10. خريطة الأولوية والإصلاح
 
-### الإصلاح الأساسي — تغيير `--warning`
+### 🔴 Priority 1 — حرجة (افعلها دلوقتي)
 
-**في `:root`:**
-
-```css
-/* ← احذف السطور دي */
---warning: #F59E0B;
---warning-rgb: 245, 158, 11;
---warning-light: #FCD34D;
---warning-surface: rgba(245, 158, 11, 0.10);
---warning-border: rgba(245, 158, 11, 0.25);
-
-/* ← وضع السطور دي بدلهم */
---warning: #F97316;
---warning-rgb: 249, 115, 22;
---warning-light: #FB923C;
---warning-surface: rgba(249, 115, 22, 0.10);
---warning-border: rgba(249, 115, 22, 0.25);
+```
+1. VACUUM ANALYZE على كل الجداول — خصوصاً drivers_profile (75% bloat)
+2. إصلاح blocked_reason — التحقق من api/users/block/route.ts
+3. شيل الـ UI elements للأعمدة 100% null من trips/[id]
+4. تفعيل RLS على spatial_ref_sys
+5. إصلاح completed_at / started_at — راجع trigger update_trip_status_timestamps
 ```
 
-**في `.dark`:**
+### 🟡 Priority 2 — مهمة (خلال الـ Sprint الجاي)
 
-```css
-/* ← احذف */
---warning: #F59E0B;
---warning-rgb: 245, 158, 11;
---warning-light: #FCD34D;
---warning-surface: rgba(245, 158, 11, 0.15);
---warning-border: rgba(245, 158, 11, 0.35);
-
-/* ← ضع بدلهم */
---warning: #F97316;
---warning-rgb: 249, 115, 22;
---warning-light: #FB923C;
---warning-surface: rgba(249, 115, 22, 0.15);
---warning-border: rgba(249, 115, 22, 0.35);
+```
+6.  إنشاء src/lib/design-tokens.ts وشيل COLOR_MAP التكرار
+7.  إضافة --info-light و--warning-light في .dark {}
+8.  إصلاح route-plans — تحويل الـ Arabic strings لـ i18n keys
+9.  إضافة صفحة /dashboard/users/[id]
+10. توحيد Server Actions vs API Routes pattern
+11. إصلاح formatCurrency لاستخدام Intl.NumberFormat
+12. تشغيل ANALYZE على الجداول غير المحللة
+13. إصلاح داتا dashboard/page.tsx — مش يجيب كل الـ trips
 ```
 
-### حذف المتغيرات الميتة
+### 🟢 Priority 3 — تحسينات (مع الوقت)
 
-```css
-/* ← احذف كل السطور دي من :root */
---text-muted: #64748B;
---warning-light: #FCD34D;                  /* بعد ما تعمل الإصلاح الأساسي */
---primary-surface-strong: rgba(245, 158, 11, 0.18);
---primary-border: rgba(245, 158, 11, 0.40);  /* موجود في .dark بس */
---bg-secondary: #F1F5F9;
---table-head-bg: #F8FAFC;
---sidebar-bg: #F6F7FA;
---sidebar-border: #E2E5EC;
---sidebar-icon-active: #D97706;
---sidebar-item-active: #FFF8EB;
---sidebar-item-hover: #EBEEF5;
---sidebar-text: #64748B;
---sidebar-text-active: #1E293B;
---chrome-control-bg: #F1F5F9;
---topbar-border: #E2E8F0;          /* ← حوّله لـ var(--divider) لو محتاج */
---chrome-join-line: #E2E8F0;       /* ← حوّله لـ var(--divider) لو محتاج */
---sb-logout-text: #EF4444;         /* ← حوّله لـ var(--error) لو محتاج */
---sb-logo-glow: none;
---radius-sm: 8px;
---radius-xl: 20px;
---radius-2xl: 24px;
---shadow-xl: 0 16px 48px rgba(0,0,0,0.10), 0 24px 64px rgba(0,0,0,0.07);
 ```
-
-### تنظيف @theme inline
-
-```css
-/* ← احذف من @theme inline */
---color-warning-light: var(--warning-light);
---color-accent-purple: var(--color-purple);
+14. إضافة Error Boundaries / Suspense في كل الصفحات
+15. إضافة driver_bonus_ledger في صفحة السائق
+16. إضافة coupon_audit_log timeline في صفحة الكوبون
+17. إضافة driver_service_areas management في صفحة السائق
+18. التحقق من views غير مستخدمة: user_trip_stats, driver_earnings_summary
+19. توثيق (comments) على الـ 20 جدول بدون comments
+20. راجع الـ 23 unused index — احذف اللي مش هيتستخدم
+21. إضافة support_messages في صفحة الرسائل
+22. إضافة user_presence counter في الـ Dashboard
+23. توضيح الفرق بين pricing_config و vehicle_types في الـ UI
 ```
 
 ---
 
-## ملاحظات ختامية
+## ملاحق تقنية
 
-**التأثير المتوقع للإصلاحات:**
+### A. الـ Enums المعرّفة في الـ DB
 
-* حذف المتغيرات الميتة لن يؤثر على شكل الموقع بالمرة — هي أصلاً مش بتُستخدم.
-* تغيير `--warning` هو التغيير الوحيد اللي هيأثر على شكل الموقع بشكل مرئي واضح — warning badges وwarning statuses هتاخد لون مختلف. ده تغيير مقصود ومطلوب.
-* بعد تغيير `--warning`، لازم تراجع أي مكان بيستخدم `bg-warning` أو `text-warning` أو `border-warning` أو `var(--warning)` في الـ TSX عشان تتأكد إن الشكل الجديد صح.
+```sql
+-- route_plan_status
+VALUES: draft | active | inactive | archived
 
-**الأهمية التصميمية:**
+-- route_waypoint_role
+VALUES: origin | stopover | destination
 
-نظام الـ warning/primary المتطابق ده بيخلق `semantic confusion` — يعني المستخدم والـ developer مش قادرين يفرقوا بين "ده action رئيسي" و"ده تحذير". أهم إصلاح في القائمة بالكامل هو تمييز `--warning` عن `--primary`.
+-- wallet_transaction_status
+VALUES: pending | completed | failed | reversed
+
+-- wallet_transaction_type
+VALUES: trip_earning | trip_payment | withdrawal | withdrawal_refund
+        top_up | refund | bonus | penalty | adjustment | coupon_subsidy
+
+-- withdrawal_method
+VALUES: bank_transfer | vodafone_cash | instapay | orange_money
+
+-- withdrawal_status
+VALUES: pending | approved | processing | completed | rejected | cancelled
+```
+
+### B. أكثر الجداول كتابة (Write Hotspots)
+
+```
+1. user_presence    — 110,344 writes (110,010 updates) — الـ Real-time Location
+2. spatial_ref_sys  — 8,500 inserts — PostGIS initialization
+3. drivers_profile  — 1,414 writes — تحديثات السائق
+4. driver_locations — 442 writes — تحديث الموقع
+5. trips            — 314 writes — عمليات الرحلات
+```
+
+### C. نموذج SQL للصيانة الدورية
+
+```sql
+-- تشغيله كل أسبوع عبر pg_cron (مفعّل على الـ DB)
+SELECT cron.schedule(
+  'weekly-vacuum-analyze',
+  '0 3 * * 0',  -- كل أحد الساعة 3 صبح
+  $$
+    VACUUM ANALYZE drivers_profile;
+    VACUUM ANALYZE trips;
+    VACUUM ANALYZE trip_offers;
+    VACUUM ANALYZE trip_route_waypoints;
+    VACUUM ANALYZE messages;
+    VACUUM ANALYZE users;
+  $$
+);
+```
+
+### D. نموذج `design-tokens.ts` الكامل للـ UI
+
+```typescript
+// src/lib/design-tokens.ts
+
+/* ─────────────────────────────────────────────────────────────────────────
+   OBSIDIAN AMBER — Shared Design Tokens
+   Single source of truth for colors, variants, and status mappings.
+   All values reference CSS variables defined in globals.css.
+───────────────────────────────────────────────────────────────────────── */
+
+export type ColorVariant =
+  | "primary"
+  | "info"
+  | "success"
+  | "warning"
+  | "error";
+
+export type BadgeVariant =
+  | ColorVariant
+  | "default"
+  | "purple"
+  | "cyan";
+
+// ── Color utility map — used by StatCard, KpiCard, Badge, etc. ──────────
+export const COLOR_MAP: Record<
+  ColorVariant,
+  { bg: string; border: string; text: string; var: string; rgb: string }
+> = {
+  primary: {
+    bg:     "bg-primary/10",
+    border: "border-primary/20",
+    text:   "text-primary",
+    var:    "var(--primary)",
+    rgb:    "var(--primary-rgb)",
+  },
+  info: {
+    bg:     "bg-info/10",
+    border: "border-info/20",
+    text:   "text-info",
+    var:    "var(--info)",
+    rgb:    "var(--info-rgb)",
+  },
+  success: {
+    bg:     "bg-success/10",
+    border: "border-success/20",
+    text:   "text-success",
+    var:    "var(--success)",
+    rgb:    "var(--success-rgb)",
+  },
+  warning: {
+    bg:     "bg-warning/10",
+    border: "border-warning/20",
+    text:   "text-warning",
+    var:    "var(--warning)",
+    rgb:    "var(--warning-rgb)",
+  },
+  error: {
+    bg:     "bg-error/10",
+    border: "border-error/20",
+    text:   "text-error",
+    var:    "var(--error)",
+    rgb:    "var(--error-rgb)",
+  },
+};
+
+// ── Trip / Offer status → color mapping ─────────────────────────────────
+export const STATUS_COLOR_MAP: Record<string, string> = {
+  completed:       "var(--success)",
+  accepted:        "var(--primary)",
+  driver_arriving: "var(--primary)",
+  in_progress:     "var(--primary)",
+  searching:       "var(--warning)",
+  pending:         "var(--warning)",
+  cancelled:       "var(--error)",
+  rejected:        "var(--error)",
+  expired:         "var(--text-disabled)",
+};
+
+// ── Trip status → Tailwind pill class (used by getStatusColor in utils) ─
+export const STATUS_PILL_MAP: Record<string, string> = {
+  searching:       "status-pill-warning border",
+  accepted:        "status-pill-primary border",
+  driver_arriving: "status-pill-primary border",
+  in_progress:     "status-pill-primary border",
+  completed:       "status-pill-success border",
+  cancelled:       "status-pill-error border",
+  pending:         "status-pill-warning border",
+  rejected:        "status-pill-error border",
+  expired:         "status-pill-muted border",
+};
+
+// ── Recharts tooltip style — consistent across all charts ───────────────
+export const TOOLTIP_STYLE: React.CSSProperties = {
+  backgroundColor: "var(--surface-elevated)",
+  border:          "1px solid var(--divider)",
+  borderRadius:    "12px",
+  color:           "var(--text-primary)",
+  boxShadow:       "var(--shadow-lg)",
+  backdropFilter:  "blur(16px)",
+  fontSize:        "13px",
+  padding:         "10px 14px",
+};
+
+// ── Pie chart fallback colors ────────────────────────────────────────────
+export const PIE_FALLBACK_COLORS: string[] = [
+  "var(--primary)",
+  "var(--success)",
+  "var(--warning)",
+  "var(--error)",
+  "var(--primary-light)",
+];
+```
+
+---
+
+*تم إعداد هذا التقرير بناءً على تحليل شامل لـ 3,007 صف من بيانات X-Ray Schema + 186 ملف كود في الـ src.*

@@ -26,9 +26,9 @@ function TypeBadge({ value }: { value: unknown }) {
   const cfg = {
     boolean:
       typeof value === "boolean" && value
-        ? { lbl: "مفعّل",   cls: "bg-success/10 text-success-dark dark:text-success border-success/20" }
+        ? { lbl: "مفعّل",   cls: "bg-success/10 text-success dark:text-success border-success/20" }
         : { lbl: "معطّل",   cls: "bg-error/10 text-error dark:text-error border-error/20" },
-    number:   { lbl: "رقم",         cls: "bg-info/10 text-info-dark dark:text-info border-info/20" },
+    number:   { lbl: "رقم",         cls: "bg-info/10 text-info dark:text-info border-info/20" },
     object:   { lbl: `كائن · ${Object.keys(value as object).length}`, cls: "bg-primary/10 text-primary border-primary/20" },
     string:   { lbl: "نص",         cls: "bg-surface-elevated text-text-disabled border-divider" },
   }[t];
@@ -111,7 +111,7 @@ function ConfigDrawer({
         
         {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-error/10 border border-error/20 text-error-dark dark:text-error text-sm font-bold">
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-error/10 border border-error/20 text-error dark:text-error text-sm font-bold">
             <AlertCircle size={16} className="flex-shrink-0" />
             <p>{error}</p>
           </div>
@@ -276,7 +276,7 @@ export function AppConfigRow({ config }: { config: any }) {
               <TypeBadge value={rawValue} />
               
               {savedFlash && (
-                <span className="flex items-center gap-1 text-xs text-success-dark dark:text-success font-bold bg-success/10 px-2 py-0.5 rounded-full animate-in fade-in zoom-in duration-300">
+                <span className="flex items-center gap-1 text-xs text-success dark:text-success font-bold bg-success/10 px-2 py-0.5 rounded-full animate-in fade-in zoom-in duration-300">
                   <Check size={12} /> تم الحفظ بنجاح
                 </span>
               )}

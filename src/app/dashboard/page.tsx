@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
     supabase.from("admin_dashboard").select("*").single(),
     supabase.from("admin_recent_trips").select("*").limit(10),
-    supabase.from("trips").select("id, status, price, vehicle_type"),
+    supabase.from("trips").select("id, status, price, vehicle_type").order("created_at", { ascending: false }).limit(2000),
   ]);
 
   const dashboard = dashboardRes.data;

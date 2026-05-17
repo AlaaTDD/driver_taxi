@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { updateRoutePlanStatus } from "./actions";
 import { Navigation, MapPin, AlertCircle, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function RoutePlansClient({
   initialData,
@@ -22,13 +23,14 @@ export default function RoutePlansClient({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [statusLoading, setStatusLoading] = useState<string | null>(null);
+  const t = useTranslations("routePlans");
 
   if (error) {
     return (
       <div className="rounded-xl border border-error/20 bg-error/5 p-5 flex items-start gap-3">
         <AlertCircle size={20} className="text-error mt-0.5" />
         <div>
-          <h3 className="text-sm font-bold text-error">حدث خطأ أثناء جلب المسارات</h3>
+          <h3 className="text-sm font-bold text-error">{t("errorFetch")}</h3>
           <p className="text-xs text-error/80 mt-1">{error}</p>
         </div>
       </div>
@@ -63,10 +65,10 @@ export default function RoutePlansClient({
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "active": return "نشط";
-      case "draft": return "مسودة";
-      case "inactive": return "غير نشط";
-      case "archived": return "مؤرشف";
+      case "active": return t("status.active");
+      case "draft": return t("status.draft");
+      case "inactive": return t("status.inactive");
+      case "archived": return t("status.archived");
       default: return status;
     }
   };
@@ -79,9 +81,9 @@ export default function RoutePlansClient({
             <Navigation size={16} className="text-primary" />
           </div>
           <div>
-            <h3 className="text-[15px] font-black text-text-primary leading-none">قائمة المسارات</h3>
+            <h3 className="text-[15px] font-black text-text-primary leading-none">{t("title")}</h3>
             <p className="mt-1 text-[12px] font-medium text-text-tertiary">
-              إجمالي {totalCount} مسار
+              {t("totalCount", { count: totalCount })}
             </p>
           </div>
         </div>
@@ -98,11 +100,11 @@ export default function RoutePlansClient({
               router.push(`${pathname}?${params.toString()}`);
             }}
           >
-            <option value="">كل الحالات</option>
-            <option value="active">نشط</option>
-            <option value="draft">مسودة</option>
-            <option value="inactive">غير نشط</option>
-            <option value="archived">مؤرشف</option>
+            <option value="">{t("allStatuses")}</option>
+            <option value="active">{t("status.active")}</option>
+            <option value="draft">{t("status.draft")}</option>
+            <option value="inactive">{t("status.inactive")}</option>
+            <option value="archived">{t("status.archived")}</option>
           </select>
         </div>
       </div>
@@ -113,8 +115,8 @@ export default function RoutePlansClient({
             <Navigation size={24} className="text-text-disabled" />
           </div>
           <div>
-            <p className="text-sm font-bold text-text-secondary">لا توجد مسارات لعرضها</p>
-            <p className="text-text-tertiary text-xs mt-1">لم يتم العثور على أي مسارات تطابق البحث</p>
+            <p className="text-sm font-bold text-text-secondary">{t("noData")}</p>
+            <p className="text-text-tertiary text-xs mt-1">{t("noDataDesc")}</p>
           </div>
         </div>
       ) : (
@@ -122,18 +124,18 @@ export default function RoutePlansClient({
           <table className="w-full text-right">
             <thead className="bg-surface-elevated border-b border-divider">
               <tr>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">التعريف</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">الحالة</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">السائق</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">المسافة / الوقت</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">النقاط</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">تاريخ الإنشاء</th>
-                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider text-center">الإجراءات</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.identifier")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.status")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.driver")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.distanceTime")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.waypoints")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider">{t("table.createdAt")}</th>
+                <th className="px-5 py-3 text-[11px] font-bold text-text-tertiary uppercase tracking-wider text-center">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-divider">
               {initialData.map((plan) => {
-                const driverName = plan.trips?.users?.name || "غير معروف";
+                const driverName = plan.trips?.users?.name || t("unknown");
                 const waypointsCount = plan.trip_route_waypoints?.length || 0;
                 
                 return (
@@ -141,11 +143,11 @@ export default function RoutePlansClient({
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <span className="text-[13px] font-black text-text-primary">
-                          {plan.label || `مسار ${plan.id.substring(0, 8)}`}
+                          {plan.label || t("routeId", { id: plan.id.substring(0, 8) })}
                         </span>
                         {plan.is_system_generated && (
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary/10 text-primary border border-primary/20 uppercase">
-                            تلقائي
+                            {t("systemGenerated")}
                           </span>
                         )}
                       </div>
@@ -160,15 +162,15 @@ export default function RoutePlansClient({
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5 text-[12px] font-semibold text-text-secondary">
-                        <span className="text-primary">{plan.total_distance_km} كم</span>
+                        <span className="text-primary">{plan.total_distance_km} {t("km")}</span>
                         <span className="text-divider-strong">•</span>
-                        <span>{plan.total_duration_min} دقيقة</span>
+                        <span>{plan.total_duration_min} {t("minutes")}</span>
                       </div>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5 text-[12px] font-semibold text-text-secondary">
                         <MapPin size={13} className="text-text-tertiary" />
-                        <span>{waypointsCount} نقطة</span>
+                        <span>{waypointsCount} {t("point")}</span>
                       </div>
                     </td>
                     <td className="px-5 py-4">
@@ -185,10 +187,10 @@ export default function RoutePlansClient({
                           value={plan.status}
                           onChange={(e) => handleStatusChange(plan.id, e.target.value as any)}
                         >
-                          <option value="active">تفعيل</option>
-                          <option value="draft">مسودة</option>
-                          <option value="inactive">تعطيل</option>
-                          <option value="archived">أرشيف</option>
+                          <option value="active">{t("status.active")}</option>
+                          <option value="draft">{t("status.draft")}</option>
+                          <option value="inactive">{t("status.inactive")}</option>
+                          <option value="archived">{t("status.archived")}</option>
                         </select>
                       </div>
                     </td>

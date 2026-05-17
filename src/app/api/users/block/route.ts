@@ -21,13 +21,21 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
 
     if (action === "block") {
-      const { error } = await supabase.rpc("block_user", {
-        p_user_id: userId,
-        p_reason: reason || null,
-      });
+      // Bypassing buggy block_user RPC to correctly save blocked_reason and blocked_at
+      const { error } = await supabase.from("users").update({
+        is_blocked: true,
+        blocked_reason: reason || null,
+        blocked_at: new Date().toISOString(),
+      }).eq("id", userId);
+      
       if (error) throw error;
     } else if (action === "unblock") {
-      const { error } = await supabase.rpc("unblock_user", { p_user_id: userId });
+      const { error } = await supabase.from("users").update({
+        is_blocked: false,
+        blocked_reason: null,
+        blocked_at: null,
+      }).eq("id", userId);
+      
       if (error) throw error;
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });

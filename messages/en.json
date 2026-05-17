@@ -278,7 +278,6 @@
     "submit": "Sign In",
     "error": "Invalid email or password"
   },
-
   "dashboard": {
     "overview": "Overview",
     "welcome": "Welcome to Taxi Dashboard",
@@ -877,5 +876,34 @@
     "revokeVerification": "Revoke Verification",
     "makeSupervisor": "Make Supervisor",
     "removeSupervisor": "Remove Supervisor"
+  },
+  "routePlans": {
+    "title": "Route Plans",
+    "totalCount": "Total {count} routes",
+    "errorFetch": "Error fetching route plans",
+    "allStatuses": "All Statuses",
+    "status": {
+      "active": "Active",
+      "draft": "Draft",
+      "inactive": "Inactive",
+      "archived": "Archived"
+    },
+    "noData": "No route plans to display",
+    "noDataDesc": "No route plans found matching your search",
+    "table": {
+      "identifier": "Identifier",
+      "status": "Status",
+      "driver": "Driver",
+      "distanceTime": "Distance / Time",
+      "waypoints": "Waypoints",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "unknown": "Unknown",
+    "systemGenerated": "Auto",
+    "routeId": "Route {id}",
+    "km": "km",
+    "minutes": "min",
+    "point": "pts"
   }
 }

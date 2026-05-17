@@ -278,7 +278,6 @@
     "submit": "دخول",
     "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
   },
-
   "dashboard": {
     "overview": "نظرة عامة",
     "welcome": "مرحباً بك في لوحة تحكم تاكسي",
@@ -877,5 +876,34 @@
     "revokeVerification": "إلغاء الاعتماد",
     "makeSupervisor": "تعيين مشرف",
     "removeSupervisor": "إلغاء مشرف"
+  },
+  "routePlans": {
+    "title": "قائمة المسارات",
+    "totalCount": "إجمالي {count} مسار",
+    "errorFetch": "حدث خطأ أثناء جلب المسارات",
+    "allStatuses": "كل الحالات",
+    "status": {
+      "active": "نشط",
+      "draft": "مسودة",
+      "inactive": "غير نشط",
+      "archived": "مؤرشف"
+    },
+    "noData": "لا توجد مسارات لعرضها",
+    "noDataDesc": "لم يتم العثور على أي مسارات تطابق البحث",
+    "table": {
+      "identifier": "التعريف",
+      "status": "الحالة",
+      "driver": "السائق",
+      "distanceTime": "المسافة / الوقت",
+      "waypoints": "النقاط",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "unknown": "غير معروف",
+    "systemGenerated": "تلقائي",
+    "routeId": "مسار {id}",
+    "km": "كم",
+    "minutes": "دقيقة",
+    "point": "نقطة"
   }
 }
