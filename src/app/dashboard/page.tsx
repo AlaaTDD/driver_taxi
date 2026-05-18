@@ -3,7 +3,7 @@ import { LocalTimeDisplay } from "@/components/local-time-display";
 import { StatCard } from "@/components/stat-card";
 import { TripsStatusChart, RevenueChart } from "@/components/charts";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import {
@@ -26,6 +26,7 @@ import { KpiCard } from "@/components/kpi-card";
 
 export default async function DashboardPage() {
   const t = await getTranslations();
+  const locale = await getLocale();
   const supabase = createAdminClient();
 
   const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
@@ -63,17 +64,23 @@ export default async function DashboardPage() {
     status: name,
   }));
 
-  const carRevenue = trips
-    .filter((t) => t.vehicle_type === "car" && t.status === "completed")
-    .reduce((s, t) => s + (Number(t.price) || 0), 0);
-  const motoRevenue = trips
-    .filter((t) => t.vehicle_type === "motorcycle" && t.status === "completed")
-    .reduce((s, t) => s + (Number(t.price) || 0), 0);
+  const revenueByType: Record<string, number> = {};
+  trips
+    .filter((trip) => trip.status === "completed")
+    .forEach((trip) => {
+      const vehicleType = trip.vehicle_type || t("common.vehicle");
+      revenueByType[vehicleType] = (revenueByType[vehicleType] || 0) + (Number(trip.price) || 0);
+    });
 
-  const revenueChartData = [
-    { name: t("dashboard.charts.car"), revenue: carRevenue },
-    { name: t("dashboard.charts.motorcycle"), revenue: motoRevenue },
-  ];
+  const vehicleTypeLabels: Record<string, string> = {
+    car: t("dashboard.charts.car"),
+    motorcycle: t("dashboard.charts.motorcycle"),
+  };
+
+  const revenueChartData = Object.entries(revenueByType).map(([name, revenue]) => ({
+    name: vehicleTypeLabels[name] || name,
+    revenue,
+  }));
 
   const completionRate = totalTrips > 0 ? Math.round((completedTrips / totalTrips) * 100) : 0;
   const cancelledTrips = trips.filter((t) => t.status === "cancelled").length;
@@ -141,12 +148,10 @@ export default async function DashboardPage() {
           {/* Card 4 (leftmost in RTL): إجمالي الإيرادات */}
           <StatCard
             title={t("dashboard.stats.totalRevenue")}
-            value={formatCurrency(totalRevenue)}
+            value={formatCurrency(totalRevenue, "EGP", locale)}
             icon={<DollarSign size={24} strokeWidth={2.5} />}
             colorVariant="primary"
             showSparkline
-            trendPercent="12.5%"
-            trendUp={true}
           />
         </div>
 
@@ -268,7 +273,7 @@ export default async function DashboardPage() {
                     <div className="flex flex-col items-end gap-1.5 w-full">
                       <div className="flex items-center gap-2 justify-end w-full">
                         <span className="text-[15px] font-black num tracking-tight text-text-primary">
-                          {formatCurrency(Number(trip.price))}
+                          {formatCurrency(Number(trip.price), "EGP", locale)}
                         </span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
                           {getStatusLabel(trip.status, t)}
@@ -276,7 +281,7 @@ export default async function DashboardPage() {
                       </div>
                       <div className="flex items-center gap-1.5 text-text-tertiary group-hover:text-text-secondary transition-colors">
                         <Clock size={12} />
-                        <span className="text-[11px] font-bold">{formatDate(trip.created_at)}</span>
+                        <span className="text-[11px] font-bold">{formatDate(trip.created_at, locale)}</span>
                       </div>
                     </div>
 

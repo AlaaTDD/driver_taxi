@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       // Bypassing buggy block_user RPC to correctly save blocked_reason and blocked_at
       const { error } = await supabase.from("users").update({
         is_blocked: true,
+        is_active: false,
         blocked_reason: reason || null,
         blocked_at: new Date().toISOString(),
       }).eq("id", userId);
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     } else if (action === "unblock") {
       const { error } = await supabase.from("users").update({
         is_blocked: false,
+        is_active: true,
         blocked_reason: null,
         blocked_at: null,
       }).eq("id", userId);

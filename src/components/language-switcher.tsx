@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { Globe } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 
 
@@ -9,13 +10,14 @@ import { useRef, useEffect, useState } from "react";
 export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean }) {
   const locale = useLocale();
   const t = useTranslations("common");
+  const router = useRouter();
   const pillRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
 
   const setLanguage = (newLocale: string) => {
     if (newLocale === locale) return;
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
-    window.location.reload();
+    router.refresh();
   };
 
   const isAr = locale === "ar";

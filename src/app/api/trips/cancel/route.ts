@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
-    const { error } = await supabase
+    const { data: cancelledTrip, error } = await supabase
       .from("trips")
       .update({
         status: "cancelled",
@@ -34,14 +34,23 @@ export async function POST(req: Request) {
         cancelled_at: new Date().toISOString(),
       })
       .eq("id", trip_id)
-      .in("status", ["searching", "accepted", "in_progress"]);
+      .in("status", ["searching", "accepted", "in_progress"])
+      .select("id")
+      .single();
 
     if (error) {
+      if (error.code === "PGRST116") {
+        const message = "الرحلة غير موجودة أو لا يمكن إلغاؤها";
+        if (contentType.includes("application/json")) {
+          return NextResponse.json({ error: message }, { status: 404 });
+        }
+        return NextResponse.redirect(new URL(`/dashboard/trips/${trip_id}?error=not_cancellable`, req.url));
+      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     if (contentType.includes("application/json")) {
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, id: cancelledTrip.id });
     } else {
       return NextResponse.redirect(new URL(`/dashboard/trips/${trip_id}`, req.url));
     }

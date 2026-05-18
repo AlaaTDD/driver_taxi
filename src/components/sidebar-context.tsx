@@ -20,7 +20,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const frame = requestAnimationFrame(() => {
       try {
         const stored = localStorage.getItem("sidebar-collapsed");
-        if (!cancelled && stored !== null) setCollapsed(stored === "true");
+        if (!cancelled && stored !== null && window.matchMedia("(min-width: 1024px)").matches) {
+          setCollapsed(stored === "true");
+        }
       } catch { /* SSR / private mode */ }
     });
 
@@ -28,6 +30,17 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    const handleChange = () => {
+      if (media.matches) setCollapsed(false);
+    };
+
+    handleChange();
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
   }, []);
 
   const toggle = useCallback(() => {

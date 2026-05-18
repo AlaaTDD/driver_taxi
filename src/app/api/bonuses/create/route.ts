@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (guard instanceof Response) return guard;
 
   try {
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const body = await req.json();
     const {
       name,
@@ -21,19 +21,31 @@ export async function POST(req: Request) {
       valid_until,
     } = body;
 
-    if (!name || !trigger_type || !threshold || !bonus_amount) {
+    const thresholdNumber = Number(threshold);
+    const bonusAmountNumber = Number(bonus_amount);
+    const validTriggerTypes = new Set(["daily_trips", "weekly_trips", "rating_threshold"]);
+
+    if (
+      typeof name !== "string" ||
+      typeof trigger_type !== "string" ||
+      !validTriggerTypes.has(trigger_type) ||
+      !Number.isFinite(thresholdNumber) ||
+      thresholdNumber <= 0 ||
+      !Number.isFinite(bonusAmountNumber) ||
+      bonusAmountNumber <= 0
+    ) {
       return NextResponse.json(
-        { error: "name, trigger_type, threshold, and bonus_amount are required" },
+        { error: "بيانات قاعدة المكافأة غير صالحة" },
         { status: 400 }
       );
     }
 
-    const insertData: Record<string, any> = {
-      name,
+    const insertData: Record<string, unknown> = {
+      name: name.trim(),
       name_ar: name_ar || name,
       trigger_type,
-      threshold,
-      bonus_amount,
+      threshold: thresholdNumber,
+      bonus_amount: bonusAmountNumber,
       is_active: is_active ?? true,
     };
     if (vehicle_types?.length) insertData.vehicle_types = vehicle_types;
@@ -51,7 +63,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ data });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "حدث خطأ غير متوقع";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

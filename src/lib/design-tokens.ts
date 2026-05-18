@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 export type ColorVariant = "primary" | "info" | "success" | "warning" | "error";
 
 export type BadgeVariant = ColorVariant | "default" | "purple" | "cyan";
@@ -79,7 +81,7 @@ export const STATUS_LABELS: Record<string, string> = {
   expired: "منتهية",
 };
 
-export const TOOLTIP_STYLE: React.CSSProperties = {
+export const TOOLTIP_STYLE: CSSProperties = {
   backgroundColor: "var(--surface-elevated)",
   border: "1px solid var(--divider)",
   borderRadius: "12px",

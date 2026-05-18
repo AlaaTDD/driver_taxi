@@ -32,7 +32,6 @@ export default function LoginPage() {
         return;
       }
       router.push("/dashboard");
-      router.refresh();
     } catch {
       setError(t("errors.generic"));
       setLoading(false);
@@ -43,13 +42,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-background">
-      
-      <div className="absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(var(--info-rgb),0.08) 0%, transparent 70%)", animation: "float 12s ease-in-out infinite" }} />
-      <div className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(var(--color-purple-rgb),0.06) 0%, transparent 70%)", animation: "float 10s ease-in-out 4s infinite" }} />
-      <div className="absolute top-1/2 left-1/4 w-[400px] h-[400px] rounded-full pointer-events-none -translate-y-1/2 opacity-60 dark:opacity-100"
-        style={{ background: "radial-gradient(circle, rgba(var(--color-cyan-rgb),0.04) 0%, transparent 70%)", animation: "float 14s ease-in-out 2s infinite" }} />
+      <div className="login-backdrop absolute inset-0 pointer-events-none" />
 
       
       <div className="absolute top-4 right-4 left-4 flex justify-between items-center z-20">
@@ -89,7 +82,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="admin@taxi.com"
+                placeholder={t("login.emailPlaceholder")}
                 className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 bg-surface-elevated border border-divider text-text-primary placeholder:text-text-disabled focus:border-primary focus:ring-2 focus:ring-primary/10"
               />
             </div>
@@ -157,13 +150,13 @@ export default function LoginPage() {
           
           <div className="flex items-center justify-center gap-1.5 mt-4">
             <Shield size={11} className="text-text-tertiary" />
-            <span className="text-[11px] text-text-tertiary">{isRTL ? "بيانات مشفرة وآمنة" : "Encrypted & Secure"}</span>
+            <span className="text-[11px] text-text-tertiary">{t("login.secureNote")}</span>
           </div>
         </div>
 
         
         <p className="text-center text-text-disabled text-[11px] mt-6 tracking-wider">
-          {isRTL ? `نظام إدارة تاكسي © ${new Date().getFullYear()}` : `Taxi Admin System © ${new Date().getFullYear()}`}
+          {t("login.copyright", { year: new Date().getFullYear() })}
         </p>
       </div>
     </div>

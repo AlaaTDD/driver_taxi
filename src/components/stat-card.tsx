@@ -30,6 +30,7 @@ export function StatCard({
 }: StatCardProps) {
   const colors = COLOR_MAP[colorVariant];
   const sparkColor = colors.var;
+  const gradientId = `spark-grad-${title.replace(/[^\w-]+/g, "-")}`;
 
   return (
     <div
@@ -73,7 +74,7 @@ export function StatCard({
             {showSparkline && (
               <svg className="mt-3 w-full h-[32px]" viewBox="0 0 120 32" fill="none" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id={`spark-grad-${title}`} x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={sparkColor} stopOpacity="0.4" />
                     <stop offset="100%" stopColor={sparkColor} stopOpacity="0.01" />
                   </linearGradient>
@@ -90,7 +91,7 @@ export function StatCard({
                 />
                 <path
                   d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4 L120 32 L0 32 Z"
-                  fill={`url(#spark-grad-${title})`}
+                  fill={`url(#${gradientId})`}
                 />
               </svg>
             )}

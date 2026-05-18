@@ -47,6 +47,14 @@ const EMPTY_FORM: CouponData = {
   description_en: "",
 };
 
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">
+      {children}
+    </label>
+  );
+}
+
 export default function CouponsClient({ editData }: { editData?: CouponData & { id: string } }) {
   const router = useRouter();
   const t = useTranslations();
@@ -116,12 +124,6 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
       setLoading(false);
     }
   };
-
-  const Label = ({ children }: { children: React.ReactNode }) => (
-    <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1.5">
-      {children}
-    </label>
-  );
 
   return (
     <>

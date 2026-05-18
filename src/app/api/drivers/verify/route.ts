@@ -16,13 +16,20 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
-  const { error } = await supabase
+  const [{ error: profileError }, { error: userError }] = await Promise.all([
+    supabase
     .from("drivers_profile")
     .update({ is_verified: true })
-    .eq("id", driverId);
+      .eq("id", driverId),
+    supabase
+      .from("users")
+      .update({ is_active: true })
+      .eq("id", driverId),
+  ]);
 
-  if (error) {
-    console.error("Verify driver error:", error);
+  if (profileError || userError) {
+    console.error("Verify driver error:", profileError || userError);
+    return NextResponse.redirect(new URL("/dashboard/drivers?error=verify_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));

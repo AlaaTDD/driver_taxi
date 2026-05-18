@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Approve withdrawal error:", error);
+    return NextResponse.redirect(new URL("/dashboard/withdrawals?error=approve_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/withdrawals", request.url));

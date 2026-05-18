@@ -14,31 +14,17 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
-    
-    const { data: coupon, error: couponError } = await supabase
-      .from("coupons")
-      .select("id, is_active, max_uses, used_count")
-      .eq("id", coupon_id)
-      .single();
-
-    if (couponError || !coupon) {
-      return NextResponse.json({ error: "الكوبون غير موجود" }, { status: 404 });
-    }
-    if (!coupon.is_active) {
-      return NextResponse.json({ error: "الكوبون معطل" }, { status: 400 });
-    }
-    if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
-      return NextResponse.json({ error: "الكوبون وصل الحد الأقصى للاستخدام" }, { status: 400 });
-    }
-
-    
-    const { error } = await supabase
-      .from("user_coupons")
-      .insert({ user_id, coupon_id });
+    const { error } = await supabase.rpc("admin_assign_user_coupon", {
+      p_user_id: user_id,
+      p_coupon_id: coupon_id,
+    });
 
     if (error) {
       if (error.code === "23505") {
         return NextResponse.json({ error: "الكوبون معين بالفعل لهذا المستخدم" }, { status: 409 });
+      }
+      if (error.code === "42883") {
+        return NextResponse.json({ error: "دالة تعيين الكوبون الآمنة غير مثبتة" }, { status: 500 });
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

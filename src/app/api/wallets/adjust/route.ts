@@ -2,6 +2,10 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
+const WALLET_TYPES = new Set(["driver", "user"]);
+const TX_TYPES = new Set(["bonus", "penalty", "adjustment"]);
+const MAX_MANUAL_ADJUSTMENT = 100_000;
+
 export async function POST(request: Request) {
   // ── Auth Guard ──────────────────────────────────────────────────────────────
   const guard = await requireAdmin();
@@ -14,45 +18,33 @@ export async function POST(request: Request) {
   const description = (formData.get("description") as string) || "تعديل يدوي من الأدمن";
   const txType = (formData.get("type") as string) || "adjustment"; // bonus, penalty, adjustment
 
-  if (!walletId || !walletType || !amount || isNaN(amount)) {
+  if (
+    !walletId ||
+    !WALLET_TYPES.has(walletType) ||
+    !TX_TYPES.has(txType) ||
+    !Number.isFinite(amount) ||
+    amount === 0 ||
+    Math.abs(amount) > MAX_MANUAL_ADJUSTMENT
+  ) {
     return NextResponse.redirect(new URL("/dashboard/wallets?error=invalid_params", request.url));
   }
 
   const supabase = createAdminClient();
-  const table = walletType === "driver" ? "driver_wallets" : "user_wallets";
 
-  // Get current balance
-  const { data: wallet } = await supabase.from(table).select("balance").eq("id", walletId).single();
-
-  if (!wallet) {
-    return NextResponse.redirect(new URL("/dashboard/wallets?error=wallet_not_found", request.url));
-  }
-
-  const currentBalance = Number(wallet.balance);
-  const newBalance = currentBalance + amount;
-
-  // Update wallet balance
-  const { error: updateError } = await supabase
-    .from(table)
-    .update({ balance: newBalance, updated_at: new Date().toISOString() })
-    .eq("id", walletId);
+  const { error: updateError } = await supabase.rpc("admin_wallet_adjust", {
+    p_wallet_id: walletId,
+    p_wallet_type: walletType,
+    p_amount: amount,
+    p_tx_type: txType,
+    p_description: `${description} (بواسطة: ${guard.email})`,
+    p_admin_email: guard.email,
+  });
 
   if (updateError) {
     console.error("Wallet adjust error:", updateError);
-    return NextResponse.redirect(new URL("/dashboard/wallets?error=update_failed", request.url));
+    const errorCode = updateError.code === "42883" ? "wallet_rpc_missing" : "update_failed";
+    return NextResponse.redirect(new URL(`/dashboard/wallets?error=${errorCode}`, request.url));
   }
-
-  // Create transaction record
-  await supabase.from("wallet_transactions").insert({
-    wallet_id: walletId,
-    wallet_type: walletType,
-    type: txType,
-    amount,
-    balance_before: currentBalance,
-    balance_after: newBalance,
-    description: `${description} (بواسطة: ${guard.email})`,
-    status: "completed",
-  });
 
   return NextResponse.redirect(new URL(`/dashboard/wallets?tab=${walletType}_wallets`, request.url));
 }

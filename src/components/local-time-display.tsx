@@ -48,8 +48,16 @@ export function LocalTimeDisplay() {
     };
 
     updateTime();
-    const interval = setInterval(updateTime, 60000); // update every minute
-    return () => clearInterval(interval);
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const timeout = setTimeout(() => {
+      updateTime();
+      interval = setInterval(updateTime, 60000);
+    }, 60000 - (Date.now() % 60000));
+
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
   }, [locale]);
 
   if (!dateStr) {

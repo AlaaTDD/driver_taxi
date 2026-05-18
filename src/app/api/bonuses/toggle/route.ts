@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (guard instanceof Response) return guard;
 
   try {
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const { id, is_active } = await req.json();
 
     if (!id) {
@@ -24,7 +24,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "حدث خطأ غير متوقع";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

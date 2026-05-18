@@ -2,25 +2,31 @@
 
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Children } from "react";
 
 interface DataTableProps {
   headers: { label: string; key: string }[];
   children: React.ReactNode;
   emptyMessage?: string;
+  emptyDescription?: string;
+  caption?: string;
 }
 
-export function DataTable({ headers, children, emptyMessage = "لا توجد بيانات" }: DataTableProps) {
+export function DataTable({ headers, children, emptyMessage, emptyDescription, caption }: DataTableProps) {
+  const t = useTranslations("common");
   const hasRows = Children.count(children) > 0;
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
+        {caption && <caption className="sr-only">{caption}</caption>}
         <thead>
           <tr className="dash-table-head">
             {headers.map((h) => (
               <th
                 key={h.key}
+                scope="col"
                 className="text-right py-3.5 px-4 text-[11px] font-bold uppercase tracking-widest whitespace-nowrap text-text-tertiary"
               >
                 {h.label}
@@ -38,8 +44,8 @@ export function DataTable({ headers, children, emptyMessage = "لا توجد ب�
             </svg>
           </div>
           <div className="text-center">
-            <p className="text-text-secondary font-semibold">{emptyMessage}</p>
-            <p className="text-text-tertiary text-sm mt-1">لا توجد بيانات للعرض حالياً</p>
+            <p className="text-text-secondary font-semibold">{emptyMessage ?? t("noData")}</p>
+            <p className="text-text-tertiary text-sm mt-1">{emptyDescription ?? t("tryChangeFilters")}</p>
           </div>
         </div>
       )}
@@ -65,6 +71,8 @@ export function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
+  const t = useTranslations("common");
+
   if (totalPages <= 1) return null;
 
   const pages = getPageNumbers(currentPage, totalPages);
@@ -74,6 +82,7 @@ export function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
+        aria-label={t("previous")}
         className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary disabled:opacity-30 hover:bg-surface-elevated hover:text-text-primary transition-all"
       >
         <ChevronRight size={14} />
@@ -87,6 +96,7 @@ export function Pagination({
           <button
             key={page}
             onClick={() => onPageChange(page as number)}
+            aria-current={page === currentPage ? "page" : undefined}
             className={cn(
               "w-9 h-9 rounded-xl text-[13px] font-bold flex items-center justify-center transition-all",
               page === currentPage
@@ -101,6 +111,7 @@ export function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
+        aria-label={t("next")}
         className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary disabled:opacity-30 hover:bg-surface-elevated hover:text-text-primary transition-all"
       >
         <ChevronLeft size={14} />

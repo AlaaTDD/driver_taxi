@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const rating_id = formData.get("rating_id") as string;
 
     if (!rating_id) {
-      return NextResponse.json({ error: "Rating ID is required" }, { status: 400 });
+      return NextResponse.json({ error: "معرف التقييم مطلوب" }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Delete rating error:", error);
     return NextResponse.json(
-      { error: "Failed to delete rating" },
+      { error: "فشل حذف التقييم" },
       { status: 500 }
     );
   }

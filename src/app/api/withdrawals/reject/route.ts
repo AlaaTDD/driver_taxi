@@ -25,6 +25,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Reject withdrawal error:", error);
+    return NextResponse.redirect(new URL("/dashboard/withdrawals?error=reject_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/withdrawals", request.url));

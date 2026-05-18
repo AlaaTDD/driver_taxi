@@ -13,7 +13,8 @@ import {
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { PIE_FALLBACK_COLORS, STATUS_COLOR_MAP, TOOLTIP_STYLE } from "@/lib/design-tokens";
 
 interface StatusData {
   name: string;
@@ -26,39 +27,8 @@ interface RevenueData {
   revenue: number;
 }
 
-const STATUS_COLOR_MAP: Record<string, string> = {
-  completed: "var(--success)",
-  accepted: "var(--primary)",
-  driver_arriving: "var(--primary)",
-  in_progress: "var(--primary)",
-  searching: "var(--warning)",
-  pending: "var(--warning)",
-  cancelled: "var(--error)",
-  rejected: "var(--error)",
-  expired: "var(--text-disabled)",
-};
-
-const PIE_FALLBACK = [
-  "var(--primary)",
-  "var(--success)",
-  "var(--warning)",
-  "var(--error)",
-  "var(--primary-light)",
-];
-
-const TOOLTIP_STYLE = {
-  backgroundColor: "var(--surface-elevated)",
-  border: "1px solid var(--divider)",
-  borderRadius: "12px",
-  color: "var(--text-primary)",
-  boxShadow: "var(--shadow-lg)",
-  backdropFilter: "blur(16px)",
-  fontSize: "13px",
-  padding: "10px 14px",
-};
-
 const statusTone = (status: string, index: number) =>
-  STATUS_COLOR_MAP[status] || PIE_FALLBACK[index % PIE_FALLBACK.length];
+  STATUS_COLOR_MAP[status] || PIE_FALLBACK_COLORS[index % PIE_FALLBACK_COLORS.length];
 
 function useChartSize() {
   const ref = useRef<HTMLDivElement>(null);
@@ -67,7 +37,10 @@ function useChartSize() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let timeout: ReturnType<typeof setTimeout>;
     const ro = new ResizeObserver((entries) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
       for (const entry of entries) {
         const cr = entry.contentRect;
         const newWidth = Math.floor(cr.width);
@@ -77,9 +50,13 @@ function useChartSize() {
           return { width: newWidth, height: newHeight };
         });
       }
+      }, 80);
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      clearTimeout(timeout);
+      ro.disconnect();
+    };
   }, []);
 
   return { ref, ...size };
@@ -131,7 +108,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
               {/* Center percentage text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span className="text-[28px] font-black text-text-primary num leading-none">{maxPercent}%</span>
-                <span className="text-[10px] text-text-tertiary mt-1 font-medium">إجمالي الرحلات</span>
+                <span className="text-[10px] text-text-tertiary mt-1 font-medium">{t("dashboard.stats.totalTrips")}</span>
               </div>
             </>
           ) : (
@@ -142,8 +119,8 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
         {/* Legend on the right */}
         <div className="flex-1 min-w-0 space-y-1">
           <div className="mb-3">
-            <p className="text-[11px] text-text-tertiary font-medium">إجمالي الرحلات</p>
-            <p className="text-[18px] font-black text-primary num">{total} <span className="text-[12px] text-text-tertiary font-medium">رحلة إجمالاً</span></p>
+            <p className="text-[11px] text-text-tertiary font-medium">{t("dashboard.stats.totalTrips")}</p>
+            <p className="text-[18px] font-black text-primary num">{total} <span className="text-[12px] text-text-tertiary font-medium">{t("dashboard.charts.totalTrips")}</span></p>
           </div>
           {data.map((entry, index) => (
             <div key={entry.name} className="flex items-center gap-2.5 py-1">
@@ -157,7 +134,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
                 <span className="text-[12px] font-semibold text-text-primary">{entry.name}</span>
               </div>
               <span className="text-[11px] text-text-tertiary font-medium num">
-                {entry.value} ({total > 0 ? Math.round((entry.value / total) * 100) : 0}%) رحلة
+                {entry.value} ({total > 0 ? Math.round((entry.value / total) * 100) : 0}%) {t("dashboard.charts.tripsLabel")}
               </span>
             </div>
           ))}
@@ -169,7 +146,8 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
 
 export function RevenueChart({ data }: { data: RevenueData[] }) {
   const t = useTranslations();
-  const { ref, width, height } = useChartSize();
+  const locale = useLocale();
+  const { ref, width } = useChartSize();
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
   return (
@@ -178,26 +156,18 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
         {/* Revenue summary */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] text-text-tertiary font-medium">إجمالي الإيرادات</p>
-            <p className="text-[22px] font-black text-primary num">{formatCurrency(total)}</p>
+            <p className="text-[11px] text-text-tertiary font-medium">{t("dashboard.stats.totalRevenue")}</p>
+            <p className="text-[22px] font-black text-primary num">{formatCurrency(total, "EGP", locale)}</p>
             <div className="flex items-center gap-1 mt-0.5">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M6 2L10 7H2L6 2Z" fill="var(--success)" />
-              </svg>
-              <span className="text-[11px] font-bold" style={{ color: "var(--success)" }}>12.5%</span>
-              <span className="text-[10px] text-text-disabled">عن الشهر السابق</span>
+              <span className="text-[10px] text-text-disabled">{t("dashboard.charts.currentPeriod")}</span>
             </div>
           </div>
-          {/* Period selector */}
-          <button
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-text-secondary hover:bg-surface-elevated transition-all"
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-text-secondary"
             style={{ border: "1px solid var(--divider)" }}
           >
-            هذا الشهر
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M3 4L5 6L7 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
+            {t("dashboard.charts.thisMonth")}
+          </div>
         </div>
 
         {/* Bar chart */}
@@ -231,12 +201,12 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
                 tick={{ fill: "var(--text-tertiary)" }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `${v} ج.م`}
+                tickFormatter={(v) => formatCurrency(Number(v ?? 0), "EGP", locale)}
               />
               <Tooltip
                 contentStyle={TOOLTIP_STYLE}
                 cursor={{ fill: "rgba(var(--primary-rgb),0.08)", radius: 8 }}
-                formatter={(value: unknown) => [formatCurrency(Number(value ?? 0)), t("dashboard.charts.revenueLabel")]}
+                formatter={(value: unknown) => [formatCurrency(Number(value ?? 0), "EGP", locale), t("dashboard.charts.revenueLabel")]}
               />
               <Bar
                 dataKey="revenue"

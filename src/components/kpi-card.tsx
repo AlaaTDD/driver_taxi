@@ -30,10 +30,12 @@ export function KpiCard({
   const radius = 22;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (clampedProgress / 100) * circumference;
+  const totalLabel = typeof total === "number" ? ` / ${total}` : "";
 
   return (
     <div
       className="dash-stat group relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
+      aria-label={`${label}: ${value}${totalLabel}`}
     >
       {/* Right side in UI (First in DOM for RTL): The Ring */}
       <div className="relative flex-shrink-0 w-14 h-14 flex items-center justify-center">
@@ -75,6 +77,9 @@ export function KpiCard({
             <span className="text-[20px] font-black num leading-none text-text-primary">
               {value}
             </span>
+            {typeof total === "number" && (
+              <span className="text-[11px] font-semibold text-text-tertiary num">/ {total}</span>
+            )}
             {suffix && (
               <span className="text-[11px] font-semibold text-text-tertiary num">{suffix}</span>
             )}

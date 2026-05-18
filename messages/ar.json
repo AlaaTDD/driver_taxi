@@ -276,7 +276,9 @@
     "emailPlaceholder": "البريد الإلكتروني",
     "passwordPlaceholder": "كلمة المرور",
     "submit": "دخول",
-    "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "secureNote": "بيانات مشفرة وآمنة",
+    "copyright": "نظام إدارة تاكسي © {year}"
   },
   "dashboard": {
     "overview": "نظرة عامة",
@@ -326,7 +328,9 @@
       "car": "عربية",
       "motorcycle": "مكنة",
       "totalLabel": "إجمالي",
-      "revenueLabel": "الإيرادات"
+      "revenueLabel": "الإيرادات",
+      "currentPeriod": "الفترة الحالية",
+      "thisMonth": "هذا الشهر"
     }
   },
   "users": {

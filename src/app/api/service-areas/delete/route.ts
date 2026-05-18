@@ -1,9 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 
 export async function DELETE(req: Request) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return guard;
+
   try {
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const { id } = await req.json();
 
     if (!id) {
@@ -20,7 +24,8 @@ export async function DELETE(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "حدث خطأ غير متوقع";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

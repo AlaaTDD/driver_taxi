@@ -15,14 +15,30 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
 
-    
-    const { data: tripsUsingType } = await supabase
-      .from("trips")
-      .select("id", { count: "exact" })
-      .eq("vehicle_type", id)
-      .limit(1);
+    const { data: vehicleType, error: vehicleTypeError } = await supabase
+      .from("vehicle_types")
+      .select("name")
+      .eq("id", id)
+      .single();
 
-    if (tripsUsingType && tripsUsingType.length > 0) {
+    if (vehicleTypeError || !vehicleType) {
+      return NextResponse.json(
+        { error: "نوع المركبة غير موجود" },
+        { status: 404 }
+      );
+    }
+
+    const { count: tripsUsingType, error: tripsError } = await supabase
+      .from("trips")
+      .select("id", { count: "exact", head: true })
+      .eq("vehicle_type", vehicleType.name);
+
+    if (tripsError) {
+      console.error("Check vehicle type usage error:", tripsError);
+      return NextResponse.json({ error: tripsError.message }, { status: 500 });
+    }
+
+    if ((tripsUsingType ?? 0) > 0) {
       return NextResponse.json(
         { error: "لا يمكن حذف هذا النوع لأنه مستخدم في رحلات سابقة" },
         { status: 400 }

@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Delete coupon error:", error);
+    return NextResponse.redirect(new URL("/dashboard/coupons?error=delete_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/coupons", request.url));

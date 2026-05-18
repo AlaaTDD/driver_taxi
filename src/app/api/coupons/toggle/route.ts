@@ -24,6 +24,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Toggle coupon error:", error);
+    return NextResponse.redirect(new URL("/dashboard/coupons?error=toggle_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/coupons", request.url));

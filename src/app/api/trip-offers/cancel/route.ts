@@ -26,6 +26,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Cancel trip offer error:", error);
+    return NextResponse.redirect(new URL("/dashboard/trip-offers?error=cancel_failed", request.url));
   }
 
   return NextResponse.redirect(new URL("/dashboard/trip-offers", request.url));

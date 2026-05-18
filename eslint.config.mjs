@@ -18,6 +18,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "find-arabic.js",
+    "fix-theme-colors.js",
+    "test-jsx.js",
   ]),
 ]);
 

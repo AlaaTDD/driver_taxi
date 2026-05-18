@@ -19,6 +19,7 @@ import {
 export default async function CouponAnalyticsPage() {
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const renderTimestamp = new Date().getTime();
 
   // ── Fetch Analytics Data ──
   const { data: analytics } = await supabase
@@ -591,7 +592,7 @@ export default async function CouponAnalyticsPage() {
                 const couponCode = event.coupons?.code || '—';
 
                 // Time ago
-                const diffMs = Date.now() - new Date(event.created_at).getTime();
+                const diffMs = renderTimestamp - new Date(event.created_at).getTime();
                 const diffMin = Math.floor(diffMs / 60000);
                 const timeAgo = diffMin < 1 ? 'Just now'
                   : diffMin < 60 ? `${diffMin}m ago`

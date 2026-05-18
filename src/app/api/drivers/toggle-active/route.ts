@@ -23,6 +23,19 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Toggle active error:", error);
+    return NextResponse.redirect(new URL("/dashboard/drivers?error=toggle_failed", request.url));
+  }
+
+  if (!isActive) {
+    const { error: availabilityError } = await supabase
+      .from("drivers_profile")
+      .update({ is_available: false })
+      .eq("id", driverId);
+
+    if (availabilityError) {
+      console.error("Toggle driver availability error:", availabilityError);
+      return NextResponse.redirect(new URL("/dashboard/drivers?error=toggle_failed", request.url));
+    }
   }
 
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
