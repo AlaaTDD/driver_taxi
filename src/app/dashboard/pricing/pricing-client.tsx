@@ -42,7 +42,7 @@ export default function PricingClient({ configs, currency }: PricingClientProps)
     { name: t("pricing.colors.purple"), value: "var(--color-purple)" },
     { name: t("pricing.colors.pink"), value: "var(--color-pink)" },
     { name: t("pricing.colors.cyan"), value: "var(--color-cyan)" },
-    { name: t("pricing.colors.orange"), value: "var(--warning)" },
+    { name: t("pricing.colors.orange"), value: "var(--color-orange)" },
   ];
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
