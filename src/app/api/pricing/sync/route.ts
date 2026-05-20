@@ -11,11 +11,33 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
-  const { error } = await supabase.rpc("_fn_sync_pricing_from_vehicle_types");
+  // Fetch all vehicle types
+  const { data: vehicleTypes, error: fetchError } = await supabase
+    .from("vehicle_types")
+    .select("name, base_fare, price_per_km");
 
-  if (error) {
-    console.error("Pricing Sync Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (fetchError) {
+    console.error("Pricing Sync Fetch Error:", fetchError);
+    return NextResponse.json({ error: fetchError.message }, { status: 500 });
+  }
+
+  if (vehicleTypes && vehicleTypes.length > 0) {
+    // Upsert into pricing_config
+    const upsertData = vehicleTypes.map((vt) => ({
+      vehicle_type: vt.name,
+      base_fare: vt.base_fare,
+      price_per_km: vt.price_per_km,
+      updated_at: new Date().toISOString(),
+    }));
+
+    const { error: upsertError } = await supabase
+      .from("pricing_config")
+      .upsert(upsertData, { onConflict: "vehicle_type" });
+
+    if (upsertError) {
+      console.error("Pricing Sync Upsert Error:", upsertError);
+      return NextResponse.json({ error: upsertError.message }, { status: 500 });
+    }
   }
 
   // Log admin action
