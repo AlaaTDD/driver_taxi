@@ -56,7 +56,20 @@ export default async function RootLayout({
     >
       <body className={`min-h-dvh flex flex-col bg-background text-foreground overflow-x-hidden ${isRTL ? "font-(family-name:--font-cairo)" : "font-(family-name:--font-inter)"}`} suppressHydrationWarning>
         <ThemeProvider>
-          <NextIntlClientProvider locale={locale} messages={messages}>
+          <NextIntlClientProvider 
+            locale={locale} 
+            messages={messages}
+            onError={(err) => {
+              if (err.code === "MISSING_MESSAGE") return;
+              console.error(err);
+            }}
+            getMessageFallback={({ key }) => {
+              const parts = key.split('.');
+              const lastKey = parts[parts.length - 1];
+              if (lastKey === "blockReasonPlaceholder") return "اكتب سبب الحظر...";
+              return lastKey;
+            }}
+          >
             {children}
             <Toaster position="top-center" richColors closeButton />
           </NextIntlClientProvider>

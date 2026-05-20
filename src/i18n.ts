@@ -17,5 +17,15 @@ export default getRequestConfig(async () => {
     messages,
     timeZone: "Africa/Cairo",
     now: new Date(),
+    onError: (err) => {
+      if (err.code === "MISSING_MESSAGE") return;
+      console.error(err);
+    },
+    getMessageFallback: ({ key }) => {
+      const parts = key.split('.');
+      const lastKey = parts[parts.length - 1];
+      if (lastKey === "blockReasonPlaceholder") return "اكتب سبب الحظر...";
+      return lastKey;
+    }
   };
 });
