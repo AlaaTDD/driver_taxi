@@ -98,20 +98,21 @@ export default function PricingClient({ configs, currency }: PricingClientProps)
 
     setLoading(true);
     try {
-      const fd = new FormData();
-      fd.append("name", form.name);
-      fd.append("display_name", form.display_name);
-      fd.append("icon", form.icon);
-      fd.append("base_fare", form.base_fare);
-      fd.append("price_per_km", form.price_per_km);
-      fd.append("sort_order", form.sort_order);
-      fd.append("color", selectedColor);
-      if (editingId) fd.append("id", editingId);
+      const payload: any = {
+        name: form.name,
+        display_name: form.display_name,
+        icon: form.icon,
+        base_fare: form.base_fare,
+        price_per_km: form.price_per_km,
+        sort_order: form.sort_order,
+      };
+      if (editingId) payload.id = editingId;
 
       const action = editingId ? "update" : "create";
       const res = await fetch(`/api/vehicle-types/${action}`, {
         method: "POST",
-        body: fd,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -130,13 +131,10 @@ export default function PricingClient({ configs, currency }: PricingClientProps)
   const toggleActive = async (id: string, current: boolean) => {
     setLoading(true);
     try {
-      const fd = new FormData();
-      fd.append("id", id);
-      fd.append("is_active", String(!current));
-
       const res = await fetch("/api/vehicle-types/toggle", {
         method: "POST",
-        body: fd,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, is_active: !current }),
       });
 
       if (res.ok) {
