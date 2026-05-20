@@ -146,6 +146,14 @@ export default function UsersClient({
   const [blockReason, setBlockReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
+  const ts = (key: string, fallback: string) => {
+    try {
+      return t(key);
+    } catch {
+      return fallback;
+    }
+  };
+
   const hasFilters = filterRole || filterStatus || searchQuery;
 
   const updateParams = (updates: Record<string, string>) => {
@@ -175,13 +183,13 @@ export default function UsersClient({
       const res = await fetch("/api/users/block", { method: "POST", body: fd });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || t("users.statusUpdateFailed"));
+        throw new Error(errData.error || ts("users.statusUpdateFailed", "فشل تحديث حالة المستخدم."));
       }
-      toast.success(t("users.statusUpdated"));
+      toast.success(ts("users.statusUpdated", "تم تحديث حالة المستخدم بنجاح."));
       setBlockModal(null); setBlockReason("");
       router.refresh();
     } catch (err: any) {
-      toast.error(err.message || t("users.statusUpdateFailed"));
+      toast.error(err.message || ts("users.statusUpdateFailed", "فشل تحديث حالة المستخدم."));
     } finally { setActionLoading(false); }
   };
 
@@ -195,13 +203,13 @@ export default function UsersClient({
       const res = await fetch("/api/users/set-role", { method: "POST", body: fd });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || t("users.roleUpdateFailed"));
+        throw new Error(errData.error || ts("users.roleUpdateFailed", "فشل تحديث دور المستخدم."));
       }
-      toast.success(t("users.roleUpdated"));
+      toast.success(ts("users.roleUpdated", "تم تحديث دور المستخدم بنجاح."));
       setRoleModal(null);
       router.refresh();
     } catch (err: any) {
-      toast.error(err.message || t("users.roleUpdateFailed"));
+      toast.error(err.message || ts("users.roleUpdateFailed", "فشل تحديث دور المستخدم."));
     } finally { setActionLoading(false); }
   };
 
