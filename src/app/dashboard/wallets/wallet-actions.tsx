@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusMinus, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export function WalletActions({ walletId, walletType, userName }: { walletId: string; walletType: "driver" | "user"; userName: string }) {
   const [isOpen, setIsOpen] = useState(false);

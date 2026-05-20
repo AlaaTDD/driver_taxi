@@ -21,6 +21,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
+import { getAppCurrency } from "@/lib/currency";
 
 
 
@@ -29,6 +30,7 @@ export default async function DashboardPage() {
     const t = await getTranslations();
     const locale = await getLocale();
     const supabase = createAdminClient();
+    const currency = await getAppCurrency();
 
     const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
       supabase.from("admin_dashboard").select("*").single(),
@@ -149,7 +151,7 @@ export default async function DashboardPage() {
             {/* Card 4 (leftmost in RTL): إجمالي الإيرادات */}
             <StatCard
               title={t("dashboard.stats.totalRevenue")}
-              value={formatCurrency(totalRevenue, "EGP", locale)}
+              value={formatCurrency(totalRevenue, currency, locale)}
               icon={<DollarSign size={24} strokeWidth={2.5} />}
               colorVariant="primary"
               showSparkline
@@ -215,7 +217,7 @@ export default async function DashboardPage() {
               <TripsStatusChart data={statusChartData} />
             </ChartCard>
             <ChartCard title={t("dashboard.charts.revenueByVehicle")} icon={<BarChart2 size={16} />}>
-              <RevenueChart data={revenueChartData} />
+              <RevenueChart data={revenueChartData} currency={currency} />
             </ChartCard>
           </div>
 
@@ -274,7 +276,7 @@ export default async function DashboardPage() {
                       <div className="flex flex-col items-end gap-1.5 w-full">
                         <div className="flex items-center gap-2 justify-end w-full">
                           <span className="text-[15px] font-black num tracking-tight text-text-primary">
-                            {formatCurrency(Number(trip.price), "EGP", locale)}
+                            {formatCurrency(Number(trip.price), currency, locale)}
                           </span>
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
                             {getStatusLabel(trip.status, t)}

@@ -43,7 +43,7 @@ export async function createBonusRule(formData: FormData) {
   if (error) return { error: error.message };
 
   await logAdminAction({
-    admin_id: guard.id,
+    admin_id: guard.user.id,
     action: "create",
     table_name: "bonus_rules",
     details: { name: data.name, trigger_type: data.trigger_type, threshold: data.threshold, amount: data.bonus_amount },
@@ -69,7 +69,7 @@ export async function toggleBonusRule(id: string, is_active: boolean) {
   }
 
   await logAdminAction({
-    admin_id: guard.id,
+    admin_id: guard.user.id,
     action: "update",
     table_name: "bonus_rules",
     record_id: id,

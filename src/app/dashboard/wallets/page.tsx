@@ -17,6 +17,7 @@ import {
   DollarSign,
   Banknote,
 } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 type TabType = "driver_wallets" | "user_wallets" | "transactions";
 
@@ -34,6 +35,7 @@ export default async function WalletsPage({
 
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const currency = await getAppCurrency();
 
   /* ── Stats ── */
   const [driverWalletsRes, userWalletsRes, txRes] = await Promise.all([
@@ -51,10 +53,10 @@ export default async function WalletsPage({
   const totalUserBalance = userWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
 
   const statCards = [
-    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance), variantClass: "variant-success", icon: Car },
-    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned), variantClass: "variant-info", icon: TrendingUp },
-    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn), variantClass: "variant-error", icon: TrendingDown },
-    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance), variantClass: "variant-warning", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance, currency), variantClass: "variant-success", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned, currency), variantClass: "variant-info", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn, currency), variantClass: "variant-error", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance, currency), variantClass: "variant-warning", icon: User },
   ];
 
   const tabs = [
@@ -205,10 +207,10 @@ export default async function WalletsPage({
                         </div>
                       </td>
                       <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.balance))}</td>
-                      <td className="py-3.5 px-4 text-[13px] font-bold num" style={{ color: "var(--info)" }}>{formatCurrency(Number(w.total_earned))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_withdrawn))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--warning)" }}>{formatCurrency(Number(w.pending_withdrawal))}</td>
+                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.balance), currency)}</td>
+                      <td className="py-3.5 px-4 text-[13px] font-bold num" style={{ color: "var(--info)" }}>{formatCurrency(Number(w.total_earned), currency)}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_withdrawn), currency)}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--warning)" }}>{formatCurrency(Number(w.pending_withdrawal), currency)}</td>
                       <td className="py-3.5 px-4 text-[13px] num text-text-secondary">{(Number(w.commission_rate) * 100).toFixed(0)}%</td>
                       <td className="py-3.5 px-4">
                         <WalletActions walletId={w.id} walletType="driver" userName={w.user?.name || "—"} />
@@ -256,9 +258,9 @@ export default async function WalletsPage({
                         </div>
                       </td>
                       <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--primary)" }}>{formatCurrency(Number(w.balance))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_spent))}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.total_topped_up))}</td>
+                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--primary)" }}>{formatCurrency(Number(w.balance), currency)}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_spent), currency)}</td>
+                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.total_topped_up), currency)}</td>
                       <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{w.updated_at ? formatDate(w.updated_at) : "—"}</td>
                       <td className="py-3.5 px-4">
                         <WalletActions walletId={w.id} walletType="user" userName={w.user?.name || "—"} />
@@ -322,10 +324,10 @@ export default async function WalletsPage({
                             </span>
                           </td>
                            <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: isPositive ? "var(--success)" : "var(--error)" }}>
-                            {isPositive ? "+" : ""}{formatCurrency(Number(tx.amount))}
+                            {isPositive ? "+" : ""}{formatCurrency(Number(tx.amount), currency)}
                           </td>
-                          <td className="py-3.5 px-4 text-[12px] num text-text-tertiary">{formatCurrency(Number(tx.balance_before))}</td>
-                          <td className="py-3.5 px-4 text-[12px] num text-text-secondary font-medium">{formatCurrency(Number(tx.balance_after))}</td>
+                          <td className="py-3.5 px-4 text-[12px] num text-text-tertiary">{formatCurrency(Number(tx.balance_before), currency)}</td>
+                          <td className="py-3.5 px-4 text-[12px] num text-text-secondary font-medium">{formatCurrency(Number(tx.balance_after), currency)}</td>
                           <td className="py-3.5 px-4">
                             <Badge variant={tx.status === "completed" ? "success" : tx.status === "failed" ? "error" : "warning"} dot>
                               {tx.status === "completed" ? t("wallets.status.completed") : tx.status === "failed" ? t("wallets.status.failed") : tx.status === "reversed" ? t("wallets.status.reversed") : t("wallets.status.pending")}

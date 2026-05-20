@@ -15,11 +15,13 @@ import {
   Clock,
   Activity,
 } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function CouponAnalyticsPage() {
   const t = await getTranslations();
   const supabase = createAdminClient();
   const renderTimestamp = new Date().getTime();
+  const currency = await getAppCurrency();
 
   // ── Fetch Analytics Data ──
   const { data: analytics } = await supabase
@@ -102,7 +104,7 @@ export default async function CouponAnalyticsPage() {
   const kpis = [
     {
       label: t("coupons.analytics.totalDiscountGiven"),
-      value: formatCurrency(totalDiscountGiven),
+      value: formatCurrency(totalDiscountGiven, currency),
       sub: `${totalUsageCount} ${t("coupons.analytics.usageCount")}`,
       icon: DollarSign,
       color: "var(--primary)",
@@ -111,7 +113,7 @@ export default async function CouponAnalyticsPage() {
     },
     {
       label: t("coupons.analytics.platformSubsidyCost"),
-      value: formatCurrency(totalSubsidyCost),
+      value: formatCurrency(totalSubsidyCost, currency),
       sub: `${t("coupons.stats.totalDiscount")}`,
       icon: TrendingUp,
       color: "var(--error)",
@@ -120,7 +122,7 @@ export default async function CouponAnalyticsPage() {
     },
     {
       label: t("coupons.analytics.avgDiscountPerTrip"),
-      value: formatCurrency(avgDiscountPerTrip),
+      value: formatCurrency(avgDiscountPerTrip, currency),
       sub: `${uniqueTrips} ${t("coupons.analytics.completedTrips")}`,
       icon: Target,
       color: "var(--info)",
@@ -233,7 +235,7 @@ export default async function CouponAnalyticsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-[13px] font-black num" style={{ color: "var(--success)" }}>
-                        {coupon.discount_type === "percentage" ? `${coupon.discount_value}%` : formatCurrency(Number(coupon.discount_value))}
+                        {coupon.discount_type === "percentage" ? `${coupon.discount_value}%` : formatCurrency(Number(coupon.discount_value), currency)}
                       </span>
                       <span className="text-[12px] font-bold text-text-secondary num">{coupon.used_count || 0}×</span>
                     </div>
@@ -289,7 +291,7 @@ export default async function CouponAnalyticsPage() {
               style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}
             >
               <p className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider">{t("coupons.fields.budgetLimit")}</p>
-              <p className="text-[18px] font-black text-text-primary mt-1 num">{formatCurrency(totalBudgetAllocated)}</p>
+              <p className="text-[18px] font-black text-text-primary mt-1 num">{formatCurrency(totalBudgetAllocated, currency)}</p>
             </div>
             <div
               className="p-4 rounded-xl"
@@ -297,7 +299,7 @@ export default async function CouponAnalyticsPage() {
             >
               <p className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider">{t("coupons.fields.spentBudget")}</p>
               <p className="text-[18px] font-black num" style={{ color: totalBudgetSpent > 0 ? "var(--primary)" : "var(--text-primary)" }}>
-                {formatCurrency(totalBudgetSpent)}
+                {formatCurrency(totalBudgetSpent, currency)}
               </p>
             </div>
           </div>
@@ -307,7 +309,7 @@ export default async function CouponAnalyticsPage() {
             <div className="mb-6">
               <div className="flex justify-between text-[11px] mb-1.5">
                 <span className="text-text-tertiary">{Math.round((totalBudgetSpent / totalBudgetAllocated) * 100)}% {t("coupons.fields.spentBudget")}</span>
-                <span className="text-text-disabled num">{formatCurrency(totalBudgetAllocated - totalBudgetSpent)} {t("coupons.stats.budgetRemaining")}</span>
+                <span className="text-text-disabled num">{formatCurrency(totalBudgetAllocated - totalBudgetSpent, currency)} {t("coupons.stats.budgetRemaining")}</span>
               </div>
               <div className="w-full h-3 rounded-full" style={{ background: "var(--surface-elevated)" }}>
                 <div
@@ -412,14 +414,14 @@ export default async function CouponAnalyticsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <span className="text-[13px] font-black num" style={{ color: "var(--success)" }}>
-                        {coupon.discount_type === "percentage" ? `${coupon.discount_value}%` : formatCurrency(Number(coupon.discount_value))}
+                        {coupon.discount_type === "percentage" ? `${coupon.discount_value}%` : formatCurrency(Number(coupon.discount_value), currency)}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       <span className="text-[13px] font-bold num text-text-primary">{coupon.used_count || 0}</span>
                     </td>
                     <td className="py-3 px-4">
-                      <span className="text-[13px] font-bold num text-text-primary">{formatCurrency(couponTotal)}</span>
+                      <span className="text-[13px] font-bold num text-text-primary">{formatCurrency(couponTotal, currency)}</span>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1.5">
@@ -436,7 +438,7 @@ export default async function CouponAnalyticsPage() {
                     <td className="py-3 px-4">
                       {coupon.budget_limit ? (
                         <span className="text-[12px] num text-text-secondary">
-                          {formatCurrency(Number(coupon.spent_budget || 0))} / {formatCurrency(Number(coupon.budget_limit))}
+                          {formatCurrency(Number(coupon.spent_budget || 0), currency)} / {formatCurrency(Number(coupon.budget_limit), currency)}
                         </span>
                       ) : (
                         <span className="text-text-disabled text-[12px]">∞</span>
@@ -537,7 +539,7 @@ export default async function CouponAnalyticsPage() {
                     <div className="text-left flex-shrink-0">
                       <p className="text-[14px] font-black num" style={{ color: style.color }}>{alert.usage_pct}%</p>
                       <p className="text-[10px] text-text-disabled num">
-                        {formatCurrency(alert.spent_budget)} / {formatCurrency(alert.budget_limit)}
+                        {formatCurrency(alert.spent_budget, currency)} / {formatCurrency(alert.budget_limit, currency)}
                       </p>
                     </div>
                   </div>

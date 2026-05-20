@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         user_id,
         message,
         sender_role: "admin",
-        sender_id: adminUser.id,
+        sender_id: adminUser.user.id,
       });
 
       if (error) throw error;
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
       const { error } = await supabase.from("messages").insert({
         trip_id,
-        sender_id: adminUser.id,
+        sender_id: adminUser.user.id,
         receiver_id,
         message,
         is_read: false,

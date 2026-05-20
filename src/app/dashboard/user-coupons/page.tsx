@@ -3,6 +3,7 @@ import { formatDate, formatCurrency } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Ticket, User, CheckCircle, Clock, Gift } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function UserCouponsPage({
   searchParams,
@@ -16,6 +17,7 @@ export default async function UserCouponsPage({
 
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const currency = await getAppCurrency();
 
   let query = supabase
     .from("user_coupons")
@@ -64,7 +66,7 @@ export default async function UserCouponsPage({
             { label: t("userCoupons.stats.assigned"), value: totalAssigned, color: "var(--info)", colorRaw: "var(--info-rgb)", icon: Gift },
             { label: t("userCoupons.stats.used"), value: totalUsed, color: "var(--success)", colorRaw: "var(--success-rgb)", icon: CheckCircle },
             { label: t("userCoupons.stats.unused"), value: totalUnused, color: "var(--warning)", colorRaw: "var(--warning-rgb)", icon: Clock },
-            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount), color: "var(--primary)", colorRaw: "var(--primary-rgb)", icon: Ticket },
+            { label: t("userCoupons.stats.totalDiscount"), value: formatCurrency(totalDiscount, currency), color: "var(--primary)", colorRaw: "var(--primary-rgb)", icon: Ticket },
           ].map((s) => (
             <div
               key={s.label}
@@ -146,7 +148,7 @@ export default async function UserCouponsPage({
                         {coupon ? (
                           coupon.discount_type === "percentage"
                             ? `${coupon.discount_value}%`
-                            : formatCurrency(Number(coupon.discount_value))
+                            : formatCurrency(Number(coupon.discount_value), currency)
                         ) : "—"}
                       </td>
                       <td className="py-3.5 px-4">

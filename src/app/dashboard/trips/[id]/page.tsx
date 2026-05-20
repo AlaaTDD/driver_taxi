@@ -7,11 +7,13 @@ import {
   ArrowRight, Car, User, Navigation, DollarSign, 
   Clock, ShieldAlert, CheckCircle, XCircle, Star, Tag, MapPin 
 } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const currency = await getAppCurrency();
 
   
   const { data: trip, error } = await supabase
@@ -214,13 +216,13 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-4 border-b border-divider">
               <span className="text-text-tertiary text-[13px] font-medium">التكلفة الإجمالية</span>
-              <span className="text-[18px] font-black num text-success">{formatCurrency(trip.price)}</span>
+              <span className="text-[18px] font-black num text-success">{formatCurrency(trip.price, currency)}</span>
             </div>
             
             {Number(trip.coupon_discount) > 0 && (
               <div className="flex justify-between items-center pb-2">
                 <span className="text-success text-[13px] font-medium flex items-center gap-1"><Tag size={13}/> خصم الكوبون</span>
-                <span className="text-[14px] font-bold num text-success">-{formatCurrency(trip.coupon_discount)}</span>
+                <span className="text-[14px] font-bold num text-success">-{formatCurrency(trip.coupon_discount, currency)}</span>
               </div>
             )}
             

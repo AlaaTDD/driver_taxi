@@ -4,6 +4,7 @@ import { Badge } from "@/components/badge";
 import CouponsClient from "./coupons-client";
 import { getTranslations } from "next-intl/server";
 import { Tag, Percent, Hash, ChevronLeft, ChevronRight, DollarSign, Users, Wallet, TrendingUp, Building2, User, Zap } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function CouponsPage({
   searchParams,
@@ -24,6 +25,7 @@ export default async function CouponsPage({
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   const totalPages = Math.ceil((count || 0) / pageSize);
+  const currency = await getAppCurrency();
 
   // Compute KPI stats
   const allCoupons = coupons || [];
@@ -47,7 +49,7 @@ export default async function CouponsPage({
     },
     {
       label: t("coupons.stats.totalDiscount"),
-      value: formatCurrency(totalDiscount),
+      value: formatCurrency(totalDiscount, currency),
       sub: t("coupons.analytics.platformSubsidyCost"),
       icon: DollarSign,
       color: "var(--primary)",
@@ -56,7 +58,7 @@ export default async function CouponsPage({
     },
     {
       label: t("coupons.stats.budgetRemaining"),
-      value: formatCurrency(budgetRemaining),
+      value: formatCurrency(budgetRemaining, currency),
       sub: t("coupons.fields.budgetLimit"),
       icon: Wallet,
       color: "var(--info)",
@@ -225,18 +227,18 @@ export default async function CouponsPage({
                         <span className="text-[14px] font-black num" style={{ color: "var(--success)" }}>
                           {coupon.discount_type === "percentage"
                             ? `${coupon.discount_value}٪`
-                            : formatCurrency(Number(coupon.discount_value))}
+                            : formatCurrency(Number(coupon.discount_value), currency)}
                         </span>
                         {coupon.max_discount && coupon.discount_type === "percentage" && (
                           <span className="text-[10px] text-text-disabled block">
-                            max: {formatCurrency(Number(coupon.max_discount))}
+                            max: {formatCurrency(Number(coupon.max_discount), currency)}
                           </span>
                         )}
                       </td>
 
                       {/* Min Trip Price */}
                       <td className="py-3.5 px-4 text-text-tertiary text-[13px] num">
-                        {coupon.min_trip_price ? formatCurrency(Number(coupon.min_trip_price)) : "—"}
+                        {coupon.min_trip_price ? formatCurrency(Number(coupon.min_trip_price), currency) : "—"}
                       </td>
 
                       {/* Uses */}
@@ -253,9 +255,9 @@ export default async function CouponsPage({
                         {coupon.budget_limit ? (
                           <div>
                             <div className="flex items-center gap-1.5 text-[12px]">
-                              <span className="text-text-primary font-bold num">{formatCurrency(Number(coupon.spent_budget || 0))}</span>
+                              <span className="text-text-primary font-bold num">{formatCurrency(Number(coupon.spent_budget || 0), currency)}</span>
                               <span className="text-text-disabled">/</span>
-                              <span className="text-text-tertiary num">{formatCurrency(Number(coupon.budget_limit))}</span>
+                              <span className="text-text-tertiary num">{formatCurrency(Number(coupon.budget_limit), currency)}</span>
                             </div>
                             {/* Budget progress bar */}
                             <div className="w-full h-1 rounded-full mt-1.5" style={{ background: "var(--surface-elevated)" }}>

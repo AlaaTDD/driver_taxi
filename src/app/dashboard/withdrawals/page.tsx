@@ -12,10 +12,11 @@ import {
   AlertTriangle,
   User,
   CreditCard,
-  Smartphone,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Smartphone
 } from "lucide-react";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function WithdrawalsPage({
   searchParams,
@@ -29,6 +30,7 @@ export default async function WithdrawalsPage({
 
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const currency = await getAppCurrency();
 
   /* ── Stats ── */
   const { data: allRequests } = await supabase.from("withdrawal_requests").select("id, status, amount");
@@ -44,9 +46,9 @@ export default async function WithdrawalsPage({
   };
 
   const statCards = [
-    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount), color: "var(--warning)", colorRaw: "var(--warning-rgb)", icon: Clock },
+    { label: t("withdrawals.stats.pending"), value: stats.pending, amount: formatCurrency(stats.pendingAmount, currency), color: "var(--warning)", colorRaw: "var(--warning-rgb)", icon: Clock },
     { label: t("withdrawals.stats.approved"), value: stats.approved, color: "var(--info)", colorRaw: "var(--info-rgb)", icon: Loader2 },
-    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount), color: "var(--success)", colorRaw: "var(--success-rgb)", icon: CheckCircle },
+    { label: t("withdrawals.stats.completed"), value: stats.completed, amount: formatCurrency(stats.totalAmount, currency), color: "var(--success)", colorRaw: "var(--success-rgb)", icon: CheckCircle },
     { label: t("withdrawals.stats.rejected"), value: stats.rejected, color: "var(--error)", colorRaw: "var(--error-rgb)", icon: XCircle },
   ];
 
@@ -174,7 +176,7 @@ export default async function WithdrawalsPage({
                           </div>
                         </div>
                       </td>
-                       <td className="py-3.5 px-4 text-[15px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(req.amount))}</td>
+                       <td className="py-3.5 px-4 text-[15px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(req.amount), currency)}</td>
                       <td className="py-3.5 px-4">
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-semibold" style={{ background: "var(--surface-glass)", color: "var(--text-secondary)", border: "1px solid var(--divider)" }}>
                           <method.icon size={11} />

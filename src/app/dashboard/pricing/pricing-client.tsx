@@ -19,9 +19,10 @@ interface VehicleType {
 
 interface PricingClientProps {
   configs: VehicleType[];
+  currency: string;
 }
 
-export default function PricingClient({ configs }: PricingClientProps) {
+export default function PricingClient({ configs, currency }: PricingClientProps) {
   const t = useTranslations();
   const router = useRouter();
 
@@ -307,7 +308,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                       {t("pricing.baseFare")}
                     </span>
                     <span className="block text-[15px] font-black text-text-primary">
-                      {formatCurrency(Number(config.base_fare))}
+                      {formatCurrency(Number(config.base_fare), currency)}
                     </span>
                   </div>
                   <div className="p-3 rounded-xl" style={{ background: "var(--surface-muted)", border: "1px solid var(--divider)" }}>
@@ -315,7 +316,7 @@ export default function PricingClient({ configs }: PricingClientProps) {
                       {t("pricing.pricePerKm")}
                     </span>
                     <span className="block text-[15px] font-black text-text-primary">
-                      {formatCurrency(Number(config.price_per_km))}
+                      {formatCurrency(Number(config.price_per_km), currency)}
                     </span>
                   </div>
                 </div>

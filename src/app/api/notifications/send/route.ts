@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       }
 
       await logAdminAction({
-        admin_id: guard.id,
+        admin_id: guard.user.id,
         action: "send_notification",
         table_name: "notifications",
         details: { title, type, count: totalSent },

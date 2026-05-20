@@ -144,7 +144,7 @@ export function TripsStatusChart({ data }: { data: StatusData[] }) {
   );
 }
 
-export function RevenueChart({ data }: { data: RevenueData[] }) {
+export function RevenueChart({ data, currency = "EGP" }: { data: RevenueData[], currency?: string }) {
   const t = useTranslations();
   const locale = useLocale();
   const { ref, width } = useChartSize();
@@ -157,7 +157,7 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[11px] text-text-tertiary font-medium">{t("dashboard.stats.totalRevenue")}</p>
-            <p className="text-[22px] font-black text-primary num">{formatCurrency(total, "EGP", locale)}</p>
+            <p className="text-[22px] font-black text-primary num">{formatCurrency(total, currency, locale)}</p>
             <div className="flex items-center gap-1 mt-0.5">
               <span className="text-[10px] text-text-disabled">{t("dashboard.charts.currentPeriod")}</span>
             </div>
@@ -201,12 +201,12 @@ export function RevenueChart({ data }: { data: RevenueData[] }) {
                 tick={{ fill: "var(--text-tertiary)" }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => formatCurrency(Number(v ?? 0), "EGP", locale)}
+                tickFormatter={(v) => formatCurrency(Number(v ?? 0), currency, locale)}
               />
               <Tooltip
                 contentStyle={TOOLTIP_STYLE}
                 cursor={{ fill: "rgba(var(--primary-rgb),0.08)", radius: 8 }}
-                formatter={(value: unknown) => [formatCurrency(Number(value ?? 0), "EGP", locale), t("dashboard.charts.revenueLabel")]}
+                formatter={(value: unknown) => [formatCurrency(Number(value ?? 0), currency, locale), t("dashboard.charts.revenueLabel")]}
               />
               <Bar
                 dataKey="revenue"

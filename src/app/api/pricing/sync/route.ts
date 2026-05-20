@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
   // Log admin action
   await logAdminAction({
-    admin_id: adminUser.id,
+    admin_id: adminUser.user.id,
     action: "update",
     table_name: "pricing",
     details: { sync_triggered: true },

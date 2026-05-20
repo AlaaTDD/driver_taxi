@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   await logAdminAction({
-    admin_id: guard.id,
+    admin_id: guard.user.id,
     action: "update",
     table_name: "wallets",
     record_id: walletId,

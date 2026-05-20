@@ -6,6 +6,7 @@ import {
   XCircle, Clock, Zap, TrendingUp, Award,
 } from "lucide-react";
 import BonusesClient, { ToggleRuleStatus } from "./bonuses-client";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function BonusesPage() {
   const t = await getTranslations();
@@ -38,6 +39,7 @@ export default async function BonusesPage() {
     0
   );
   const activeRules = rules.filter((r: any) => r.is_active).length;
+  const currency = await getAppCurrency();
 
   return (
     <>
@@ -59,7 +61,7 @@ export default async function BonusesPage() {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
               <Award size={13} />
-              {formatCurrency(totalBonusesPaid)}
+              {formatCurrency(totalBonusesPaid, currency)}
             </span>
             <BonusesClient />
           </div>
@@ -91,7 +93,7 @@ export default async function BonusesPage() {
             </div>
             <div>
               <p className="text-[12px] text-text-tertiary font-medium">{t("bonuses.totalPaid")}</p>
-              <p className="text-[22px] font-black text-text-primary num leading-tight">{formatCurrency(totalBonusesPaid)}</p>
+              <p className="text-[22px] font-black text-text-primary num leading-tight">{formatCurrency(totalBonusesPaid, currency)}</p>
             </div>
           </div>
         </div>
@@ -133,7 +135,7 @@ export default async function BonusesPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-[13px] font-bold text-text-primary num">{rule.threshold}</td>
-                    <td className="px-5 py-3.5 text-[13px] font-black text-success num">{formatCurrency(Number(rule.bonus_amount))}</td>
+                    <td className="px-5 py-3.5 text-[13px] font-black text-success num">{formatCurrency(Number(rule.bonus_amount), currency)}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex flex-wrap gap-1">
                         {(rule.vehicle_types || []).map((vt: string, i: number) => (
@@ -221,7 +223,7 @@ export default async function BonusesPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[13px] font-black text-success num">
-                    +{formatCurrency(Number(award.bonus_amount))}
+                    +{formatCurrency(Number(award.bonus_amount), currency)}
                   </span>
                   <div className="flex items-center gap-1 text-[11px] text-text-tertiary">
                     <Clock size={11} />

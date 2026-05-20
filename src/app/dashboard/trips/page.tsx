@@ -4,6 +4,7 @@ import TripsClient from "./trips-client";
 import { getTranslations } from "next-intl/server";
 import { MapPin, Gauge, ArrowUpRight, Clock, Car, User } from "lucide-react";
 import Link from "next/link";
+import { getAppCurrency } from "@/lib/currency";
 
 export default async function TripsPage({
   searchParams,
@@ -18,6 +19,7 @@ export default async function TripsPage({
 
   const t = await getTranslations();
   const supabase = createAdminClient();
+  const currency = await getAppCurrency();
 
   let query = supabase
     .from("trips")
@@ -60,7 +62,7 @@ export default async function TripsPage({
             {!statusFilter && (
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-success/10 border border-success/20 text-success">
                 <Gauge size={11} />
-                {formatCurrency(totalRevenue)}
+                {formatCurrency(totalRevenue, currency)}
               </span>
             )}
           </div>
@@ -163,7 +165,7 @@ export default async function TripsPage({
                   <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between shrink-0 gap-3 w-full sm:w-[130px] py-1">
                     <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 w-full">
                       <span className="text-[16px] font-black num tracking-tight text-text-primary">
-                        {formatCurrency(Number(trip.price))}
+                        {formatCurrency(Number(trip.price), currency)}
                       </span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
                         {getStatusLabel(trip.status, t)}
