@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { Eye, EyeOff, Zap, Shield, ArrowLeft, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Zap, Shield, ArrowLeft, ArrowRight, Mail, Lock } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
@@ -44,15 +44,18 @@ export default function LoginPage() {
     <div className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-background">
       <div className="login-backdrop absolute inset-0 pointer-events-none" />
 
-      
+      {/* Background Glow Blobs */}
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[500px] h-[350px] md:h-[500px] bg-primary/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[300px] md:w-[450px] h-[300px] md:h-[450px] bg-[var(--color-purple)]/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none z-0" />
+
+      {/* Top Bar - Options */}
       <div className="absolute top-4 right-4 left-4 flex justify-between items-center z-20">
         <ThemeToggle />
         <LanguageSwitcher />
       </div>
 
-      
       <div className="relative w-full max-w-[420px] mx-4 z-10">
-        
+        {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             <div className="absolute inset-0 rounded-2xl scale-125 blur-xl animate-pulse-glow" style={{ background: "rgba(var(--primary-rgb), 0.3)" }} />
@@ -68,31 +71,49 @@ export default function LoginPage() {
           </p>
         </div>
 
-        
-        <div className="bg-surface border border-divider rounded-2xl p-6 sm:p-8 shadow-lg">
+        {/* Login Card */}
+        <div className="bg-surface-glass backdrop-blur-md border border-divider/60 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-[3px] bg-linear-to-r from-[var(--primary)] to-[var(--color-purple)]" />
+          
           <form onSubmit={handleLogin} className="space-y-5" id="login-form">
-            
+            {/* Email Field */}
             <div>
               <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider">
                 {t("login.emailPlaceholder")}
               </label>
-              <input
-                type="email"
-                id="login-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder={t("login.emailPlaceholder")}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 bg-surface-elevated border border-divider text-text-primary placeholder:text-text-disabled focus:border-primary focus:ring-2 focus:ring-primary/10"
-              />
+              <div className="relative">
+                <Mail
+                  size={16}
+                  className={`absolute top-1/2 -translate-y-1/2 text-text-disabled transition-colors ${
+                    isRTL ? "right-4" : "left-4"
+                  }`}
+                />
+                <input
+                  type="email"
+                  id="login-email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder={t("login.emailPlaceholder")}
+                  className={`w-full py-3.5 rounded-xl text-sm outline-none transition-all duration-200 bg-surface-elevated/60 border border-divider text-text-primary placeholder:text-text-disabled focus:bg-surface-elevated focus:border-primary focus:ring-4 focus:ring-primary/10 ${
+                    isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
+                  }`}
+                />
+              </div>
             </div>
 
-            
+            {/* Password Field */}
             <div>
               <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider">
                 {t("login.passwordPlaceholder")}
               </label>
               <div className="relative">
+                <Lock
+                  size={16}
+                  className={`absolute top-1/2 -translate-y-1/2 text-text-disabled transition-colors ${
+                    isRTL ? "right-4" : "left-4"
+                  }`}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   id="login-password"
@@ -100,20 +121,23 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••••"
-                  className={`w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 bg-surface-elevated border border-divider text-text-primary placeholder:text-text-disabled focus:border-primary focus:ring-2 focus:ring-primary/10 ${isRTL ? "pl-12" : "pr-12"}`}
+                  className={`w-full py-3.5 rounded-xl text-sm outline-none transition-all duration-200 bg-surface-elevated/60 border border-divider text-text-primary placeholder:text-text-disabled focus:bg-surface-elevated focus:border-primary focus:ring-4 focus:ring-primary/10 ${
+                    isRTL ? "pr-11 pl-12" : "pl-11 pr-12"
+                  }`}
                 />
                 <button
                   type="button"
                   id="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
-                  className={`absolute top-1/2 -translate-y-1/2 p-1 text-text-disabled hover:text-primary transition-colors ${isRTL ? "left-3.5" : "right-3.5"}`}
+                  className={`absolute top-1/2 -translate-y-1/2 p-1 text-text-disabled hover:text-primary transition-colors ${
+                    isRTL ? "left-3.5" : "right-3.5"
+                  }`}
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
             </div>
 
-            
             {error && (
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-error/5 border border-error/20 text-error">
                 <div className="w-2 h-2 rounded-full bg-error animate-pulse" />
@@ -121,12 +145,11 @@ export default function LoginPage() {
               </div>
             )}
 
-            
             <button
               type="submit"
               id="login-submit"
               disabled={loading}
-              className="relative w-full py-3.5 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-200 bg-primary hover:bg-primary-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/25 disabled:opacity-60 disabled:hover:translate-y-0"
+              className="relative w-full py-3.5 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-300 bg-linear-to-r from-[var(--primary)] to-[var(--color-purple)] hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 shadow-md shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               <span className="relative flex items-center justify-center gap-2">
                 {loading ? (
@@ -140,21 +163,19 @@ export default function LoginPage() {
                 ) : (
                   <>
                     {t("login.submit")}
-                    <Arrow size={16} className={isRTL ? "" : ""} />
+                    <Arrow size={16} />
                   </>
                 )}
               </span>
             </button>
           </form>
 
-          
           <div className="flex items-center justify-center gap-1.5 mt-4">
             <Shield size={11} className="text-text-tertiary" />
             <span className="text-[11px] text-text-tertiary">{t("login.secureNote")}</span>
           </div>
         </div>
 
-        
         <p className="text-center text-text-disabled text-[11px] mt-6 tracking-wider">
           {t("login.copyright", { year: new Date().getFullYear() })}
         </p>

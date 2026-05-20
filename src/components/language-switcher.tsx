@@ -68,7 +68,7 @@ export function LanguageSwitcher({ collapsed = false }: { collapsed?: boolean })
 
   /* ━━ EXPANDED: two-button toggle matching the theme design ━━ */
   return (
-    <div className="flex items-center justify-end w-full" style={{ padding: "4px 6px" }}>
+    <div className="flex items-center justify-end w-fit" style={{ padding: "4px 6px" }}>
       <div
         ref={pillRef}
         className="relative flex items-center rounded-lg overflow-hidden"
