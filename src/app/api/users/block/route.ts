@@ -45,8 +45,8 @@ export async function POST(request: Request) {
 
     revalidatePath("/dashboard/users");
     return NextResponse.redirect(new URL("/dashboard/users", request.url));
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
+  } catch (error: any) {
+    const msg = error?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
     console.error("Block user error:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
