@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Plus, Save, X, Trash2, Power, PowerOff, Car, Bike, Truck, Zap, Star, Pencil, GripVertical } from "lucide-react";
+import { Plus, Save, X, Trash2, Power, PowerOff, Car, Bike, Truck, Zap, Star, Pencil, GripVertical, RefreshCw } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 interface VehicleType {
@@ -169,6 +169,24 @@ export default function PricingClient({ configs }: PricingClientProps) {
     }
   };
 
+  const syncPricing = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/pricing/sync", {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        alert("تم مزامنة التسعير بنجاح");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "فشل مزامنة التسعير");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getIconComponent = (iconName: string) => {
     const found = ICON_OPTIONS.find((i) => i.value === iconName);
     return found ? found.icon : Car;
@@ -194,6 +212,15 @@ export default function PricingClient({ configs }: PricingClientProps) {
               <span className="px-2 py-1 rounded-lg bg-text-disabled/10 text-text-disabled">{inactiveCount} {t("pricing.inactive")}</span>
             )}
           </div>
+          <button
+            onClick={syncPricing}
+            disabled={loading}
+            className="btn px-4 py-2.5 rounded-xl text-[13px] font-bold flex items-center gap-2 transition-all"
+            style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-border)" }}
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            مزامنة التسعير
+          </button>
           <button
             onClick={openAddModal}
             className="btn btn-primary px-4 py-2.5 rounded-xl text-[13px] font-bold flex items-center gap-2 transition-all"

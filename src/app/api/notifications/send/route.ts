@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { logAdminAction } from "@/lib/admin-logger";
 
 const MAX_TITLE_LENGTH = 120;
 const MAX_MESSAGE_LENGTH = 1000;
@@ -68,6 +69,14 @@ export async function POST(request: Request) {
         if (users.length < BATCH_SIZE) break;
         from += BATCH_SIZE;
       }
+
+      await logAdminAction({
+        admin_id: guard.id,
+        action: "send_notification",
+        table_name: "notifications",
+        details: { title, type, count: totalSent },
+        ip_address: request.headers.get("x-forwarded-for") || undefined,
+      });
 
       return NextResponse.json({ success: true, sent: totalSent });
     }

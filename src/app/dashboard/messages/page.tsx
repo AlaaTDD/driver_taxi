@@ -3,6 +3,7 @@ import { formatDate } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { MessageSquare, User, Clock, ChevronLeft, ChevronRight, Headphones, MapPin, ArrowLeftRight } from "lucide-react";
+import { ReplyButton } from "./messages-client";
 
 type TabType = "support" | "trip";
 
@@ -167,8 +168,11 @@ export default async function MessagesPage({
                       </div>
                       <p className="text-text-secondary text-[13px] leading-relaxed">{msg.message}</p>
                     </div>
-                    <div className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity variant-cyan">
-                      <Headphones size={14} className="text-info" />
+                    <div className="shrink-0 flex items-center gap-2">
+                      <ReplyButton props={{ type: "support", targetUserId: msg.user_id, targetUserName: user?.name }} />
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity variant-cyan">
+                        <Headphones size={14} className="text-info" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -226,7 +230,7 @@ export default async function MessagesPage({
                 <table className="w-full">
                   <thead>
                     <tr className="dash-table-head">
-                      {[t("messages.trip.table.sender"), t("messages.trip.table.receiver"), t("messages.trip.table.message"), t("messages.trip.table.trip"), t("messages.trip.table.read"), t("messages.trip.table.date")].map((h) => (
+                      {[t("messages.trip.table.sender"), t("messages.trip.table.receiver"), t("messages.trip.table.message"), t("messages.trip.table.trip"), t("messages.trip.table.read"), t("messages.trip.table.date"), "إجراء"].map((h) => (
                         <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
@@ -273,6 +277,9 @@ export default async function MessagesPage({
                             <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: msg.is_read ? "var(--success)" : "var(--error)", boxShadow: msg.is_read ? "0 0 6px var(--success-surface)" : "0 0 6px var(--error-surface)" }} />
                           </td>
                           <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{formatDate(msg.created_at)}</td>
+                          <td className="py-3.5 px-4">
+                            <ReplyButton props={{ type: "trip", tripId: msg.trip_id, targetUserId: msg.sender_id, targetUserName: sender?.name }} />
+                          </td>
                         </tr>
                       );
                     })}

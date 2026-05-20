@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { logAdminAction } from "@/lib/admin-logger";
 
 const WALLET_TYPES = new Set(["driver", "user"]);
 const TX_TYPES = new Set(["bonus", "penalty", "adjustment"]);
@@ -45,6 +46,15 @@ export async function POST(request: Request) {
     const errorCode = updateError.code === "42883" ? "wallet_rpc_missing" : "update_failed";
     return NextResponse.redirect(new URL(`/dashboard/wallets?error=${errorCode}`, request.url));
   }
+
+  await logAdminAction({
+    admin_id: guard.id,
+    action: "update",
+    table_name: "wallets",
+    record_id: walletId,
+    details: { amount, txType, description },
+    ip_address: request.headers.get("x-forwarded-for") || undefined,
+  });
 
   return NextResponse.redirect(new URL(`/dashboard/wallets?tab=${walletType}_wallets`, request.url));
 }

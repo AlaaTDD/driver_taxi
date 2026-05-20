@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
+import { logAdminAction } from "@/lib/admin-logger";
 import { revalidatePath } from "next/cache";
 
 export async function createBonusRule(formData: FormData) {
@@ -26,7 +27,7 @@ export async function createBonusRule(formData: FormData) {
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("bonus_rules").insert({
+  const data = {
     name,
     name_ar,
     trigger_type,
@@ -36,11 +37,17 @@ export async function createBonusRule(formData: FormData) {
     is_active,
     starts_at: starts_at ? new Date(starts_at).toISOString() : null,
     expires_at: expires_at ? new Date(expires_at).toISOString() : null,
-  });
+  };
 
-  if (error) {
-    return { error: error.message };
-  }
+  const { error } = await supabase.from("bonus_rules").insert(data);
+  if (error) return { error: error.message };
+
+  await logAdminAction({
+    admin_id: guard.id,
+    action: "create",
+    table_name: "bonus_rules",
+    details: { name: data.name, trigger_type: data.trigger_type, threshold: data.threshold, amount: data.bonus_amount },
+  });
 
   revalidatePath("/dashboard/bonuses");
   return { success: true };
@@ -48,12 +55,26 @@ export async function createBonusRule(formData: FormData) {
 
 export async function toggleBonusRule(id: string, is_active: boolean) {
   const guard = await requireAdmin();
-  if (guard instanceof Response) return { error: "غير مصرح لك بإجراء هذا العمل" };
+  if (guard instanceof Response) return;
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("bonus_rules").update({ is_active }).eq("id", id);
+  const { error } = await supabase
+    .from("bonus_rules")
+    .update({ is_active })
+    .eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("Failed to toggle bonus rule:", error);
+    return;
+  }
+
+  await logAdminAction({
+    admin_id: guard.id,
+    action: "update",
+    table_name: "bonus_rules",
+    record_id: id,
+    details: { is_active },
+  });
 
   revalidatePath("/dashboard/bonuses");
   return { success: true };

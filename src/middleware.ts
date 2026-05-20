@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -33,33 +33,29 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminRoute = pathname.startsWith("/dashboard");
 
-  
-  let isAdmin = false;
+  let hasAccess = false;
   if (user && isAdminRoute) {
     const { data: userProfile } = await supabase
       .from("users")
-      .select("is_admin")
+      .select("is_admin, role")
       .eq("id", user.id)
       .single();
-    isAdmin = userProfile?.is_admin === true;
+      
+    hasAccess = userProfile?.is_admin === true || userProfile?.role === "supervisor" || userProfile?.role === "admin";
   }
 
-  
   if (user && pathname === "/login") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  
   if (!user && pathname !== "/login" && pathname !== "/") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  
-  if (user && isAdminRoute && !isAdmin) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (user && isAdminRoute && !hasAccess) {
+    return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }
 
-  
   if (pathname === "/") {
     return NextResponse.redirect(
       new URL(user ? "/dashboard" : "/login", request.url)

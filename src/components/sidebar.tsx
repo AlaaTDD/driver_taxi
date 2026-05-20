@@ -80,7 +80,6 @@ const getNavGroups = (t: any): NavGroup[] => [
     id: "system",
     label: t("sidebar.sections.system"),
     items: [
-      { href: "/dashboard/vehicle-types",    label: t("common.vehicleTypes"),      icon: Truck,                navClass: "nav-primary" },
       { href: "/dashboard/notifications",    label: t("common.notifications"),           icon: Bell,                 navClass: "nav-primary" },
       { href: "/dashboard/messages",         label: t("common.messages"),             icon: MessageSquare,        navClass: "nav-primary" },
       { href: "/dashboard/admin-logs",       label: t("common.adminLogs"),          icon: Shield,               navClass: "nav-primary" },

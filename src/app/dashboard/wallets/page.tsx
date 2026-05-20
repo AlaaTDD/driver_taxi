@@ -3,6 +3,7 @@ import { formatDate, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/badge";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { WalletActions } from "./wallet-actions";
 import {
   Wallet,
   TrendingUp,
@@ -187,7 +188,7 @@ export default async function WalletsPage({
               <table className="w-full">
                 <thead>
                   <tr className="dash-table-head">
-                    {[t("common.driver"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalEarned"), t("wallets.fields.totalWithdrawn"), t("wallets.fields.pendingWithdrawal"), t("wallets.fields.commission")].map((h) => (
+                    {[t("common.driver"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalEarned"), t("wallets.fields.totalWithdrawn"), t("wallets.fields.pendingWithdrawal"), t("wallets.fields.commission"), t("common.actions")].map((h) => (
                       <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -209,6 +210,9 @@ export default async function WalletsPage({
                       <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_withdrawn))}</td>
                       <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--warning)" }}>{formatCurrency(Number(w.pending_withdrawal))}</td>
                       <td className="py-3.5 px-4 text-[13px] num text-text-secondary">{(Number(w.commission_rate) * 100).toFixed(0)}%</td>
+                      <td className="py-3.5 px-4">
+                        <WalletActions walletId={w.id} walletType="driver" userName={w.user?.name || "—"} />
+                      </td>
                     </tr>
                   ))}
                   {driverWalletsData.length === 0 && (
@@ -235,7 +239,7 @@ export default async function WalletsPage({
               <table className="w-full">
                 <thead>
                   <tr className="dash-table-head">
-                    {[t("common.user"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalSpent"), t("wallets.fields.totalToppedUp"), t("common.date")].map((h) => (
+                    {[t("common.user"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalSpent"), t("wallets.fields.totalToppedUp"), t("common.date"), t("common.actions")].map((h) => (
                       <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -256,6 +260,9 @@ export default async function WalletsPage({
                       <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_spent))}</td>
                       <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.total_topped_up))}</td>
                       <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{w.updated_at ? formatDate(w.updated_at) : "—"}</td>
+                      <td className="py-3.5 px-4">
+                        <WalletActions walletId={w.id} walletType="user" userName={w.user?.name || "—"} />
+                      </td>
                     </tr>
                   ))}
                   {userWalletsData.length === 0 && (
