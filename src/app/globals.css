@@ -8,33 +8,33 @@
      ════════════════════════════════════════════════════════════════════ */
 
   /* ── BACKGROUNDS ── */
-  --background: #F3F7F7;
-  --surface-high: #E7F0F0;
+  --background: #F3F7FF;
+  --surface-high: #E7EEFF;
   --surface: #FFFFFF;
-  --surface-elevated: #F8FBFB;
-  --surface-muted: #EEF5F4;
+  --surface-elevated: #F8FAFF;
+  --surface-muted: #EEF2FF;
   --surface-glass: rgba(255, 255, 255, 0.88);
 
   /* ── DIVIDERS ── */
-  --divider: #D7E5E3;
-  --divider-strong: #B8CBC8;
+  --divider: #D5E2F8;
+  --divider-strong: #B5C6E8;
   --table-row-border: var(--divider);
 
   /* ── TEXT ── */
-  --text-primary: #102322;
-  --text-secondary: #425C59;
-  --text-tertiary: #667C78;
-  --text-disabled: #91A5A1;
-  --text-disabled-rgb: 145, 165, 161;
+  --text-primary: #0F1E3C;
+  --text-secondary: #3D5278;
+  --text-tertiary: #5E6D90;
+  --text-disabled: #8EA0BE;
+  --text-disabled-rgb: 142, 160, 190;
 
   /* ── BRAND (Nile Teal) ── */
-  --primary: #0F766E;
-  --primary-rgb: 15, 118, 110;
-  --primary-dark: #0A5C55;
-  --primary-light: #14B8A6;
-  --primary-text: #0A5C55;
+  --primary: #4C8BF5;
+  --primary-rgb: 76, 139, 245;
+  --primary-dark: #2563EB;
+  --primary-light: #93C5FD;
+  --primary-text: #1D4ED8;
   --primary-foreground: #FFFFFF;
-  --primary-surface: rgba(15, 118, 110, 0.10);
+  --primary-surface: rgba(76, 139, 245, 0.10);
 
   /* ── STATUS ── */
   --success: #0F9F6E;
@@ -80,10 +80,10 @@
   --accent-surface-strong: rgba(var(--primary-rgb), 0.18);
   --accent-border: rgba(var(--primary-rgb), 0.28);
   --accent-shadow: rgba(var(--primary-rgb), 0.20);
-  --neutral-surface: rgba(66, 92, 89, 0.10);
-  --neutral-border: rgba(66, 92, 89, 0.22);
+  --neutral-surface: rgba(61, 82, 120, 0.10);
+  --neutral-border: rgba(61, 82, 120, 0.22);
   --table-row-hover: rgba(var(--primary-rgb), 0.05);
-  --overlay: rgba(15, 23, 42, 0.55);
+  --overlay: rgba(10, 20, 50, 0.55);
 
   /* ── RADIUS & SHADOWS ── */
   --radius-sm: 8px;
@@ -98,17 +98,17 @@
   --transition-normal: 220ms var(--ease-out);
   --transition-slow: 360ms var(--ease-in-out);
 
-  --shadow-sm: 0 1px 4px rgba(12, 32, 31, 0.04), 0 4px 12px rgba(12, 32, 31, 0.03);
-  --shadow-md: 0 4px 16px rgba(12, 32, 31, 0.07), 0 8px 24px rgba(12, 32, 31, 0.05);
-  --shadow-lg: 0 8px 28px rgba(12, 32, 31, 0.10), 0 16px 40px rgba(12, 32, 31, 0.06);
+  --shadow-sm: 0 1px 4px rgba(12, 20, 50, 0.04), 0 4px 12px rgba(12, 20, 50, 0.03);
+  --shadow-md: 0 4px 16px rgba(12, 20, 50, 0.07), 0 8px 24px rgba(12, 20, 50, 0.05);
+  --shadow-lg: 0 8px 28px rgba(12, 20, 50, 0.10), 0 16px 40px rgba(12, 20, 50, 0.06);
 
   /* ── SIDEBAR ALIASES ── */
-  --chrome-control-bg: #EAF3F2;
-  --chrome-shadow: 0 16px 34px rgba(12, 32, 31, 0.07);
+  --chrome-control-bg: #EAF0FF;
+  --chrome-shadow: 0 16px 34px rgba(12, 20, 50, 0.07);
   --dashboard-content-bg:
-    linear-gradient(90deg, rgba(15, 118, 110, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, #F8FBFB 0%, #EEF5F4 100%);
-  --sidebar-chrome-shadow: inset -1px 0 0 var(--divider), 4px 0 16px rgba(12, 32, 31, 0.04);
+    linear-gradient(90deg, rgba(76, 139, 245, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 100%);
+  --sidebar-chrome-shadow: inset -1px 0 0 var(--divider), 4px 0 16px rgba(12, 20, 50, 0.04);
 
   /* ── SIDEBAR TOKENS — LIGHT ── */
   --sb-bg-gradient: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface-high) 100%);
@@ -116,15 +116,15 @@
   --sb-nav-text-active: var(--text-primary);
 
 
-  --sb-divider: linear-gradient(to right, transparent, #C9DAD7, transparent);
+  --sb-divider: linear-gradient(to right, transparent, #C5D5F0, transparent);
 
-  --sb-group-dot: #B8CBC8;
+  --sb-group-dot: #B5C6E8;
 
   --sb-footer-hover: var(--text-primary);
   --sb-logout-text: var(--error);
 
-  --sb-logo-gradient: linear-gradient(135deg, #0F766E 0%, #E0A018 100%);
-  --sb-logo-shadow: 0 4px 12px rgba(15, 118, 110, 0.20);
+  --sb-logo-gradient: linear-gradient(135deg, #4C8BF5 0%, #E0A018 100%);
+  --sb-logo-shadow: 0 4px 12px rgba(76, 139, 245, 0.20);
 
   --sb-brand-gradient: linear-gradient(to right, var(--text-primary) 0%, var(--text-secondary) 100%);
 
@@ -133,7 +133,7 @@
   --sb-noise-opacity: 0;
   --sb-top-glow: none;
   --sb-top-glow-opacity: 0;
-  --sb-mobile-btn-text: #0A5C55;
+  --sb-mobile-btn-text: #1D4ED8;
   --sb-backdrop: rgba(15, 23, 42, 0.40);
 }
 
@@ -142,33 +142,33 @@
    ══════════════════════════════════════════════════════════════════════ */
 .dark {
   /* ── BACKGROUNDS (Deep Nile) ── */
-  --background: #080D0F;
-  --surface-high: #1E2A2D;
-  --surface: #0F171A;
-  --surface-elevated: #142023;
-  --surface-muted: #111B1E;
-  --surface-glass: rgba(15, 23, 26, 0.88);
+  --background: #06090F;
+  --surface-high: #131A2E;
+  --surface: #090E1A;
+  --surface-elevated: #0D1425;
+  --surface-muted: #0B1020;
+  --surface-glass: rgba(10, 15, 30, 0.88);
 
   /* ── DIVIDERS (Extremely Clear Separation) ── */
-  --divider: #243236;
-  --divider-strong: #33464B;
+  --divider: #1A2540;
+  --divider-strong: #253558;
   --table-row-border: rgba(255, 255, 255, 0.08);
 
   /* ── TEXT ── */
-  --text-primary: #EAF4F2;
-  --text-secondary: #A7B8B5;
-  --text-tertiary: #78908D;
-  --text-disabled: #536966;
-  --text-disabled-rgb: 83, 105, 102;
+  --text-primary: #E8F0FF;
+  --text-secondary: #A0B0D0;
+  --text-tertiary: #6878A8;
+  --text-disabled: #435880;
+  --text-disabled-rgb: 67, 88, 128;
 
   /* ── BRAND (Nile Teal on Dark) ── */
-  --primary: #0F766E;
-  --primary-rgb: 15, 118, 110;
-  --primary-dark: #0A5C55;
-  --primary-light: #2DD4BF;
-  --primary-text: #5EEAD4;
+  --primary: #4C8BF5;
+  --primary-rgb: 76, 139, 245;
+  --primary-dark: #2563EB;
+  --primary-light: #93C5FD;
+  --primary-text: #93C5FD;
   --primary-foreground: #FFFFFF;
-  --primary-surface: rgba(15, 118, 110, 0.18);
+  --primary-surface: rgba(76, 139, 245, 0.18);
 
   /* ── STATUS ── */
   --success: #16A36F;
@@ -210,21 +210,21 @@
   --color-black-rgb: 0, 0, 0;
 
   /* ── ACCENTS & NEUTRALS ── */
-  --accent-surface: rgba(15, 118, 110, 0.16);
-  --accent-surface-strong: rgba(15, 118, 110, 0.26);
-  --accent-border: rgba(45, 212, 191, 0.26);
-  --accent-shadow: rgba(45, 212, 191, 0.18);
-  --neutral-surface: rgba(167, 184, 181, 0.10);
-  --neutral-border: rgba(167, 184, 181, 0.22);
-  --table-row-hover: rgba(255, 255, 255, 0.06);
-  --overlay: rgba(8, 10, 15, 0.85);
+  --accent-surface: rgba(76, 139, 245, 0.16);
+  --accent-surface-strong: rgba(76, 139, 245, 0.26);
+  --accent-border: rgba(76, 139, 245, 0.26);
+  --accent-shadow: rgba(76, 139, 245, 0.18);
+  --neutral-surface: rgba(160, 176, 208, 0.10);
+  --neutral-border: rgba(160, 176, 208, 0.22);
+  --table-row-hover: rgba(76, 139, 245, 0.06);
+  --overlay: rgba(5, 8, 20, 0.85);
 
   /* ── CHROME & SHELL ── */
-  --chrome-control-bg: #172326;
+  --chrome-control-bg: #101830;
   --chrome-shadow: 0 18px 42px rgba(0, 0, 0, 0.60);
   --dashboard-content-bg:
-    linear-gradient(90deg, rgba(45, 212, 191, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, #0A1113 0%, #080D0F 100%);
+    linear-gradient(90deg, rgba(76, 139, 245, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #06090F 0%, #040710 100%);
   --sidebar-chrome-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06), 12px 0 32px rgba(0, 0, 0, 0.42);
 
   /* ── SHADOWS (Darker and richer) ── */
@@ -245,17 +245,17 @@
   --sb-footer-hover: var(--text-primary);
   --sb-logout-text: var(--error);
 
-  --sb-logo-gradient: linear-gradient(135deg, #0F766E 0%, #D49210 100%);
-  --sb-logo-shadow: 0 4px 14px rgba(45, 212, 191, 0.20);
+  --sb-logo-gradient: linear-gradient(135deg, #4C8BF5 0%, #D49210 100%);
+  --sb-logo-shadow: 0 4px 14px rgba(76, 139, 245, 0.20);
 
   --sb-brand-gradient: linear-gradient(to right, var(--text-primary) 0%, var(--text-secondary) 100%);
 
   --sb-tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.60);
 
   --sb-noise-opacity: 0.03;
-  --sb-top-glow: linear-gradient(180deg, rgba(45, 212, 191, 0.08), transparent);
+  --sb-top-glow: linear-gradient(180deg, rgba(76, 139, 245, 0.08), transparent);
   --sb-top-glow-opacity: 1;
-  --sb-mobile-btn-text: #5EEAD4;
+  --sb-mobile-btn-text: #93C5FD;
   --sb-backdrop: rgba(8, 10, 15, 0.80);
 }
 
@@ -504,11 +504,11 @@ body {
 
 .dark .login-backdrop {
   background:
-    linear-gradient(115deg, rgba(45, 212, 191, 0.08), transparent 34%),
+    linear-gradient(115deg, rgba(76, 139, 245, 0.08), transparent 34%),
     linear-gradient(245deg, rgba(var(--warning-rgb), 0.08), transparent 36%),
     repeating-linear-gradient(90deg,
       transparent 0 42px,
-      rgba(45, 212, 191, 0.035) 42px 43px);
+      rgba(76, 139, 245, 0.035) 42px 43px);
 }
 
 @layer base {
