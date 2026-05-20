@@ -57,79 +57,7 @@ const roleLabel = (user: User, t: any) =>
   : user.role === "supervisor" ? { label: t("users.roles.supervisor"), className: "variant-purple" }
   : { label: t("users.roles.user"), className: "variant-neutral" };
 
-/* ─── ActionMenu (three-dot dropdown) ───────────────────── */
-function ActionMenu({
-  user,
-  onBlock,
-  onRole,
-}: {
-  user: User;
-  onBlock: () => void;
-  onRole: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-        style={{
-          background: open ? "var(--surface-glass)" : "transparent",
-          border: open ? "1px solid var(--divider)" : "1px solid transparent",
-          color: "var(--text-tertiary)",
-        }}
-      >
-        <MoreVertical size={15} />
-      </button>
-
-      {open && (
-        <div
-          className="absolute left-0 top-10 z-30 w-44 rounded-xl overflow-hidden"
-          style={{
-            background: "var(--surface-elevated)",
-            border: "1px solid var(--divider)",
-            boxShadow: "var(--shadow-lg)",
-            animation: "fadeSlideDown 0.15s ease",
-          }}
-        >
-          <button
-            onClick={() => { setOpen(false); onBlock(); }}
-            id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
-            style={{
-              background: "transparent",
-              color: user.is_blocked ? "var(--primary)" : "var(--error)",
-              borderBottom: "1px solid var(--divider)",
-            }}
-          >
-            {user.is_blocked ? <Unlock size={13} /> : <Lock size={13} />}
-            {user.is_blocked ? "رفع الحظر" : "حظر المستخدم"}
-          </button>
-
-          {user.role !== "driver" && (
-            <button
-              onClick={() => { setOpen(false); onRole(); }}
-              id={`set-role-${user.id}`}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[12px] font-bold text-right transition-all hover:brightness-110"
-              style={{ background: "transparent", color: "var(--primary)" }}
-            >
-              <Shield size={13} />
-              {user.role === "supervisor" ? "إلغاء مشرف" : "تعيين مشرف"}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 /* ─── main component ─────────────────────────────────────── */
 export default function UsersClient({
@@ -489,12 +417,22 @@ export default function UsersClient({
                             {user.is_blocked ? <><Unlock size={10} /> رفع</> : <><Lock size={10} /> حظر</>}
                           </button>
 
-                          {/* three-dot for role */}
-                          <ActionMenu
-                            user={user}
-                            onBlock={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                            onRole={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                          />
+                          {/* quick supervisor toggle */}
+                          {user.role !== "driver" && (
+                            <button
+                              onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
+                              id={`set-role-${user.id}`}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action"
+                              style={
+                                user.role === "supervisor"
+                                  ? { background: "var(--neutral-surface)", color: "var(--text-tertiary)", border: "1px solid var(--neutral-border)" }
+                                  : { background: "rgba(168, 85, 247, 0.12)", color: "rgb(168, 85, 247)", border: "1px solid rgba(168, 85, 247, 0.22)" }
+                              }
+                            >
+                              <Shield size={10} />
+                              {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>
