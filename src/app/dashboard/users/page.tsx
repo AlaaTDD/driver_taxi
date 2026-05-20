@@ -4,6 +4,8 @@ import UsersClient from "./users-client";
 import { getTranslations } from "next-intl/server";
 import { Users, ShieldBan, Shield, Crown } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 /* ─── stat colours ────────────────────────────────────────── */
 const STAT_COLORS = {
   users:      { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },

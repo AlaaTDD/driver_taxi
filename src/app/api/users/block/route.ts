@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     revalidatePath("/dashboard/users");
-    return NextResponse.redirect(new URL("/dashboard/users", request.url));
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     const msg = error?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
     console.error("Block user error:", msg);

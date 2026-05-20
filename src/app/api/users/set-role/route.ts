@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     revalidatePath("/dashboard/users");
-    return NextResponse.redirect(new URL("/dashboard/users", request.url));
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     const msg = error?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
     console.error("Set role error:", msg);
