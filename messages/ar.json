@@ -358,6 +358,10 @@
     "setRole": "تعيين الدور",
     "roleSupervisorWarning": "سيتمكن المشرف من عرض الشكاوي والرد عليها وطلب مراجعة السائقين.",
     "roleUserWarning": "سيفقد المستخدم صلاحيات الإشراف فوراً.",
+    "roleUpdated": "تم تحديث دور المستخدم بنجاح.",
+    "roleUpdateFailed": "فشل تحديث دور المستخدم.",
+    "statusUpdated": "تم تحديث حالة المستخدم بنجاح.",
+    "statusUpdateFailed": "فشل تحديث حالة المستخدم.",
     "userDetails": "تفاصيل المستخدم",
     "stats": {
       "totalRegistered": "إجمالي المسجّلين",

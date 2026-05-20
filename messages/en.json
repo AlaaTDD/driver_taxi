@@ -358,6 +358,10 @@
     "setRole": "Set Role",
     "roleSupervisorWarning": "Supervisors will be able to view and reply to complaints and review drivers.",
     "roleUserWarning": "The user will lose supervisor privileges immediately.",
+    "roleUpdated": "User role updated successfully.",
+    "roleUpdateFailed": "Failed to update user role.",
+    "statusUpdated": "User status updated successfully.",
+    "statusUpdateFailed": "Failed to update user status.",
     "userDetails": "User Details",
     "stats": {
       "totalRegistered": "Total Registered",

@@ -10,6 +10,7 @@ import {
   MoreVertical, CheckCircle2
 } from "lucide-react";
 import { UserBlockModal, UserRoleModal } from "./user-modals";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -171,9 +172,16 @@ export default function UsersClient({
       fd.set("user_id", blockModal.user.id);
       fd.set("action", blockModal.action);
       if (blockModal.action === "block" && blockReason) fd.set("reason", blockReason);
-      await fetch("/api/users/block", { method: "POST", body: fd });
+      const res = await fetch("/api/users/block", { method: "POST", body: fd });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || t("users.statusUpdateFailed"));
+      }
+      toast.success(t("users.statusUpdated"));
       setBlockModal(null); setBlockReason("");
       router.refresh();
+    } catch (err: any) {
+      toast.error(err.message || t("users.statusUpdateFailed"));
     } finally { setActionLoading(false); }
   };
 
@@ -184,9 +192,16 @@ export default function UsersClient({
       const fd = new FormData();
       fd.set("user_id", roleModal.user.id);
       fd.set("role", roleModal.role);
-      await fetch("/api/users/set-role", { method: "POST", body: fd });
+      const res = await fetch("/api/users/set-role", { method: "POST", body: fd });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || t("users.roleUpdateFailed"));
+      }
+      toast.success(t("users.roleUpdated"));
       setRoleModal(null);
       router.refresh();
+    } catch (err: any) {
+      toast.error(err.message || t("users.roleUpdateFailed"));
     } finally { setActionLoading(false); }
   };
 
