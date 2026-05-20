@@ -18,6 +18,31 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Check env vars safely
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-background text-error p-6 text-center">
+        <div className="max-w-md p-8 rounded-3xl bg-red-500/10 border border-red-500/20 text-red-500">
+          <h1 className="text-xl font-bold mb-2">خطأ في إعدادات الاتصال (Configuration Error)</h1>
+          <p className="text-sm font-semibold mb-4">
+            مفاتيح البيئة (Environment Variables) غير معرّفة على Vercel.
+          </p>
+          <p className="text-xs text-text-secondary text-right mb-2 font-bold">
+            يرجى إضافة المفاتيح التالية في إعدادات المشروع على Vercel:
+          </p>
+          <ul className="text-xs font-mono bg-black/40 p-4 rounded text-left space-y-1 text-white">
+            <li>• NEXT_PUBLIC_SUPABASE_URL</li>
+            <li>• NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
