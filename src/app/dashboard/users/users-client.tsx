@@ -52,9 +52,9 @@ const avatarGrad = (user: User) =>
 
 const roleLabel = (user: User, t: any) =>
   user.is_admin ? { label: t("users.roles.admin"), className: "variant-primary-strong" }
-  : user.role === "driver" ? { label: t("users.roles.driver"), className: "variant-primary-strong" }
-  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), className: "variant-primary-strong" }
-  : { label: t("users.roles.user"), className: "variant-primary" };
+  : user.role === "driver" ? { label: t("users.roles.driver"), className: "variant-info" }
+  : user.role === "supervisor" ? { label: t("users.roles.supervisor"), className: "variant-purple" }
+  : { label: t("users.roles.user"), className: "variant-neutral" };
 
 /* ─── ActionMenu (three-dot dropdown) ───────────────────── */
 function ActionMenu({
@@ -399,7 +399,7 @@ export default function UsersClient({
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-text-primary font-bold text-[13px] truncate">{user.name}</span>
                             {user.is_admin && <Crown size={10} style={{ color: "var(--primary)", flexShrink: 0 }} />}
-                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "var(--primary)", flexShrink: 0 }} />}
+                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "var(--color-purple)", flexShrink: 0 }} />}
                           </div>
                           <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-disabled)" }}>{user.email}</p>
                         </div>
@@ -522,6 +522,7 @@ export default function UsersClient({
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-[14px] truncate" style={{ color: "var(--text-primary)" }}>{user.name}</span>
                         {user.is_admin && <Crown size={11} style={{ color: "var(--primary)", flexShrink: 0 }} />}
+                        {user.role === "supervisor" && !user.is_admin && <Shield size={11} style={{ color: "var(--color-purple)", flexShrink: 0 }} />}
                       </div>
                       <p className="text-[11px] font-mono" style={{ color: "var(--text-disabled)" }}>{user.phone}</p>
                     </div>
