@@ -11,21 +11,16 @@ function resolveLocale(rawLocale?: string): Locale {
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   const resolvedLocale = resolveLocale(cookieStore.get("NEXT_LOCALE")?.value);
-  const messages = (await import(`../messages/${resolvedLocale}.json`)).default;
+  let messages;
+  if (resolvedLocale === "ar") {
+    messages = (await import("../messages/ar.json")).default;
+  } else {
+    messages = (await import("../messages/en.json")).default;
+  }
   return {
     locale: resolvedLocale,
     messages,
     timeZone: "Africa/Cairo",
     now: new Date(),
-    onError: (err) => {
-      if (err.code === "MISSING_MESSAGE") return;
-      console.error(err);
-    },
-    getMessageFallback: ({ key }) => {
-      const parts = key.split('.');
-      const lastKey = parts[parts.length - 1];
-      if (lastKey === "blockReasonPlaceholder") return "اكتب سبب الحظر...";
-      return lastKey;
-    }
   };
 });
