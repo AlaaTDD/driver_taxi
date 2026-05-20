@@ -311,6 +311,9 @@ export default async function DashboardPage() {
       </>
     );
   } catch (err: any) {
+    if (err && (err.digest === 'DYNAMIC_SERVER_USAGE' || err.message?.includes('dynamic-server-error') || err.message?.includes('Dynamic server usage'))) {
+      throw err;
+    }
     console.error("Dashboard Page Error:", err);
     return (
       <div className="p-8 text-center rounded-2xl bg-error/10 border border-error/20 text-error max-w-2xl mx-auto my-12">
@@ -327,7 +330,6 @@ export default async function DashboardPage() {
       </div>
     );
   }
-}
 }
 
 /* ─── UTILITY SUB-COMPONENTS ────────────────────────────────────────── */
