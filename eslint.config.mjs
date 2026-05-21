@@ -21,6 +21,7 @@ const eslintConfig = defineConfig([
     "find-arabic.js",
     "fix-theme-colors.js",
     "test-jsx.js",
+    "scratch/**",
   ]),
 ]);
 

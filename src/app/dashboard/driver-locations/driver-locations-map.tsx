@@ -24,11 +24,12 @@ export default function DriverLocationsMap({
   const markersRef = useRef<Record<string, any>>({});
   
   const [drivers, setDrivers] = useState<DriverPin[]>(initialDrivers);
+  const [prevInitial, setPrevInitial] = useState<DriverPin[]>(initialDrivers);
 
-  // Sync with prop updates
-  useEffect(() => {
+  if (initialDrivers !== prevInitial) {
+    setPrevInitial(initialDrivers);
     setDrivers(initialDrivers);
-  }, [initialDrivers]);
+  }
 
   // Supabase Realtime Subscription
   useEffect(() => {

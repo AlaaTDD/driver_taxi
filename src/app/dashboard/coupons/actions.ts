@@ -1,9 +1,13 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
 
 export async function createCoupon(formData: FormData) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return { error: "غير مصرح لك بإجراء هذا العمل" };
+
   const supabase = createAdminClient();
 
   const data: Record<string, unknown> = {
@@ -57,6 +61,9 @@ export async function createCoupon(formData: FormData) {
 }
 
 export async function updateCoupon(couponId: string, formData: FormData) {
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return { error: "غير مصرح لك بإجراء هذا العمل" };
+
   const supabase = createAdminClient();
 
   const data: Record<string, unknown> = {

@@ -165,6 +165,7 @@ export function ChatButton({ props }: { props: ChatModalProps }) {
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchMessages();
       setTimeout(() => inputRef.current?.focus(), 300);
     }

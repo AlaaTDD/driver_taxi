@@ -4,6 +4,7 @@ import { Badge } from "@/components/badge";
 import { getTranslations } from "next-intl/server";
 import { Car, CheckCircle, ShieldBan, AlertCircle, Star, Phone, Mail, User, FileText, ArrowRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export default async function DriverDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -209,7 +210,7 @@ export default async function DriverDetailPage({ params }: { params: Promise<{ i
                 <span className="text-text-secondary text-sm font-bold">{doc.label}</span>
                 {doc.url ? (
                   <a href={doc.url} target="_blank" rel="noopener noreferrer" className="relative group block rounded-xl overflow-hidden aspect-4/3 bg-[rgba(var(--color-black-rgb),0.5)] border border-divider">
-                    <img src={doc.url} alt={doc.label} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <Image src={doc.url} alt={doc.label} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                     <div className="absolute inset-0 flex items-center justify-center bg-[rgba(var(--color-black-rgb),0.3)] opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="px-3 py-1.5 rounded-lg text-white font-bold text-[12px]" style={{ background: "rgba(var(--color-white-rgb),0.15)", backdropFilter: "blur(4px)" }}>
                         عرض الصورة
