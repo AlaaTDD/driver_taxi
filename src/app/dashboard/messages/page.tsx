@@ -47,10 +47,19 @@ export default async function MessagesPage({
   const supabase = createAdminClient();
 
   /* ── Stats ── */
+  const safeCountQuery = async (query: any) => {
+    try {
+      const res = await query;
+      return { count: res.count || 0 };
+    } catch {
+      return { count: 0 };
+    }
+  };
+
   const [supportCountRes, tripMsgCountRes, openTicketsRes] = await Promise.all([
-    supabase.from("support_tickets").select("id", { count: "exact", head: true }).then(r => r).catch(() => ({ count: 0 })),
-    supabase.from("trip_conversations_view").select("trip_id", { count: "exact", head: true }).then(r => r).catch(() => ({ count: 0 })),
-    supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "open").then(r => r).catch(() => ({ count: 0 })),
+    safeCountQuery(supabase.from("support_tickets").select("id", { count: "exact", head: true })),
+    safeCountQuery(supabase.from("trip_conversations_view").select("trip_id", { count: "exact", head: true })),
+    safeCountQuery(supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "open")),
   ]);
 
   const totalTickets = supportCountRes.count || 0;
