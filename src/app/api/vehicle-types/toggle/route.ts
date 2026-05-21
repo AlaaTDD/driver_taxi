@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const { error } = await supabase
       .from("vehicle_types")
-      .update({ is_active })
+      .update({ is_active: !!is_active })
       .eq("id", id);
 
     if (error) {

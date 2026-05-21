@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/dashboard-shell";
+import { ConfirmDialogProvider } from "@/components/confirm-dialog";
 
 export default function DashboardLayout({
   children,
@@ -7,7 +8,9 @@ export default function DashboardLayout({
 }) {
   return (
     <DashboardShell>
-      {children}
+      <ConfirmDialogProvider>
+        {children}
+      </ConfirmDialogProvider>
     </DashboardShell>
   );
 }

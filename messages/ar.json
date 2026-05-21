@@ -527,7 +527,12 @@
       "saveFailed": "فشل الحفظ",
       "toggleFailed": "فشل التبديل",
       "confirmDelete": "هل أنت متأكد من حذف هذا النوع؟",
-      "deleteFailed": "فشل الحذف - قد يكون النوع مستخدماً في رحلات"
+      "deleteFailed": "فشل الحذف - قد يكون النوع مستخدماً في رحلات",
+      "updateSuccess": "تم التحديث بنجاح",
+      "addSuccess": "تمت الإضافة بنجاح",
+      "activated": "تم التفعيل",
+      "deactivated": "تم التعطيل",
+      "deleteSuccess": "تم الحذف بنجاح"
     },
     "icons": {
       "car": "سيارة",

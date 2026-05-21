@@ -26,6 +26,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+    await logAdminAction({
+      admin_id: guard.user.id,
+      action: "delete",
+      table_name: "ratings",
+      record_id: rating_id,
+      ip_address: getIpFromRequest(request),
+    });
+
+    const { revalidatePath } = await import("next/cache");
+    revalidatePath("/dashboard/ratings");
     return NextResponse.redirect(new URL("/dashboard/ratings", request.url));
   } catch (error) {
     console.error("Delete rating error:", error);

@@ -6,6 +6,7 @@ import { updateRoutePlanStatus } from "./actions";
 import { Navigation, MapPin, AlertCircle, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 export default function RoutePlansClient({
   initialData,
@@ -42,7 +43,9 @@ export default function RoutePlansClient({
     startTransition(async () => {
       const res = await updateRoutePlanStatus(id, newStatus);
       if (!res.success) {
-        alert("فشل تحديث الحالة: " + res.error);
+        toast.error("فشل تحديث الحالة: " + res.error);
+      } else {
+        toast.success("تم تحديث الحالة بنجاح");
       }
       setStatusLoading(null);
     });

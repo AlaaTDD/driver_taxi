@@ -5,6 +5,7 @@ import { Plus, X, Tag, Check, Edit3 } from "lucide-react";
 import { createCoupon, updateCoupon } from "./actions";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 type CouponData = {
   id?: string;
@@ -107,7 +108,7 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
       }
 
       if (result.error) {
-        alert(`${t("common.error")}: ${result.error}`);
+        toast.error(`${t("common.error")}: ${result.error}`);
         return;
       }
 
@@ -119,7 +120,7 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
         router.refresh();
       }, 1000);
     } catch {
-      alert(t("common.unexpectedError"));
+      toast.error(t("common.unexpectedError"));
     } finally {
       setLoading(false);
     }

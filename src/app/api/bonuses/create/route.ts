@@ -17,7 +17,9 @@ export async function POST(req: Request) {
       bonus_amount,
       vehicle_types,
       is_active,
+      starts_at,
       valid_from,
+      expires_at,
       valid_until,
     } = body;
 
@@ -49,8 +51,10 @@ export async function POST(req: Request) {
       is_active: is_active ?? true,
     };
     if (vehicle_types?.length) insertData.vehicle_types = vehicle_types;
-    if (valid_from) insertData.valid_from = valid_from;
-    if (valid_until) insertData.valid_until = valid_until;
+    const effective_start = starts_at || valid_from;
+    const effective_expire = expires_at || valid_until;
+    if (effective_start) insertData.starts_at = effective_start;
+    if (effective_expire) insertData.expires_at = effective_expire;
 
     const { data, error } = await supabase
       .from("bonus_rules")

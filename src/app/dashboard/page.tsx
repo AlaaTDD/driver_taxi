@@ -3,6 +3,7 @@ import { LocalTimeDisplay } from "@/components/local-time-display";
 import { StatCard } from "@/components/stat-card";
 import { TripsStatusChart, RevenueChart } from "@/components/charts";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel } from "@/lib/utils";
+import { ChartCard } from "@/components/chart-card";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -32,10 +33,14 @@ export default async function DashboardPage() {
     const supabase = createAdminClient();
     const currency = await getAppCurrency();
 
-    const [dashboardRes, recentTripsRes, tripsForChartRes] = await Promise.all([
+    const [
+      dashboardRes,
+      recentTripsRes,
+      tripsForChartRes
+    ] = await Promise.all([
       supabase.from("admin_dashboard").select("*").single(),
       supabase.from("admin_recent_trips").select("*").limit(10),
-      supabase.from("trips").select("id, status, price, vehicle_type").order("created_at", { ascending: false }).limit(2000),
+      supabase.from("trips").select("id, status, price, vehicle_type").order("created_at", { ascending: false }).limit(500),
     ]);
 
     const dashboard = dashboardRes.data;
@@ -44,19 +49,16 @@ export default async function DashboardPage() {
 
     const totalUsers = Number(dashboard?.total_users ?? 0);
     const totalDrivers = Number(dashboard?.total_drivers ?? 0);
-    const totalTrips = Number(dashboard?.total_trips ?? trips.length);
-    const completedTrips = Number(dashboard?.completed_trips ?? trips.filter((t) => t.status === "completed").length);
-    const activeTrips = Number(dashboard?.active_trips ?? trips.filter((t) => !["completed", "cancelled"].includes(t.status)).length);
+    const totalTrips = Number(dashboard?.total_trips ?? 0);
+    const completedTrips = Number(dashboard?.completed_trips ?? 0);
+    const cancelledTrips = Number(dashboard?.cancelled_trips ?? 0);
+    const activeTrips = Number(dashboard?.active_trips ?? 0);
     const verifiedDrivers = Number(dashboard?.verified_drivers ?? 0);
     const availableDrivers = Number(dashboard?.available_drivers ?? 0);
     const pendingDrivers = Number(dashboard?.pending_drivers ?? 0);
-    const totalRevenue = Number(
-      dashboard?.total_revenue ??
-        trips
-          .filter((t) => t.status === "completed")
-          .reduce((sum, t) => sum + (Number(t.price) || 0), 0)
-    );
+    const totalRevenue = Number(dashboard?.total_revenue ?? 0);
 
+    // Generate chart data from the most recent 500 trips (optimized from 2000)
     const statusCounts: Record<string, number> = {};
     trips.forEach((t) => {
       statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
@@ -86,7 +88,6 @@ export default async function DashboardPage() {
     }));
 
     const completionRate = totalTrips > 0 ? Math.round((completedTrips / totalTrips) * 100) : 0;
-    const cancelledTrips = trips.filter((t) => t.status === "cancelled").length;
     const acceptanceRate = totalTrips > 0 ? Math.round(((totalTrips - cancelledTrips) / totalTrips) * 100) : 0;
     const recentCompletedTrips = recentTrips.filter((trip) => trip.status === "completed").length;
     const recentActiveTrips = recentTrips.filter((trip) => !["completed", "cancelled"].includes(trip.status)).length;
@@ -320,11 +321,13 @@ export default async function DashboardPage() {
     return (
       <div className="p-8 text-center rounded-2xl bg-error/10 border border-error/20 text-error max-w-2xl mx-auto my-12">
         <h2 className="text-xl font-bold mb-2">حدث خطأ في تحميل لوحة التحكم (Server Error)</h2>
-        <p className="text-sm font-semibold mb-4">{err?.message || String(err)}</p>
+        <p className="text-sm font-semibold mb-4">
+          {process.env.NODE_ENV === "development" ? (err?.message || String(err)) : "حدث خطأ غير متوقع أثناء تحميل البيانات. يرجى المحاولة لاحقاً."}
+        </p>
         <p className="text-[11px] text-text-secondary mb-4 text-right">
           يرجى التحقق من إعدادات مفاتيح البيئة (Environment Variables) في لوحة تحكم Vercel الخاصة بك (مثل SUPABASE_SERVICE_ROLE_KEY).
         </p>
-        {err?.stack && (
+        {process.env.NODE_ENV === "development" && err?.stack && (
           <pre className="p-4 rounded bg-black/80 text-white text-xs text-left overflow-auto max-h-60 font-mono dir-ltr">
             {err.stack}
           </pre>
@@ -334,28 +337,3 @@ export default async function DashboardPage() {
   }
 }
 
-/* ─── UTILITY SUB-COMPONENTS ────────────────────────────────────────── */
-
-function ChartCard({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="dash-card">
-      <div className="dash-section-header">
-        {icon && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-            <span className="text-primary">{icon}</span>
-          </div>
-        )}
-        <h3 className="text-sm font-bold text-text-primary">{title}</h3>
-      </div>
-      <div className="p-4">{children}</div>
-    </div>
-  );
-}

@@ -43,10 +43,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
+    const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+    await logAdminAction({
+      admin_id: guard.user.id,
+      action: action === "block" ? "block" : "unblock",
+      table_name: "users",
+      record_id: userId,
+      new_data: { is_blocked: action === "block", reason },
+      ip_address: getIpFromRequest(request),
+    });
+
     revalidatePath("/dashboard/users");
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    const msg = error?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : (typeof error === "object" ? JSON.stringify(error) : String(error));
     console.error("Block user error:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }

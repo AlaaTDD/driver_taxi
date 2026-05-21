@@ -26,7 +26,7 @@ export default async function CouponAnalyticsPage() {
   // ── Fetch Analytics Data ──
   const { data: analytics } = await supabase
     .from("coupons")
-    .select("*, coupon_usages:coupon_usages(discount_amount, trip_id)")
+    .select("*")
     .order("used_count", { ascending: false });
 
   // ── Fetch Wallet Subsidy Transactions ──
@@ -70,10 +70,12 @@ export default async function CouponAnalyticsPage() {
   const activeCoupons = allCoupons.filter((c) => c.is_active).length;
 
   // All usages across all coupons
-  const allUsages = allCoupons.flatMap((c) => (c.coupon_usages || []) as { discount_amount: number; trip_id: string }[]);
-  const totalDiscountGiven = allUsages.reduce((sum, u) => sum + Number(u.discount_amount || 0), 0);
-  const totalUsageCount = allUsages.length;
-  const uniqueTrips = new Set(allUsages.map((u) => u.trip_id)).size;
+  const totalDiscountGiven = allCoupons.reduce((sum, c) => sum + Number(c.spent_budget || 0), 0);
+  const totalUsageCount = allCoupons.reduce((sum, c) => sum + Number(c.used_count || 0), 0);
+  
+  // Unique trips across all coupons
+  const { data: tripUsages } = await supabase.from("coupon_usages").select("trip_id");
+  const uniqueTrips = new Set((tripUsages || []).map((u) => u.trip_id)).size;
   const avgDiscountPerTrip = totalUsageCount > 0 ? totalDiscountGiven / totalUsageCount : 0;
 
   // Platform subsidy cost
@@ -93,8 +95,9 @@ export default async function CouponAnalyticsPage() {
     topCouponTimeline = timeline || [];
   }
 
-  // Unique users across all coupons (approximate from used_count)
-  const totalUniqueUsers = allCoupons.reduce((sum, c) => sum + (c.used_count || 0), 0);
+  // Unique users across all coupons
+  const { data: userUsages } = await supabase.from("coupon_usages").select("user_id");
+  const totalUniqueUsers = new Set((userUsages || []).map((u) => u.user_id)).size;
 
   // Budget stats
   const totalBudgetAllocated = allCoupons.reduce((sum, c) => sum + Number(c.budget_limit || 0), 0);
@@ -401,8 +404,7 @@ export default async function CouponAnalyticsPage() {
             </thead>
             <tbody>
               {allCoupons.slice(0, 15).map((coupon) => {
-                const usages = (coupon.coupon_usages || []) as { discount_amount: number }[];
-                const couponTotal = usages.reduce((sum, u) => sum + Number(u.discount_amount || 0), 0);
+                const couponTotal = Number(coupon.spent_budget || 0);
                 
                 return (
                   <tr key={coupon.id} className="group/row dash-table-row">

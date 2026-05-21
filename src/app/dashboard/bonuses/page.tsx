@@ -8,15 +8,27 @@ import {
 import BonusesClient, { ToggleRuleStatus } from "./bonuses-client";
 import { getAppCurrency } from "@/lib/currency";
 
-export default async function BonusesPage() {
+export default async function BonusesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>;
+}) {
+  const params = await searchParams;
+  const searchQuery = params.search || "";
   const t = await getTranslations();
   const supabase = createAdminClient();
 
   const [rulesRes, summaryRes, recentAwardsRes] = await Promise.all([
-    supabase
-      .from("bonus_rules")
-      .select("*")
-      .order("created_at", { ascending: false }),
+    (() => {
+      let q = supabase
+        .from("bonus_rules")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (searchQuery) {
+        q = q.or(`name.ilike.%${searchQuery}%,name_ar.ilike.%${searchQuery}%`);
+      }
+      return q;
+    })(),
     supabase.from("admin_bonus_summary").select("*"),
     supabase
       .from("driver_bonus_ledger")
@@ -66,6 +78,41 @@ export default async function BonusesPage() {
             <BonusesClient />
           </div>
         </div>
+
+        {/* Search */}
+        <form className="flex items-center gap-2">
+          <input
+            type="text"
+            name="search"
+            defaultValue={searchQuery}
+            placeholder={t("common.search") + "..."}
+            className="px-4 py-2 rounded-xl text-[13px] font-semibold outline-none transition-colors"
+            style={{
+              background: searchQuery ? "var(--accent-surface)" : "var(--surface-elevated)",
+              border: `1px solid ${searchQuery ? "var(--accent-border)" : "var(--divider-strong)"}`,
+              color: "var(--text-primary)",
+              minWidth: 200,
+            }}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-xl text-[13px] font-bold transition-all"
+            style={{ background: "var(--primary)", color: "var(--color-black)" }}
+          >
+            {t("ratings.filters.apply")}
+          </button>
+          {searchQuery && (
+            <a
+              href="/dashboard/bonuses"
+              className="px-3 py-2 rounded-xl text-[12px] font-semibold text-text-tertiary hover:text-text-secondary"
+              style={{ border: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+            >
+              {t("ratings.filters.reset")}
+            </a>
+          )}
+        </form>
+
+
 
         {/* KPI Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

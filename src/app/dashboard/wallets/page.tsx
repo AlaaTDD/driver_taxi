@@ -38,57 +38,81 @@ export default async function WalletsPage({
   const currency = await getAppCurrency();
 
   /* ── Stats ── */
-  const [driverWalletsRes, userWalletsRes, txRes] = await Promise.all([
-    supabase.from("driver_wallets").select("id, balance, total_earned, total_withdrawn, pending_withdrawal, commission_rate"),
-    supabase.from("user_wallets").select("id, balance, total_spent, total_topped_up"),
+  /* ── Global TX Count & Wallet Stats ── */
+  const [txRes, statsRes] = await Promise.all([
     supabase.from("wallet_transactions").select("id", { count: "exact", head: true }),
+    supabase.rpc("get_wallet_stats").single(),
   ]);
 
-  const driverWallets = driverWalletsRes.data || [];
-  const userWallets = userWalletsRes.data || [];
-
-  const totalDriverBalance = driverWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
-  const totalDriverEarned = driverWallets.reduce((s, w) => s + Number(w.total_earned || 0), 0);
-  const totalDriverWithdrawn = driverWallets.reduce((s, w) => s + Number(w.total_withdrawn || 0), 0);
-  const totalUserBalance = userWallets.reduce((s, w) => s + Number(w.balance || 0), 0);
+  const stats: any = statsRes.data || {};
 
   const statCards = [
-    { label: t("wallets.stats.driverBalance"), value: formatCurrency(totalDriverBalance, currency), variantClass: "variant-success", icon: Car },
-    { label: t("wallets.stats.driverEarned"), value: formatCurrency(totalDriverEarned, currency), variantClass: "variant-info", icon: TrendingUp },
-    { label: t("wallets.stats.driverWithdrawn"), value: formatCurrency(totalDriverWithdrawn, currency), variantClass: "variant-error", icon: TrendingDown },
-    { label: t("wallets.stats.userBalance"), value: formatCurrency(totalUserBalance, currency), variantClass: "variant-warning", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: stats.total_driver_balance ? formatCurrency(Number(stats.total_driver_balance), currency) : "—", variantClass: "variant-success", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: stats.total_driver_earned ? formatCurrency(Number(stats.total_driver_earned), currency) : "—", variantClass: "variant-info", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: stats.total_driver_withdrawn ? formatCurrency(Number(stats.total_driver_withdrawn), currency) : "—", variantClass: "variant-error", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: stats.total_user_balance ? formatCurrency(Number(stats.total_user_balance), currency) : "—", variantClass: "variant-warning", icon: User },
   ];
 
   const tabs = [
-    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: driverWallets.length, navClass: "nav-success" },
-    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: userWallets.length, navClass: "nav-warning" },
+    { key: "driver_wallets", label: t("wallets.tabs.driverWallets"), count: 0, navClass: "nav-success" },
+    { key: "user_wallets", label: t("wallets.tabs.userWallets"), count: 0, navClass: "nav-warning" },
     { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, navClass: "nav-info" },
   ];
 
-  /* ── Driver wallets with user info ── */
+  /* ── Driver wallets with user info (Fix N+1 PERF-04) ── */
   let driverWalletsData: any[] = [];
   let driverWalletsCount = 0;
+  let driverTotalPages = 1;
   if (tab === "driver_wallets") {
-    const driverIds = driverWallets.map((w) => w.id);
-    const { data: users } = driverIds.length
-      ? await supabase.from("users").select("id, name, phone, email").in("id", driverIds)
-      : { data: [] };
-    const userMap = new Map((users || []).map((u) => [u.id, u]));
-    driverWalletsData = driverWallets.map((w) => ({ ...w, user: userMap.get(w.id) }));
-    driverWalletsCount = driverWalletsData.length;
+    const { data: dWallets, count } = await supabase
+      .from("driver_wallets")
+      .select(`
+        id, balance, total_earned, total_withdrawn, pending_withdrawal, commission_rate,
+        users!inner(id, name, phone, email)
+      `, { count: "exact" })
+      .order("id", { ascending: true })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+      
+    driverWalletsCount = count || 0;
+    driverTotalPages = Math.ceil(driverWalletsCount / pageSize);
+    const wData = dWallets || [];
+    
+    // Format the response to map the joined user correctly
+    driverWalletsData = wData.map((w: any) => ({
+      ...w,
+      user: w.users
+    }));
+    
+    // Update count in tab
+    tabs[0].count = driverWalletsCount;
   }
 
-  /* ── User wallets with user info ── */
+  /* ── User wallets with user info (Fix N+1 PERF-04) ── */
   let userWalletsData: any[] = [];
   let userWalletsCount = 0;
+  let userTotalPages = 1;
   if (tab === "user_wallets") {
-    const userIds = userWallets.map((w) => w.id);
-    const { data: users } = userIds.length
-      ? await supabase.from("users").select("id, name, phone, email").in("id", userIds)
-      : { data: [] };
-    const userMap = new Map((users || []).map((u) => [u.id, u]));
-    userWalletsData = userWallets.map((w) => ({ ...w, user: userMap.get(w.id) }));
-    userWalletsCount = userWalletsData.length;
+    const { data: uWallets, count } = await supabase
+      .from("user_wallets")
+      .select(`
+        id, balance, total_spent, total_topped_up, updated_at,
+        users!inner(id, name, phone, email)
+      `, { count: "exact" })
+      .order("id", { ascending: true })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+      
+    userWalletsCount = count || 0;
+    userTotalPages = Math.ceil(userWalletsCount / pageSize);
+    const wData = uWallets || [];
+    
+    // Format the response to map the joined user correctly
+    userWalletsData = wData.map((w: any) => ({
+      ...w,
+      user: w.users
+    }));
+    
+    // Update count in tab
+    tabs[1].count = userWalletsCount;
   }
 
   /* ── Transactions ── */
@@ -226,6 +250,25 @@ export default async function WalletsPage({
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination */}
+            {driverTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
+                {page > 1 && (
+                  <Link href={`/dashboard/wallets?tab=driver_wallets&page=${page - 1}`}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                    <ChevronRight size={14} />
+                  </Link>
+                )}
+                <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {driverTotalPages}</span>
+                {page < driverTotalPages && (
+                  <Link href={`/dashboard/wallets?tab=driver_wallets&page=${page + 1}`}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                    <ChevronLeft size={14} />
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -276,6 +319,25 @@ export default async function WalletsPage({
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination */}
+            {userTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
+                {page > 1 && (
+                  <Link href={`/dashboard/wallets?tab=user_wallets&page=${page - 1}`}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                    <ChevronRight size={14} />
+                  </Link>
+                )}
+                <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {userTotalPages}</span>
+                {page < userTotalPages && (
+                  <Link href={`/dashboard/wallets?tab=user_wallets&page=${page + 1}`}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
+                    <ChevronLeft size={14} />
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         )}
 

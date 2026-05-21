@@ -88,7 +88,6 @@ function ConfigDrawer({
     setLoading(true);
     setError(null);
     const fd = new FormData();
-    fd.append("id", config.id);
     fd.append("key", config.key);
     try {
       fd.append("value", isObject ? JSON.stringify(objValue) : strValue);

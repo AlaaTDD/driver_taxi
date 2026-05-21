@@ -27,14 +27,20 @@ export default async function CouponsPage({
   const totalPages = Math.ceil((count || 0) / pageSize);
   const currency = await getAppCurrency();
 
-  // Compute KPI stats
-  const allCoupons = coupons || [];
-  const activeCount = allCoupons.filter((c) => c.is_active).length;
-  const totalDiscount = allCoupons.reduce((sum, c) => sum + Number(c.spent_budget || 0), 0);
-  const budgetRemaining = allCoupons.reduce((sum, c) => {
-    if (c.budget_limit) return sum + (Number(c.budget_limit) - Number(c.spent_budget || 0));
+  // Fetch stats for all coupons
+  const { data: allCouponsData } = await supabase
+    .from("coupons")
+    .select("is_active, spent_budget, budget_limit");
+
+  const allCouponsStats = allCouponsData || [];
+  const activeCount = allCouponsStats.filter((c) => c.is_active).length;
+  const totalDiscount = allCouponsStats.reduce((sum, c) => sum + Number(c.spent_budget || 0), 0);
+  const budgetRemaining = allCouponsStats.reduce((sum, c) => {
+    if (c.budget_limit) return sum + (Math.max(0, Number(c.budget_limit) - Number(c.spent_budget || 0)));
     return sum;
   }, 0);
+  
+  const allCoupons = coupons || [];
 
   // KPI Cards data
   const kpis = [

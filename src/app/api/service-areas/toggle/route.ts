@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (guard instanceof Response) return guard;
 
   try {
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const { id, is_active } = await req.json();
 
     if (!id) {

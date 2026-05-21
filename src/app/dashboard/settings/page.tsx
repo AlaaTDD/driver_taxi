@@ -191,12 +191,14 @@ export default async function SettingsPage() {
     console.error("Settings Page Error:", err);
     return (
       <div className="p-8 text-center rounded-2xl bg-error/10 border border-error/20 text-error max-w-2xl mx-auto my-12">
-        <h2 className="text-xl font-bold mb-2">حدث خطأ في تحميل الإعدادات (Server Error)</h2>
-        <p className="text-sm font-semibold mb-4">{err?.message || String(err)}</p>
+        <h2 className="text-xl font-bold mb-2">حدث خطأ (Server Error)</h2>
+        <p className="text-sm font-semibold mb-4">
+          {process.env.NODE_ENV === "development" ? (err?.message || String(err)) : "حدث خطأ غير متوقع أثناء تحميل الإعدادات. يرجى المحاولة لاحقاً."}
+        </p>
         <p className="text-[11px] text-text-secondary mb-4 text-right">
           يرجى التحقق من إعدادات مفاتيح البيئة (Environment Variables) وجداول قاعدة البيانات (app_config).
         </p>
-        {err?.stack && (
+        {process.env.NODE_ENV === "development" && err?.stack && (
           <pre className="p-4 rounded bg-black/80 text-white text-xs text-left overflow-auto max-h-60 font-mono dir-ltr">
             {err.stack}
           </pre>

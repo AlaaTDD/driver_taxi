@@ -43,7 +43,8 @@ export default async function DriversPage({
     `, { count: "exact" });
 
   if (searchQuery) {
-    driversQuery = driversQuery.or(`national_id.ilike.%${searchQuery}%,license_number.ilike.%${searchQuery}%,vehicle_plate.ilike.%${searchQuery}%,users.name.ilike.%${searchQuery}%,users.phone.ilike.%${searchQuery}%`);
+    const safeSearch = searchQuery.replace(/[%_\\]/g, '\\$&');
+    driversQuery = driversQuery.or(`national_id.ilike.%${safeSearch}%,license_number.ilike.%${safeSearch}%,vehicle_plate.ilike.%${safeSearch}%,users.name.ilike.%${safeSearch}%,users.phone.ilike.%${safeSearch}%`);
   }
 
   if (tab === "approved") {
@@ -55,23 +56,37 @@ export default async function DriversPage({
   }
 
   const { data: driversRaw, count: driversCount } = await driversQuery
-    .order("users(created_at)", { ascending: false })
+    .order("id", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   
   let revisionDrivers: unknown[] = [];
   if (tab === "revision") {
-    const { data } = await supabase
+    const { data: revData } = await supabase
       .from("driver_revision_requests")
       .select(`
-        id, fields_requested, message, status, created_at,
-        users!driver_id(id, name, phone, email),
-        drivers_profile!driver_id(national_id, vehicle_type, vehicle_brand, vehicle_plate, national_id_image_url, license_image_url)
+        id, fields_requested, message, status, created_at, driver_id,
+        users!driver_id(id, name, phone, email)
       `)
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
-    revisionDrivers = data || [];
+      
+    let mergedRevs: any[] = [];
+    if (revData && revData.length > 0) {
+      const driverIds = [...new Set(revData.map(r => r.driver_id))];
+      const { data: profiles } = await supabase
+        .from("drivers_profile")
+        .select("id, national_id, vehicle_type, vehicle_brand, vehicle_plate, national_id_image_url, license_image_url")
+        .in("id", driverIds);
+        
+      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+      mergedRevs = revData.map(r => ({
+        ...r,
+        drivers_profile: profileMap.get(r.driver_id) || null
+      }));
+    }
+    revisionDrivers = mergedRevs;
   }
 
   const totalPages = Math.ceil(((tab === "revision" ? revisionRes.count : driversCount) || 0) / pageSize);

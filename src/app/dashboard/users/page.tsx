@@ -40,8 +40,9 @@ export default async function UsersPage({
     );
 
   if (searchQuery) {
+    const safeSearch = searchQuery.replace(/[%_\\]/g, '\\$&');
     query = query.or(
-      `name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
+      `name.ilike.%${safeSearch}%,phone.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`
     );
   }
   if (filterRole)   query = query.eq("role", filterRole);

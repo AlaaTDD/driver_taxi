@@ -9,11 +9,17 @@ export async function updateAppConfig(formData: FormData) {
   if (guard instanceof Response)
     return { error: "غير مصرح لك بإجراء هذا العمل" };
 
-  const id = formData.get("id")?.toString();
+  const key = formData.get("key")?.toString();
   const value = formData.get("value")?.toString();
 
-  if (!id || value === undefined) {
-    return { error: "بيانات غير صالحة" };
+  const ALLOWED_KEYS = [
+    "currency", "max_search_radius_km", "max_search_duration_sec",
+    "maintenance_mode", "min_app_version", "multi_route_enabled",
+    "referral_system_enabled", "scheduled_rides_enabled"
+  ];
+
+  if (!key || !ALLOWED_KEYS.includes(key) || value === undefined) {
+    return { error: "بيانات غير صالحة أو مفتاح الإعداد غير مسموح بتعديله" };
   }
 
   // Parse the value: if it's valid JSON store as jsonb, else as plain text
@@ -27,8 +33,7 @@ export async function updateAppConfig(formData: FormData) {
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("app_config")
-    .update({ value: parsedValue })
-    .eq("id", id);
+    .upsert({ key, value: parsedValue }, { onConflict: "key" });
 
   if (error) {
     return { error: error.message };

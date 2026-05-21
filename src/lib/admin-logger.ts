@@ -1,18 +1,28 @@
 import { createAdminClient } from "@/lib/supabase/server";
 
+export function getIpFromRequest(request: Request): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+  return request.headers.get("x-real-ip") || "unknown";
+}
+
 export async function logAdminAction({
   admin_id,
   action,
   table_name,
   record_id,
-  details,
+  old_data,
+  new_data,
   ip_address = "system",
 }: {
   admin_id: string;
   action: "create" | "update" | "delete" | "verify" | "revoke" | "block" | "unblock" | "send_notification";
   table_name: string;
   record_id?: string;
-  details?: any;
+  old_data?: any;
+  new_data?: any;
   ip_address?: string;
 }) {
   try {
@@ -22,7 +32,8 @@ export async function logAdminAction({
       action,
       table_name,
       record_id,
-      details,
+      old_data,
+      new_data,
       ip_address,
     });
 

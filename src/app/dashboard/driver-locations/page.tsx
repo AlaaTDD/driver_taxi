@@ -42,7 +42,8 @@ export default async function DriverLocationsPage() {
   const { data: locations } = await supabase
     .from("driver_locations")
     .select("id, driver_id, lat, lng, heading, geohash, created_at, updated_at")
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(500);
 
   const locationRows = locations || [];
   const driverIds = [...new Set(locationRows.map((l) => l.driver_id).filter(Boolean))];
@@ -63,7 +64,9 @@ export default async function DriverLocationsPage() {
 
   const { data: presenceData } = await supabase
     .from("user_presence")
-    .select("user_id, lat, lng, last_seen");
+    .select("user_id, lat, lng, last_seen")
+    .order("last_seen", { ascending: false })
+    .limit(500);
 
   const presenceRows = presenceData || [];
   const presenceMap = new Map(presenceRows.map((p) => [p.user_id, p]));

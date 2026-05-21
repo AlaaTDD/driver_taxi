@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, X, Search, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import { createServiceArea, toggleServiceArea, testServiceAreaCoverage } from "./actions";
 
 export default function ServiceAreasClient() {
@@ -15,8 +16,9 @@ export default function ServiceAreasClient() {
     const res = await createServiceArea(formData);
     setLoading(false);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else {
+      toast.success("تم إضافة المنطقة بنجاح");
       setIsModalOpen(false);
     }
   };
@@ -88,8 +90,14 @@ export function ToggleAreaStatus({ id, is_active }: { id: string; is_active: boo
 
   const handleToggle = async () => {
     setLoading(true);
-    await toggleServiceArea(id, !is_active);
-    setLoading(false);
+    try {
+      await toggleServiceArea(id, !is_active);
+      toast.success(is_active ? "تم تعطيل المنطقة" : "تم تفعيل المنطقة");
+    } catch {
+      toast.error("حدث خطأ أثناء التحديث");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

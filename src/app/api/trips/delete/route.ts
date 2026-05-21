@@ -23,6 +23,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+    await logAdminAction({
+      admin_id: guard.user.id,
+      action: "delete",
+      table_name: "trips",
+      record_id: trip_id,
+      ip_address: getIpFromRequest(req),
+    });
+
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });

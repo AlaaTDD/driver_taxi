@@ -20,11 +20,38 @@ export async function POST(request: Request) {
     if (type === "support") {
       if (!user_id) return NextResponse.json({ error: "Missing user_id for support message" }, { status: 400 });
 
+      // If no ticket_id is provided, try to find an open ticket for this user
+      let currentTicketId = body.ticket_id;
+      if (!currentTicketId) {
+        const { data: openTickets } = await supabase
+          .from("support_tickets")
+          .select("id")
+          .eq("user_id", user_id)
+          .eq("status", "open")
+          .order("created_at", { ascending: false })
+          .limit(1);
+          
+        if (openTickets && openTickets.length > 0) {
+          currentTicketId = openTickets[0].id;
+        } else {
+          // Create a new open ticket
+          const { data: newTicket, error: ticketError } = await supabase
+            .from("support_tickets")
+            .insert({ user_id, status: "open", subject: "تذكرة دعم جديدة" })
+            .select("id")
+            .single();
+            
+          if (ticketError) throw ticketError;
+          currentTicketId = newTicket.id;
+        }
+      }
+
       const { error } = await supabase.from("support_messages").insert({
         user_id,
         message,
         sender_role: "admin",
         sender_id: adminUser.user.id,
+        ticket_id: currentTicketId,
       });
 
       if (error) throw error;
@@ -35,7 +62,7 @@ export async function POST(request: Request) {
         trip_id,
         sender_id: adminUser.user.id,
         receiver_id,
-        message,
+        content: message,
         is_read: false,
       });
 
@@ -45,8 +72,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Messages Send Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to send message" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Failed to send message";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

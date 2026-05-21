@@ -46,7 +46,7 @@ export async function createBonusRule(formData: FormData) {
     admin_id: guard.user.id,
     action: "create",
     table_name: "bonus_rules",
-    details: { name: data.name, trigger_type: data.trigger_type, threshold: data.threshold, amount: data.bonus_amount },
+    new_data: { name: data.name, trigger_type: data.trigger_type, threshold: data.threshold, amount: data.bonus_amount },
   });
 
   revalidatePath("/dashboard/bonuses");
@@ -73,7 +73,7 @@ export async function toggleBonusRule(id: string, is_active: boolean) {
     action: "update",
     table_name: "bonus_rules",
     record_id: id,
-    details: { is_active },
+    new_data: { is_active },
   });
 
   revalidatePath("/dashboard/bonuses");

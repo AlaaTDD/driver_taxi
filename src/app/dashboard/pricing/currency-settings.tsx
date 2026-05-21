@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateAppCurrency } from "@/lib/currency";
 import { Banknote, CheckCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CurrencySettingsProps {
   currentCurrency: string;
@@ -29,13 +30,14 @@ export function CurrencySettings({ currentCurrency }: CurrencySettingsProps) {
     try {
       const result = await updateAppCurrency(newCurrency);
       if (result.error) {
-        alert("حدث خطأ أثناء تحديث العملة: " + result.error);
+        toast.error("حدث خطأ أثناء تحديث العملة: " + result.error);
       } else {
+        toast.success("تم تحديث العملة بنجاح");
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);
       }
     } catch (e: any) {
-      alert("حدث خطأ غير متوقع: " + e.message);
+      toast.error("حدث خطأ غير متوقع: " + e.message);
     } finally {
       setLoading(false);
     }

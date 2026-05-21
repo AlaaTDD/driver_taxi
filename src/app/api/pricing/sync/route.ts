@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     admin_id: adminUser.user.id,
     action: "update",
     table_name: "pricing",
-    details: { sync_triggered: true },
+    new_data: { sync_triggered: true },
     ip_address: request.headers.get("x-forwarded-for") || undefined,
   });
 

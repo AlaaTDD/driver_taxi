@@ -50,8 +50,26 @@ export async function POST(req: Request) {
     }
 
     if (contentType.includes("application/json")) {
+      const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+      await logAdminAction({
+        admin_id: guard.user.id,
+        action: "update",
+        table_name: "trips",
+        record_id: trip_id,
+        new_data: { status: "cancelled", cancel_reason },
+        ip_address: getIpFromRequest(req),
+      });
       return NextResponse.json({ success: true, id: cancelledTrip.id });
     } else {
+      const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+      await logAdminAction({
+        admin_id: guard.user.id,
+        action: "update",
+        table_name: "trips",
+        record_id: trip_id,
+        new_data: { status: "cancelled", cancel_reason },
+        ip_address: getIpFromRequest(req),
+      });
       return NextResponse.redirect(new URL(`/dashboard/trips/${trip_id}`, req.url));
     }
   } catch (error) {

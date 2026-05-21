@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     action: "update",
     table_name: "wallets",
     record_id: walletId,
-    details: { amount, txType, description },
+    new_data: { amount, txType, description },
     ip_address: request.headers.get("x-forwarded-for") || undefined,
   });
 

@@ -24,22 +24,12 @@ export async function requireAdmin(): Promise<
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const claimIsAdmin =
-      user.app_metadata?.is_admin === true ||
-      user.user_metadata?.is_admin === true;
+    const claimIsAdmin = user.app_metadata?.is_admin === true;
+    const claimRole = user.app_metadata?.role;
+    
+    const hasAccess = claimIsAdmin || claimRole === "supervisor" || claimRole === "admin";
 
-    if (claimIsAdmin) {
-      return { user, email: user.email || "admin" };
-    }
-
-    // Fallback for deployments that have not moved admin state into JWT claims.
-    const { data: profile } = await supabase
-      .from("users")
-      .select("is_admin")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile?.is_admin) {
+    if (!hasAccess) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

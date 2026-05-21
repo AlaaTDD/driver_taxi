@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { createBonusRule, toggleBonusRule } from "./actions";
 
 export default function BonusesClient() {
@@ -15,8 +16,9 @@ export default function BonusesClient() {
     const res = await createBonusRule(formData);
     setLoading(false);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
     } else {
+      toast.success("تم إضافة القاعدة بنجاح");
       setIsModalOpen(false);
     }
   };
@@ -121,8 +123,14 @@ export function ToggleRuleStatus({ id, is_active }: { id: string; is_active: boo
 
   const handleToggle = async () => {
     setLoading(true);
-    await toggleBonusRule(id, !is_active);
-    setLoading(false);
+    try {
+      await toggleBonusRule(id, !is_active);
+      toast.success(is_active ? "تم تعطيل القاعدة" : "تم تفعيل القاعدة");
+    } catch (error: any) {
+      toast.error("حدث خطأ أثناء التحديث");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

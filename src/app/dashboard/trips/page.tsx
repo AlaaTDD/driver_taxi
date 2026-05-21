@@ -40,9 +40,11 @@ export default async function TripsPage({
   const { data: tripUsers } = await supabase.from("users").select("id, name").in("id", userIds);
   const userMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
-  const totalRevenue = (trips || [])
-    .filter((t) => t.status === "completed")
-    .reduce((s, t) => s + (Number(t.price) || 0), 0);
+  let revenueQuery = supabase.from("trips").select("price").eq("status", "completed");
+  if (vehicleFilter) revenueQuery = revenueQuery.eq("vehicle_type", vehicleFilter);
+  const { data: allRevenueTrips } = await revenueQuery;
+
+  const totalRevenue = (allRevenueTrips || []).reduce((s, t) => s + (Number(t.price) || 0), 0);
 
   return (
     <>

@@ -31,5 +31,15 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/dashboard/drivers?error=revoke_failed", request.url));
   }
 
+  const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+  await logAdminAction({
+    admin_id: guard.user.id,
+    action: "revoke",
+    table_name: "drivers_profile",
+    record_id: driverId,
+    new_data: { is_verified: false, is_available: false, is_active: false },
+    ip_address: getIpFromRequest(request),
+  });
+
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
 }

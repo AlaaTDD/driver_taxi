@@ -21,11 +21,12 @@ import { getAppCurrency } from "@/lib/currency";
 export default async function WithdrawalsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const statusFilter = params.status || "";
+  const searchQuery = params.search || "";
   const pageSize = 15;
 
   const t = await getTranslations();
@@ -60,6 +61,7 @@ export default async function WithdrawalsPage({
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (statusFilter) query = query.eq("status", statusFilter);
+  if (searchQuery) query = query.or(`method.ilike.%${searchQuery}%`);
 
   const { data: requests, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
@@ -138,6 +140,40 @@ export default async function WithdrawalsPage({
             </Link>
           ))}
         </div>
+
+        {/* Search */}
+        <form className="flex items-center gap-2">
+          <input type="hidden" name="status" value={statusFilter} />
+          <input
+            type="text"
+            name="search"
+            defaultValue={searchQuery}
+            placeholder={t("common.search") + "..."}
+            className="px-4 py-2 rounded-xl text-[13px] font-semibold outline-none transition-colors"
+            style={{
+              background: searchQuery ? "var(--accent-surface)" : "var(--surface-elevated)",
+              border: `1px solid ${searchQuery ? "var(--accent-border)" : "var(--divider-strong)"}`,
+              color: "var(--text-primary)",
+              minWidth: 200,
+            }}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-xl text-[13px] font-bold transition-all"
+            style={{ background: "var(--primary)", color: "var(--color-black)" }}
+          >
+            {t("ratings.filters.apply")}
+          </button>
+          {searchQuery && (
+            <a
+              href={`/dashboard/withdrawals${statusFilter ? `?status=${statusFilter}` : ""}`}
+              className="px-3 py-2 rounded-xl text-[12px] font-semibold text-text-tertiary hover:text-text-secondary"
+              style={{ border: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+            >
+              {t("ratings.filters.reset")}
+            </a>
+          )}
+        </form>
 
         {/* Requests Table */}
         <div className="dash-table-card">

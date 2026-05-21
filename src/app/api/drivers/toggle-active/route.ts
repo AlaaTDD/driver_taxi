@@ -16,27 +16,25 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
-  const { error } = await supabase
-    .from("users")
-    .update({ is_active: isActive })
-    .eq("id", driverId);
+  const { error } = await supabase.rpc("toggle_driver_active", {
+    p_driver_id: driverId,
+    p_is_active: isActive,
+  });
 
   if (error) {
     console.error("Toggle active error:", error);
     return NextResponse.redirect(new URL("/dashboard/drivers?error=toggle_failed", request.url));
   }
 
-  if (!isActive) {
-    const { error: availabilityError } = await supabase
-      .from("drivers_profile")
-      .update({ is_available: false })
-      .eq("id", driverId);
-
-    if (availabilityError) {
-      console.error("Toggle driver availability error:", availabilityError);
-      return NextResponse.redirect(new URL("/dashboard/drivers?error=toggle_failed", request.url));
-    }
-  }
+  const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+  await logAdminAction({
+    admin_id: guard.user.id,
+    action: "update",
+    table_name: "users",
+    record_id: driverId,
+    new_data: { is_active: isActive },
+    ip_address: getIpFromRequest(request),
+  });
 
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
 }

@@ -7,13 +7,13 @@ export async function POST(req: Request) {
   if (guard instanceof Response) return guard;
 
   try {
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const body = await req.json();
-    const { name, geohash_prefixes, is_active } = body;
+    const { name, code, geohash_prefixes, is_active } = body;
 
-    if (!name || !geohash_prefixes?.length) {
+    if (!name || !code || !geohash_prefixes?.length) {
       return NextResponse.json(
-        { error: "name and geohash_prefixes are required" },
+        { error: "name, code, and geohash_prefixes are required" },
         { status: 400 }
       );
     }
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       .from("service_areas")
       .insert({
         name,
+        code,
         geohash_prefixes,
         is_active: is_active ?? true,
       })

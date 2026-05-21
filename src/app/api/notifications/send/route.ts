@@ -40,6 +40,15 @@ export async function POST(request: Request) {
         type,
       });
       if (error) throw error;
+      const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
+      await logAdminAction({
+        admin_id: guard.user.id,
+        action: "send_notification",
+        table_name: "notifications",
+        record_id: user_id,
+        new_data: { title, type },
+        ip_address: getIpFromRequest(request),
+      });
       return NextResponse.json({ success: true, sent: 1 });
     } else {
       let totalSent = 0;
@@ -74,7 +83,7 @@ export async function POST(request: Request) {
         admin_id: guard.user.id,
         action: "send_notification",
         table_name: "notifications",
-        details: { title, type, count: totalSent },
+        new_data: { title, type, count: totalSent },
         ip_address: request.headers.get("x-forwarded-for") || undefined,
       });
 

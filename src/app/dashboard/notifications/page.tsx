@@ -8,11 +8,12 @@ import { Bell, Eye, Clock, User } from "lucide-react";
 export default async function NotificationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; type?: string }>;
+  searchParams: Promise<{ page?: string; type?: string; search?: string }>;
 }) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const typeFilter = params.type || "";
+  const searchQuery = params.search || "";
   const pageSize = 10;
 
   const supabase = createAdminClient();
@@ -26,12 +27,26 @@ export default async function NotificationsPage({
   if (typeFilter) {
     query = query.eq("type", typeFilter);
   }
+  if (searchQuery) {
+    query = query.or(`title.ilike.%${searchQuery}%,message.ilike.%${searchQuery}%`);
+  }
 
   const { data: notifications, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
 
   const t = await getTranslations();
-  const unreadCount = (notifications || []).filter((n) => !n.is_read).length;
+  
+  let unreadQuery = supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("is_read", false);
+    
+  if (typeFilter) {
+    unreadQuery = unreadQuery.eq("type", typeFilter);
+  }
+  
+  const { count: unreadTotal } = await unreadQuery;
+  const unreadCount = unreadTotal || 0;
 
   const typeLabels: Record<string, string> = {
     trip_offer: t("notifications.types.tripOffer"),
@@ -80,6 +95,40 @@ export default async function NotificationsPage({
           </div>
         </div>
       </div>
+
+        {/* Search */}
+        <form className="flex items-center gap-2 mt-4">
+          <input type="hidden" name="type" value={typeFilter} />
+          <input
+            type="text"
+            name="search"
+            defaultValue={searchQuery}
+            placeholder={t("common.search") + "..."}
+            className="px-4 py-2 rounded-xl text-[13px] font-semibold outline-none transition-colors"
+            style={{
+              background: searchQuery ? "var(--accent-surface)" : "var(--surface-elevated)",
+              border: `1px solid ${searchQuery ? "var(--accent-border)" : "var(--divider-strong)"}`,
+              color: "var(--text-primary)",
+              minWidth: 200,
+            }}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-xl text-[13px] font-bold transition-all"
+            style={{ background: "var(--primary)", color: "var(--color-black)" }}
+          >
+            {t("ratings.filters.apply")}
+          </button>
+          {searchQuery && (
+            <a
+              href={`/dashboard/notifications${typeFilter ? `?type=${typeFilter}` : ""}`}
+              className="px-3 py-2 rounded-xl text-[12px] font-semibold text-text-tertiary hover:text-text-secondary"
+              style={{ border: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+            >
+              {t("ratings.filters.reset")}
+            </a>
+          )}
+        </form>
 
       
       <NotificationsClient

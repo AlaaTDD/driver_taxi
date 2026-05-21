@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Send } from "lucide-react";
+import { toast } from "sonner";
 
 
 function DriverRevisionForm() {
@@ -48,7 +49,7 @@ function DriverRevisionForm() {
         setTimeout(() => router.push("/dashboard/drivers"), 1200);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert("حدث خطأ: " + (data.error || "فشل إرسال الطلب"));
+        toast.error("حدث خطأ: " + (data.error || "فشل إرسال الطلب"));
       }
     } finally {
       setLoading(false);
