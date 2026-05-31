@@ -1,17 +1,19 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const DeleteVehicleTypeSchema = z.object({
+  id: uuidSchema,
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { id } = await request.json();
-
-    if (!id) {
-      return NextResponse.json({ error: "ID مطلوب" }, { status: 400 });
-    }
+    const parsed = parseRequest(DeleteVehicleTypeSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { id } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -35,7 +37,8 @@ export async function POST(request: Request) {
 
     if (tripsError) {
       console.error("Check vehicle type usage error:", tripsError);
-      return NextResponse.json({ error: tripsError.message }, { status: 500 });
+      // [WEB-H-05 FIXED] Never expose internal DB error messages to client
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     if ((tripsUsingType ?? 0) > 0) {
@@ -52,15 +55,8 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Delete vehicle type error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Delete vehicle type error:", error);
-    return NextResponse.json(
-      { error: "فشل حذف نوع المركبة" },
-      { status: 500 }
-    );
-  }
-}
+});

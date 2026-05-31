@@ -1,22 +1,27 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { messageTypeSchema, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function GET(request: Request) {
+const ConversationQuerySchema = z.object({
+  type: messageTypeSchema,
+  id: uuidSchema,
+});
+
+export const GET = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
   const { searchParams } = new URL(request.url);
-  const type = searchParams.get("type");
-  const id = searchParams.get("id");
-
-  if (!type || !id) {
-    return NextResponse.json({ error: "Missing type or id" }, { status: 400 });
-  }
+  const parsed = parseRequest(ConversationQuerySchema, {
+    type: searchParams.get("type"),
+    id: searchParams.get("id"),
+  });
+  if (parsed.response) return parsed.response;
+  const { type, id } = parsed.data;
 
   const supabase = createAdminClient();
 
-  try {
     if (type === "support") {
       const { data, error } = await supabase
         .from("support_messages")
@@ -53,8 +58,4 @@ export async function GET(request: Request) {
     } else {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
-  } catch (error: any) {
-    console.error("Fetch Conversation Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch" }, { status: 500 });
-  }
-}
+});

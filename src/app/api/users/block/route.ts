@@ -1,63 +1,65 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createClient, createAuthAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
+import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { formDataToObject, optionalString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const BlockUserSchema = z.object({
+  user_id: uuidSchema,
+  action: z.enum(["block", "unblock"]),
+  reason: optionalString(500),
+});
+
+export const POST = safeHandler(async (request: Request) => {
   // ── Auth Guard ──────────────────────────────────────────────────────────────
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const formData = await request.formData();
-    const userId = formData.get("user_id") as string;
-    const action = formData.get("action") as string; 
-    const reason = formData.get("reason") as string | null;
+  const formData = await request.formData();
+  const parsed = parseRequest(BlockUserSchema, formDataToObject(formData));
+  if (parsed.response) return parsed.response;
+  const { user_id: userId, action, reason } = parsed.data;
 
-    if (!userId || !action) {
-      return NextResponse.json({ error: "user_id and action required" }, { status: 400 });
-    }
+  const supabase = await createClient();
 
-    const supabase = createAdminClient();
-
-    if (action === "block") {
-      // Bypassing buggy block_user RPC to correctly save blocked_reason and blocked_at
-      const { error } = await supabase.from("users").update({
-        is_blocked: true,
-        is_active: false,
-        blocked_reason: reason || null,
-        blocked_at: new Date().toISOString(),
-      }).eq("id", userId);
-      
-      if (error) throw error;
-    } else if (action === "unblock") {
-      const { error } = await supabase.from("users").update({
-        is_blocked: false,
-        is_active: true,
-        blocked_reason: null,
-        blocked_at: null,
-      }).eq("id", userId);
-      
-      if (error) throw error;
-    } else {
-      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-
-    const { logAdminAction, getIpFromRequest } = await import("@/lib/admin-logger");
-    await logAdminAction({
-      admin_id: guard.user.id,
-      action: action === "block" ? "block" : "unblock",
-      table_name: "users",
-      record_id: userId,
-      new_data: { is_blocked: action === "block", reason },
-      ip_address: getIpFromRequest(request),
+  if (action === "block") {
+    const { error } = await supabase.rpc("block_user", {
+      p_user_id: userId,
+      p_reason: reason || null,
     });
-
-    revalidatePath("/dashboard/users");
-    return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : (typeof error === "object" ? JSON.stringify(error) : String(error));
-    console.error("Block user error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    if (error) throw error;
+  } else if (action === "unblock") {
+    const { error } = await supabase.rpc("unblock_user", {
+      p_user_id: userId,
+    });
+    if (error) throw error;
+  } else {
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
-}
+
+  await logAdminAction({
+    admin_id: guard.user.id,
+    action: action === "block" ? "block" : "unblock",
+    table_name: "users",
+    record_id: userId,
+    // [INT-C-02 FIXED] old_data: the state before this admin action
+    old_data: { is_blocked: action !== "block" },
+    new_data: { is_blocked: action === "block", reason },
+    ip_address: getIpFromRequest(request),
+  });
+
+  // [WEB-H-03 FIXED] Sync is_blocked to app_metadata so requireAdmin() can
+  // trust the JWT claim without a second DB round-trip.
+  try {
+    const authAdmin = createAuthAdminClient();
+    await authAdmin.auth.admin.updateUserById(userId, {
+      app_metadata: { is_blocked: action === "block" },
+    });
+  } catch (metaErr) {
+    console.warn("block: app_metadata sync failed (non-fatal):", metaErr);
+  }
+
+  revalidatePath("/dashboard/users");
+  return NextResponse.json({ success: true });
+});

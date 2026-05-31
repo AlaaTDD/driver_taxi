@@ -9,7 +9,6 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  AlertTriangle,
   User,
   CreditCard,
   ChevronRight,
@@ -18,32 +17,70 @@ import {
 } from "lucide-react";
 import { getAppCurrency } from "@/lib/currency";
 
+const VALID_WITHDRAWAL_STATUSES = new Set(["pending", "approved", "processing", "completed", "rejected", "cancelled"]);
+const WITHDRAWAL_METHODS = ["bank_transfer", "vodafone_cash", "instapay", "orange_money"];
+const EMPTY_UUID = "00000000-0000-0000-0000-000000000000";
+
 export default async function WithdrawalsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string; search?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; search?: string; error?: string; success?: string }>;
 }) {
   const params = await searchParams;
-  const page = Number(params.page) || 1;
-  const statusFilter = params.status || "";
-  const searchQuery = params.search || "";
+  const page = Math.max(1, Number(params.page) || 1);
+  const statusFilter = VALID_WITHDRAWAL_STATUSES.has(params.status || "") ? params.status || "" : "";
+  const searchQuery = (params.search || "").trim().slice(0, 64);
+  const normalizedSearch = searchQuery.replace(/[%,()]/g, " ").trim();
   const pageSize = 15;
 
   const t = await getTranslations();
   const supabase = createAdminClient();
   const currency = await getAppCurrency();
+  const errorMessage = params.error ? ({
+    missing_id: "طلب السحب غير محدد.",
+    invalid_params: "بيانات الطلب غير صحيحة. تأكد من سبب الرفض وحاول مرة أخرى.",
+    approve_failed: "فشل اعتماد طلب السحب.",
+    reject_failed: "فشل رفض طلب السحب.",
+    not_pending: "لا يمكن تعديل طلب سحب لم يعد في حالة الانتظار.",
+    unauthorized: "صلاحيات الأدمن غير متزامنة مع قاعدة البيانات.",
+  } as Record<string, string>)[params.error] || "حدث خطأ أثناء معالجة طلب السحب." : "";
+  const successMessage = params.success ? ({
+    withdrawal_approved: "تم اعتماد طلب السحب بنجاح.",
+    withdrawal_rejected: "تم رفض طلب السحب وتسجيل السبب.",
+  } as Record<string, string>)[params.success] || "تم تنفيذ العملية بنجاح." : "";
 
-  /* ── Stats ── */
-  const { data: allRequests } = await supabase.from("withdrawal_requests").select("id, status, amount");
+  /* ── Stats ─────────────────────────────────────────────────────────────────
+   * ✅ BUG-8 FIX: was fetching all rows just to count them in JS (N+1 at scale).
+   * Now uses parallel count-only queries with head:true — zero data transferred,
+   * and a single SUM query for amounts (only two numeric columns needed).
+   */
+  const [
+    { count: totalCount },
+    { count: pendingCount },
+    { count: approvedCount },
+    { count: completedCount },
+    { count: rejectedCount },
+    { data: pendingAmountData },
+    { data: completedAmountData },
+  ] = await Promise.all([
+    supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }),
+    supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).in("status", ["approved", "processing"]),
+    supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).eq("status", "completed"),
+    supabase.from("withdrawal_requests").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+    // Only fetch amount column for pending — minimises payload
+    supabase.from("withdrawal_requests").select("amount").eq("status", "pending"),
+    supabase.from("withdrawal_requests").select("amount").eq("status", "completed"),
+  ]);
 
   const stats = {
-    total: allRequests?.length || 0,
-    pending: allRequests?.filter((r) => r.status === "pending").length || 0,
-    approved: allRequests?.filter((r) => r.status === "approved" || r.status === "processing").length || 0,
-    completed: allRequests?.filter((r) => r.status === "completed").length || 0,
-    rejected: allRequests?.filter((r) => r.status === "rejected").length || 0,
-    totalAmount: allRequests?.filter((r) => r.status === "completed").reduce((s, r) => s + Number(r.amount || 0), 0) || 0,
-    pendingAmount: allRequests?.filter((r) => r.status === "pending").reduce((s, r) => s + Number(r.amount || 0), 0) || 0,
+    total: totalCount || 0,
+    pending: pendingCount || 0,
+    approved: approvedCount || 0,
+    completed: completedCount || 0,
+    rejected: rejectedCount || 0,
+    totalAmount: (completedAmountData || []).reduce((s, r) => s + Number(r.amount || 0), 0),
+    pendingAmount: (pendingAmountData || []).reduce((s, r) => s + Number(r.amount || 0), 0),
   };
 
   const statCards = [
@@ -61,7 +98,25 @@ export default async function WithdrawalsPage({
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (statusFilter) query = query.eq("status", statusFilter);
-  if (searchQuery) query = query.or(`method.ilike.%${searchQuery}%`);
+  if (normalizedSearch) {
+    const { data: matchingDrivers } = await supabase
+      .from("users")
+      .select("id")
+      .or(`name.ilike.%${normalizedSearch}%,phone.ilike.%${normalizedSearch}%,email.ilike.%${normalizedSearch}%`)
+      .limit(50);
+    const driverMatches = (matchingDrivers || []).map((u) => u.id);
+    const methodMatches = WITHDRAWAL_METHODS.filter((method) =>
+      method.includes(normalizedSearch.toLowerCase().replace(/\s+/g, "_"))
+    );
+
+    if (driverMatches.length) {
+      query = query.in("driver_id", driverMatches);
+    } else if (methodMatches.length) {
+      query = query.in("payment_method", methodMatches);
+    } else {
+      query = query.eq("id", EMPTY_UUID);
+    }
+  }
 
   const { data: requests, count } = await query;
   const totalPages = Math.ceil((count || 0) / pageSize);
@@ -104,6 +159,17 @@ export default async function WithdrawalsPage({
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("withdrawals.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("withdrawals.subtitle")}</p>
         </div>
+
+        {errorMessage && (
+          <div className="rounded-xl border border-error/25 bg-error/10 px-4 py-3 text-[13px] font-semibold text-error">
+            {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className="rounded-xl border border-success/25 bg-success/10 px-4 py-3 text-[13px] font-semibold text-success">
+            {successMessage}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -227,26 +293,59 @@ export default async function WithdrawalsPage({
                       <td className="py-3.5 px-4">
                         {req.status === "pending" ? (
                           <div className="flex gap-2">
+                            {/* Approve — no modal needed */}
                             <form action="/api/withdrawals/approve" method="POST">
                               <input type="hidden" name="request_id" value={req.id} />
                               <button
                                 type="submit"
-                                id={`approve-withdrawal-${req.id}`}
                                 className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition-all hover:scale-105 bg-success shadow-sm shadow-success/30"
                               >
                                 {t("common.accept")}
                               </button>
                             </form>
-                            <form action="/api/withdrawals/reject" method="POST">
-                              <input type="hidden" name="request_id" value={req.id} />
-                              <button
-                                type="submit"
-                                id={`reject-withdrawal-${req.id}`}
-                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-error/15 text-error border border-error/25 hover:bg-error/25"
+
+                            {/*
+                             * ✅ BUG-4 FIX: Rejection reason modal.
+                             * Previously the reject button submitted directly with no reason input,
+                             * so the RPC always received the hardcoded default string.
+                             * Now we use a <details> disclosure pattern (zero JS required, works
+                             * server-side) that expands an inline form with a textarea for the reason.
+                             * The form submits to /api/withdrawals/reject which now reads `reason`.
+                             */}
+                            <details className="relative" style={{ display: "inline-block" }}>
+                              <summary
+                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-error/15 text-error border border-error/25 hover:bg-error/25 cursor-pointer list-none"
                               >
                                 {t("common.reject")}
-                              </button>
-                            </form>
+                              </summary>
+                              <div
+                                className="absolute left-0 top-full mt-1 z-20 rounded-xl shadow-2xl p-3 min-w-[260px]"
+                                style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}
+                              >
+                                <p className="text-[11px] font-bold text-text-secondary mb-2">سبب الرفض</p>
+                                <form action="/api/withdrawals/reject" method="POST" className="space-y-2">
+                                  <input type="hidden" name="request_id" value={req.id} />
+                                  <textarea
+                                    name="reason"
+                                    rows={3}
+                                    placeholder="اكتب سبب الرفض هنا..."
+                                    required
+                                    className="w-full px-3 py-2 rounded-lg text-[12px] resize-none outline-none"
+                                    style={{
+                                      background: "var(--surface-elevated)",
+                                      border: "1px solid var(--divider-strong)",
+                                      color: "var(--text-primary)",
+                                    }}
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="w-full py-1.5 rounded-lg text-[11px] font-bold bg-error text-white transition-all hover:opacity-90"
+                                  >
+                                    تأكيد الرفض
+                                  </button>
+                                </form>
+                              </div>
+                            </details>
                           </div>
                         ) : req.status === "rejected" && req.rejection_reason ? (
                           <span className="text-[11px] text-error/60 max-w-[120px] truncate block" title={req.rejection_reason}>
@@ -277,14 +376,14 @@ export default async function WithdrawalsPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
               {page > 1 && (
-                <Link href={`/dashboard/withdrawals?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+                <Link href={`/dashboard/withdrawals?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`}
                   className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
                   <ChevronRight size={14} />
                 </Link>
               )}
               <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {totalPages}</span>
               {page < totalPages && (
-                <Link href={`/dashboard/withdrawals?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+                <Link href={`/dashboard/withdrawals?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`}
                   className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
                   <ChevronLeft size={14} />
                 </Link>

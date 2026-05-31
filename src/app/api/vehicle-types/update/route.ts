@@ -1,17 +1,24 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { integerRange, moneyAmount, nonEmptyString, optionalString, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const UpdateVehicleTypeSchema = z.object({
+  id: uuidSchema,
+  display_name: nonEmptyString(80),
+  icon: optionalString(80),
+  base_fare: moneyAmount(100_000),
+  price_per_km: moneyAmount(100_000),
+  sort_order: integerRange(0, 10_000).default(0),
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { id, display_name, icon, base_fare, price_per_km, sort_order = 0 } = await request.json();
-
-    if (!id || !display_name || !base_fare || !price_per_km) {
-      return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });
-    }
+    const parsed = parseRequest(UpdateVehicleTypeSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { id, display_name, icon, base_fare, price_per_km, sort_order } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -28,15 +35,8 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Update vehicle type error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Update vehicle type error:", error);
-    return NextResponse.json(
-      { error: "فشل تحديث نوع المركبة" },
-      { status: 500 }
-    );
-  }
-}
+});

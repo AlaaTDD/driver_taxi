@@ -2,21 +2,21 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { nonEmptyString, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const RequestRevisionSchema = z.object({
+  driver_id: uuidSchema,
+  fields: z.array(nonEmptyString(80)).min(1).max(20),
+  message: nonEmptyString(1000),
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const body = await request.json();
-    const { driver_id, fields, message } = body;
-
-    if (!driver_id || !fields?.length || !message) {
-      return NextResponse.json(
-        { error: "driver_id, fields[], and message are required" },
-        { status: 400 }
-      );
-    }
+    const parsed = parseRequest(RequestRevisionSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { driver_id, fields, message } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -30,9 +30,5 @@ export async function POST(request: Request) {
 
     revalidatePath("/dashboard/drivers");
     return NextResponse.json({ success: true, revision_id: data });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    console.error("Request revision error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler handles uncaught errors
+});

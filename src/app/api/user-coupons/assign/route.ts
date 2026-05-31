@@ -1,16 +1,20 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(req: Request) {
+const AssignUserCouponSchema = z.object({
+  user_id: uuidSchema,
+  coupon_id: uuidSchema,
+});
+
+export const POST = safeHandler(async (req: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { user_id, coupon_id } = await req.json();
-    if (!user_id || !coupon_id) {
-      return NextResponse.json({ error: "user_id و coupon_id مطلوبين" }, { status: 400 });
-    }
+    const parsed = parseRequest(AssignUserCouponSchema, await req.json());
+    if (parsed.response) return parsed.response;
+    const { user_id, coupon_id } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -26,11 +30,9 @@ export async function POST(req: Request) {
       if (error.code === "42883") {
         return NextResponse.json({ error: "دالة تعيين الكوبون الآمنة غير مثبتة" }, { status: 500 });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler handles uncaught errors
+});

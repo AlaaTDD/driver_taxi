@@ -1,25 +1,25 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { integerRange, moneyAmount, nonEmptyString, optionalString, safeHandler, parseRequest, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const VehicleTypeNameSchema = z.string().trim().regex(/^[a-z][a-z0-9_]{1,39}$/);
+const CreateVehicleTypeSchema = z.object({
+  name: VehicleTypeNameSchema,
+  display_name: nonEmptyString(80),
+  icon: optionalString(80),
+  base_fare: moneyAmount(100_000),
+  price_per_km: moneyAmount(100_000),
+  sort_order: integerRange(0, 10_000).default(0),
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { name, display_name, icon, base_fare, price_per_km, sort_order = 0 } = await request.json();
-
-    if (!name || !display_name || !base_fare || !price_per_km) {
-      return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });
-    }
-
-    
-    if (!/^[a-z][a-z0-9_]*$/.test(name)) {
-      return NextResponse.json(
-        { error: "الاسم التقني يجب أن يبدأ بحرف صغير ويحتوي على حروف وأرقام وشرطات سفلية فقط" },
-        { status: 400 }
-      );
-    }
+    const parsed = parseRequest(CreateVehicleTypeSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { name, display_name, icon, base_fare, price_per_km, sort_order } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -49,15 +49,8 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Create vehicle type error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Create vehicle type error:", error);
-    return NextResponse.json(
-      { error: "فشل إنشاء نوع المركبة" },
-      { status: 500 }
-    );
-  }
-}
+});

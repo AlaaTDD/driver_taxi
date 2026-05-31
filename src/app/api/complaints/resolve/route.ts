@@ -2,18 +2,21 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { complaintStatusSchema, nonEmptyString, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const ResolveComplaintSchema = z.object({
+  complaint_id: uuidSchema,
+  reply: nonEmptyString(2000),
+  status: complaintStatusSchema.default("resolved"),
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const body = await request.json();
-    const { complaint_id, reply, status = "resolved" } = body;
-
-    if (!complaint_id || !reply) {
-      return NextResponse.json({ error: "complaint_id and reply required" }, { status: 400 });
-    }
+    const parsed = parseRequest(ResolveComplaintSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { complaint_id, reply, status } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -27,8 +30,5 @@ export async function POST(request: Request) {
 
     revalidatePath("/dashboard/complaints");
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler handles uncaught errors
+});

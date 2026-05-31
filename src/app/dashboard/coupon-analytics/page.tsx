@@ -60,7 +60,7 @@ export default async function CouponAnalyticsPage() {
   // ── Fetch Audit Log ──
   const { data: auditLog } = await supabase
     .from("coupon_audit_log")
-    .select("*, coupons!coupon_audit_log_coupon_id_fkey(code)")
+    .select("*, coupons!fk_coupon_audit_log_coupon(code)")
     .order("created_at", { ascending: false })
     .limit(20);
 
@@ -79,7 +79,7 @@ export default async function CouponAnalyticsPage() {
   const avgDiscountPerTrip = totalUsageCount > 0 ? totalDiscountGiven / totalUsageCount : 0;
 
   // Platform subsidy cost
-  const totalSubsidyCost = (subsidyTxs || []).reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+  const totalSubsidyCost = Math.abs((subsidyTxs || []).reduce((sum, tx) => sum + Number(tx.amount || 0), 0));
 
   // Top 5 coupons by usage
   const topCoupons = [...allCoupons]
@@ -96,8 +96,17 @@ export default async function CouponAnalyticsPage() {
   }
 
   // Unique users across all coupons
-  const { data: userUsages } = await supabase.from("coupon_usages").select("user_id");
-  const totalUniqueUsers = new Set((userUsages || []).map((u) => u.user_id)).size;
+  const { data: userUsages } = await supabase
+    .from("coupon_usages")
+    .select("user_coupon:user_coupons!coupon_usages_user_coupon_id_fkey(user_id)");
+  const totalUniqueUsers = new Set(
+    (userUsages || [])
+      .map((usage) => {
+        const userCoupon = usage.user_coupon as any;
+        return Array.isArray(userCoupon) ? userCoupon[0]?.user_id : userCoupon?.user_id;
+      })
+      .filter(Boolean)
+  ).size;
 
   // Budget stats
   const totalBudgetAllocated = allCoupons.reduce((sum, c) => sum + Number(c.budget_limit || 0), 0);

@@ -1,56 +1,95 @@
+// [WEB-H-06 FIXED] Tab content extracted to _components/ — page was 485 lines.
+// page.tsx now handles only: data fetching, stats, tab nav, and component wiring.
 import { createAdminClient } from "@/lib/supabase/server";
-import { formatDate, formatCurrency } from "@/lib/utils";
-import { Badge } from "@/components/badge";
+import { formatCurrency } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { WalletActions } from "./wallet-actions";
-import {
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  ArrowUpDown,
-  User,
-  Car,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  DollarSign,
-  Banknote,
-} from "lucide-react";
+import { TrendingUp, TrendingDown, User, Car } from "lucide-react";
 import { getAppCurrency } from "@/lib/currency";
+import { DriverWalletsTab } from "./_components/driver-wallets-tab";
+import { UserWalletsTab } from "./_components/user-wallets-tab";
+import { TransactionsTab } from "./_components/transactions-tab";
 
 type TabType = "driver_wallets" | "user_wallets" | "transactions";
+const VALID_TABS = new Set<TabType>(["driver_wallets", "user_wallets", "transactions"]);
+const VALID_WALLET_TYPES = new Set(["driver", "user"]);
+const VALID_TX_TYPES = new Set([
+  "trip_earning",
+  "trip_payment",
+  "withdrawal",
+  "withdrawal_refund",
+  "top_up",
+  "refund",
+  "bonus",
+  "penalty",
+  "adjustment",
+  "coupon_subsidy",
+]);
+
+// ── Local types (WEB-H-01 FIXED: no more `any`) ──────────────────────────────
+type WalletUser = { id: string; name?: string | null; phone?: string | null; email?: string | null };
+type WalletStats = {
+  total_driver_balance?: number | null;
+  total_driver_earned?:  number | null;
+  total_driver_withdrawn?: number | null;
+  total_user_balance?: number | null;
+};
+type DriverWallet = {
+  id: string; balance: number; total_earned: number; total_withdrawn: number;
+  pending_withdrawal: number; commission_rate: number;
+  user?: WalletUser | null;
+};
+type UserWallet = {
+  id: string; balance: number; total_spent: number; total_topped_up: number;
+  updated_at?: string | null;
+  user?: WalletUser | null;
+};
+type WalletTx = {
+  id: string; wallet_id?: string; wallet_type?: string; type: string;
+  amount: number; balance_before: number; balance_after: number;
+  status: string; created_at: string; user_name?: string;
+};
 
 export default async function WalletsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; page?: string; wallet_type?: string; tx_type?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string; wallet_type?: string; tx_type?: string; error?: string; success?: string }>;
 }) {
   const params = await searchParams;
-  const tab = (params.tab as TabType) || "driver_wallets";
-  const page = Number(params.page) || 1;
-  const walletTypeFilter = params.wallet_type || "";
-  const txTypeFilter = params.tx_type || "";
+  const tab = VALID_TABS.has(params.tab as TabType) ? (params.tab as TabType) : "driver_wallets";
+  const page = Math.max(1, Number(params.page) || 1);
+  const walletTypeFilter = VALID_WALLET_TYPES.has(params.wallet_type || "") ? params.wallet_type || "" : "";
+  const txTypeFilter = VALID_TX_TYPES.has(params.tx_type || "") ? params.tx_type || "" : "";
   const pageSize = 15;
 
   const t = await getTranslations();
   const supabase = createAdminClient();
   const currency = await getAppCurrency();
+  const errorMessage = params.error ? ({
+    invalid_params: "البيانات المرسلة غير صحيحة. راجع المبلغ ونوع العملية وحاول مرة أخرى.",
+    wallet_rpc_missing: "دوال المحفظة غير موجودة أو لم يتم تطبيق تحديثات قاعدة البيانات.",
+    update_failed: "فشل تحديث المحفظة. راجع السجلات أو أعد المحاولة.",
+    insufficient_balance: "الرصيد غير كافٍ لتنفيذ هذه العملية.",
+    unauthorized: "صلاحيات الأدمن غير متزامنة مع قاعدة البيانات.",
+  } as Record<string, string>)[params.error] || "حدث خطأ أثناء تنفيذ عملية المحفظة." : "";
+  const successMessage = params.success ? ({
+    wallet_updated: "تم تحديث رصيد المحفظة بنجاح.",
+    wallet_topped_up: "تم شحن رصيد المستخدم بنجاح.",
+  } as Record<string, string>)[params.success] || "تم تنفيذ العملية بنجاح." : "";
 
   /* ── Stats ── */
-  /* ── Global TX Count & Wallet Stats ── */
   const [txRes, statsRes] = await Promise.all([
     supabase.from("wallet_transactions").select("id", { count: "exact", head: true }),
     supabase.rpc("get_wallet_stats").single(),
   ]);
 
-  const stats: any = statsRes.data || {};
+  const stats = (statsRes.data || {}) as WalletStats;
 
   const statCards = [
-    { label: t("wallets.stats.driverBalance"), value: stats.total_driver_balance ? formatCurrency(Number(stats.total_driver_balance), currency) : "—", variantClass: "variant-success", icon: Car },
-    { label: t("wallets.stats.driverEarned"), value: stats.total_driver_earned ? formatCurrency(Number(stats.total_driver_earned), currency) : "—", variantClass: "variant-info", icon: TrendingUp },
-    { label: t("wallets.stats.driverWithdrawn"), value: stats.total_driver_withdrawn ? formatCurrency(Number(stats.total_driver_withdrawn), currency) : "—", variantClass: "variant-error", icon: TrendingDown },
-    { label: t("wallets.stats.userBalance"), value: stats.total_user_balance ? formatCurrency(Number(stats.total_user_balance), currency) : "—", variantClass: "variant-warning", icon: User },
+    { label: t("wallets.stats.driverBalance"), value: stats.total_driver_balance != null ? formatCurrency(Number(stats.total_driver_balance), currency) : "—", variantClass: "variant-success", icon: Car },
+    { label: t("wallets.stats.driverEarned"), value: stats.total_driver_earned != null ? formatCurrency(Number(stats.total_driver_earned), currency) : "—", variantClass: "variant-info", icon: TrendingUp },
+    { label: t("wallets.stats.driverWithdrawn"), value: stats.total_driver_withdrawn != null ? formatCurrency(Number(stats.total_driver_withdrawn), currency) : "—", variantClass: "variant-error", icon: TrendingDown },
+    { label: t("wallets.stats.userBalance"), value: stats.total_user_balance != null ? formatCurrency(Number(stats.total_user_balance), currency) : "—", variantClass: "variant-warning", icon: User },
   ];
 
   const tabs = [
@@ -59,8 +98,8 @@ export default async function WalletsPage({
     { key: "transactions", label: t("wallets.tabs.transactions"), count: txRes.count || 0, navClass: "nav-info" },
   ];
 
-  /* ── Driver wallets with user info (Fix N+1 PERF-04) ── */
-  let driverWalletsData: any[] = [];
+  /* ── Driver wallets ── */
+  let driverWalletsData: DriverWallet[] = [];
   let driverWalletsCount = 0;
   let driverTotalPages = 1;
   if (tab === "driver_wallets") {
@@ -72,23 +111,19 @@ export default async function WalletsPage({
       `, { count: "exact" })
       .order("id", { ascending: true })
       .range((page - 1) * pageSize, page * pageSize - 1);
-      
+
     driverWalletsCount = count || 0;
     driverTotalPages = Math.ceil(driverWalletsCount / pageSize);
-    const wData = dWallets || [];
-    
-    // Format the response to map the joined user correctly
-    driverWalletsData = wData.map((w: any) => ({
+    driverWalletsData = (dWallets || []).map((w) => ({
       ...w,
-      user: w.users
+      // Supabase join returns users as array; take first element
+      user: (Array.isArray(w.users) ? (w.users[0] ?? null) : w.users) as WalletUser | null,
     }));
-    
-    // Update count in tab
     tabs[0].count = driverWalletsCount;
   }
 
-  /* ── User wallets with user info (Fix N+1 PERF-04) ── */
-  let userWalletsData: any[] = [];
+  /* ── User wallets ── */
+  let userWalletsData: UserWallet[] = [];
   let userWalletsCount = 0;
   let userTotalPages = 1;
   if (tab === "user_wallets") {
@@ -100,23 +135,19 @@ export default async function WalletsPage({
       `, { count: "exact" })
       .order("id", { ascending: true })
       .range((page - 1) * pageSize, page * pageSize - 1);
-      
+
     userWalletsCount = count || 0;
     userTotalPages = Math.ceil(userWalletsCount / pageSize);
-    const wData = uWallets || [];
-    
-    // Format the response to map the joined user correctly
-    userWalletsData = wData.map((w: any) => ({
+    userWalletsData = (uWallets || []).map((w) => ({
       ...w,
-      user: w.users
+      // Supabase join returns users as array; take first element
+      user: (Array.isArray(w.users) ? (w.users[0] ?? null) : w.users) as WalletUser | null,
     }));
-    
-    // Update count in tab
     tabs[1].count = userWalletsCount;
   }
 
   /* ── Transactions ── */
-  let transactions: any[] = [];
+  let transactions: WalletTx[] = [];
   let txCount = 0;
   let txTotalPages = 1;
   if (tab === "transactions") {
@@ -134,7 +165,6 @@ export default async function WalletsPage({
     txCount = count || 0;
     txTotalPages = Math.ceil(txCount / pageSize);
 
-    // Get user names for wallet IDs
     const walletIds = [...new Set(transactions.map((tx) => tx.wallet_id).filter(Boolean))];
     if (walletIds.length) {
       const { data: walletUsers } = await supabase.from("users").select("id, name").in("id", walletIds);
@@ -143,16 +173,27 @@ export default async function WalletsPage({
     }
   }
 
+  // ✅ BUG-7 FIX: tx_type filter labels — complete list matching DB ENUM.
+  // 'coupon_subsidy' was missing from the original map.
   const txTypeLabels: Record<string, { label: string; variantClass: string }> = {
-    trip_earning: { label: t("wallets.txTypes.trip_earning"), variantClass: "variant-success" },
-    trip_payment: { label: t("wallets.txTypes.trip_payment"), variantClass: "variant-info" },
-    withdrawal: { label: t("wallets.txTypes.withdrawal"), variantClass: "variant-error" },
+    trip_earning:      { label: t("wallets.txTypes.trip_earning"),      variantClass: "variant-success" },
+    trip_payment:      { label: t("wallets.txTypes.trip_payment"),      variantClass: "variant-info"    },
+    withdrawal:        { label: t("wallets.txTypes.withdrawal"),        variantClass: "variant-error"   },
     withdrawal_refund: { label: t("wallets.txTypes.withdrawal_refund"), variantClass: "variant-warning" },
-    top_up: { label: t("wallets.txTypes.top_up"), variantClass: "variant-warning" },
-    refund: { label: t("wallets.txTypes.refund"), variantClass: "variant-info" },
-    bonus: { label: t("wallets.txTypes.bonus"), variantClass: "variant-success" },
-    penalty: { label: t("wallets.txTypes.penalty"), variantClass: "variant-error" },
-    adjustment: { label: t("wallets.txTypes.adjustment"), variantClass: "variant-warning" },
+    top_up:            { label: t("wallets.txTypes.top_up"),            variantClass: "variant-warning" },
+    refund:            { label: t("wallets.txTypes.refund"),            variantClass: "variant-info"    },
+    bonus:             { label: t("wallets.txTypes.bonus"),             variantClass: "variant-success" },
+    penalty:           { label: t("wallets.txTypes.penalty"),           variantClass: "variant-error"   },
+    adjustment:        { label: t("wallets.txTypes.adjustment"),        variantClass: "variant-warning" },
+    coupon_subsidy:    { label: t("wallets.txTypes.coupon_subsidy"),    variantClass: "variant-info"    },
+  };
+
+  // Helper to build the transactions filter URL, preserving wallet_type when set
+  const txFilterHref = (type: string) => {
+    const base = `/dashboard/wallets?tab=transactions`;
+    const wt = walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : "";
+    const tt = type ? `&tx_type=${type}` : "";
+    return `${base}${wt}${tt}`;
   };
 
   return (
@@ -163,6 +204,17 @@ export default async function WalletsPage({
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("wallets.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("wallets.subtitle")}</p>
         </div>
+
+        {errorMessage && (
+          <div className="rounded-xl border border-error/25 bg-error/10 px-4 py-3 text-[13px] font-semibold text-error">
+            {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className="rounded-xl border border-success/25 bg-success/10 px-4 py-3 text-[13px] font-semibold text-success">
+            {successMessage}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -178,7 +230,6 @@ export default async function WalletsPage({
             </div>
           ))}
         </div>
-
 
         {/* Tabs */}
         <div className="flex gap-2 flex-wrap">
@@ -204,231 +255,41 @@ export default async function WalletsPage({
 
         {/* ── DRIVER WALLETS TAB ── */}
         {tab === "driver_wallets" && (
-          <div className="dash-table-card">
-            <div className="dash-section-header">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--success), var(--success-light))", boxShadow: "0 0 8px var(--success-surface)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.driverWallets")}</h3>
-              <span className="text-text-disabled text-[11px]">({driverWalletsCount})</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="dash-table-head">
-                    {[t("common.driver"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalEarned"), t("wallets.fields.totalWithdrawn"), t("wallets.fields.pendingWithdrawal"), t("wallets.fields.commission"), t("common.actions")].map((h) => (
-                      <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {driverWalletsData.map((w) => (
-                    <tr key={w.id} className="group/row dash-table-row">
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "var(--success-surface)", color: "var(--success)" }}>
-                            {(w.user?.name || "?")[0]}
-                          </div>
-                          <span className="text-[13px] font-bold text-text-primary">{w.user?.name || "—"}</span>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.balance), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] font-bold num" style={{ color: "var(--info)" }}>{formatCurrency(Number(w.total_earned), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_withdrawn), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--warning)" }}>{formatCurrency(Number(w.pending_withdrawal), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] num text-text-secondary">{(Number(w.commission_rate) * 100).toFixed(0)}%</td>
-                      <td className="py-3.5 px-4">
-                        <WalletActions walletId={w.id} walletType="driver" userName={w.user?.name || "—"} />
-                      </td>
-                    </tr>
-                  ))}
-                  {driverWalletsData.length === 0 && (
-                    <tr><td colSpan={7} className="py-16 text-center text-text-disabled">
-                      <Wallet size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>{t("wallets.noDriverWallets")}</p>
-                    </td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Pagination */}
-            {driverTotalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
-                {page > 1 && (
-                  <Link href={`/dashboard/wallets?tab=driver_wallets&page=${page - 1}`}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                    <ChevronRight size={14} />
-                  </Link>
-                )}
-                <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {driverTotalPages}</span>
-                {page < driverTotalPages && (
-                  <Link href={`/dashboard/wallets?tab=driver_wallets&page=${page + 1}`}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                    <ChevronLeft size={14} />
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
+          <DriverWalletsTab
+            wallets={driverWalletsData}
+            count={driverWalletsCount}
+            page={page}
+            totalPages={driverTotalPages}
+            currency={currency}
+            t={t}
+          />
         )}
 
         {/* ── USER WALLETS TAB ── */}
         {tab === "user_wallets" && (
-          <div className="dash-table-card">
-            <div className="dash-section-header">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--primary-light), var(--primary))", boxShadow: "0 0 8px var(--primary-surface)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.tabs.userWallets")}</h3>
-              <span className="text-text-disabled text-[11px]">({userWalletsCount})</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="dash-table-head">
-                    {[t("common.user"), t("common.phone"), t("wallets.fields.balance"), t("wallets.fields.totalSpent"), t("wallets.fields.totalToppedUp"), t("common.date"), t("common.actions")].map((h) => (
-                      <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {userWalletsData.map((w) => (
-                    <tr key={w.id} className="group/row dash-table-row">
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-bold" style={{ background: "var(--primary-surface)", color: "var(--primary)" }}>
-                            {(w.user?.name || "?")[0]}
-                          </div>
-                          <span className="text-[13px] font-bold text-text-primary">{w.user?.name || "—"}</span>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 text-[12px] text-text-tertiary num">{w.user?.phone || "—"}</td>
-                      <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: "var(--primary)" }}>{formatCurrency(Number(w.balance), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--error)" }}>{formatCurrency(Number(w.total_spent), currency)}</td>
-                      <td className="py-3.5 px-4 text-[13px] num" style={{ color: "var(--success)" }}>{formatCurrency(Number(w.total_topped_up), currency)}</td>
-                      <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{w.updated_at ? formatDate(w.updated_at) : "—"}</td>
-                      <td className="py-3.5 px-4">
-                        <WalletActions walletId={w.id} walletType="user" userName={w.user?.name || "—"} />
-                      </td>
-                    </tr>
-                  ))}
-                  {userWalletsData.length === 0 && (
-                    <tr><td colSpan={6} className="py-16 text-center text-text-disabled">
-                      <Wallet size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>{t("wallets.noUserWallets")}</p>
-                    </td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Pagination */}
-            {userTotalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
-                {page > 1 && (
-                  <Link href={`/dashboard/wallets?tab=user_wallets&page=${page - 1}`}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                    <ChevronRight size={14} />
-                  </Link>
-                )}
-                <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {userTotalPages}</span>
-                {page < userTotalPages && (
-                  <Link href={`/dashboard/wallets?tab=user_wallets&page=${page + 1}`}
-                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                    <ChevronLeft size={14} />
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
+          <UserWalletsTab
+            wallets={userWalletsData}
+            count={userWalletsCount}
+            page={page}
+            totalPages={userTotalPages}
+            currency={currency}
+            t={t}
+          />
         )}
 
         {/* ── TRANSACTIONS TAB ── */}
         {tab === "transactions" && (
-          <>
-            {/* Filters */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <Link href="/dashboard/wallets?tab=transactions" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${!walletTypeFilter ? 'bg-primary-surface text-primary border border-primary/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.all")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=driver" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'driver' ? 'bg-success/15 text-success border border-success/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.drivers")}</Link>
-              <Link href="/dashboard/wallets?tab=transactions&wallet_type=user" className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${walletTypeFilter === 'user' ? 'bg-info/15 text-info border border-info/30' : 'bg-surface-glass border border-divider text-text-tertiary hover:bg-surface-elevated'}`}>{t("common.users")}</Link>
-            </div>
-
-            <div className="dash-table-card">
-              <div className="dash-section-header justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-[3px] h-5 rounded-full bg-gradient-to-b from-primary to-primary-dark shadow-[0_0_8px_var(--primary)]" />
-                  <h3 className="text-[13px] font-bold text-text-primary">{t("wallets.txHistory")}</h3>
-                  <span className="text-text-disabled text-[11px]">({txCount})</span>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="dash-table-head">
-                      {[t("common.user"), t("wallets.fields.type"), t("wallets.fields.category"), t("wallets.fields.amount"), t("wallets.fields.before"), t("wallets.fields.after"), t("common.status"), t("common.date")].map((h) => (
-                        <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((tx) => {
-                      const txMeta = txTypeLabels[tx.type] || { label: tx.type, variantClass: "variant-neutral" };
-                      const isPositive = Number(tx.amount) > 0;
-                      return (
-                        <tr key={tx.id} className="group/row dash-table-row">
-                          <td className="py-3.5 px-4 text-[12px] text-text-primary font-medium">{tx.user_name || tx.wallet_id?.substring(0, 8) + "..."}</td>
-                          <td className="py-3.5 px-4">
-                             <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold ${tx.wallet_type === "driver" ? "variant-success" : "variant-primary"}`}>
-                              {tx.wallet_type === "driver" ? t("common.driver") : t("common.user")}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                             <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold ${txMeta.variantClass}`}>
-                              {txMeta.label}
-                            </span>
-                          </td>
-                           <td className="py-3.5 px-4 text-[14px] font-black num" style={{ color: isPositive ? "var(--success)" : "var(--error)" }}>
-                            {isPositive ? "+" : ""}{formatCurrency(Number(tx.amount), currency)}
-                          </td>
-                          <td className="py-3.5 px-4 text-[12px] num text-text-tertiary">{formatCurrency(Number(tx.balance_before), currency)}</td>
-                          <td className="py-3.5 px-4 text-[12px] num text-text-secondary font-medium">{formatCurrency(Number(tx.balance_after), currency)}</td>
-                          <td className="py-3.5 px-4">
-                            <Badge variant={tx.status === "completed" ? "success" : tx.status === "failed" ? "error" : "warning"} dot>
-                              {tx.status === "completed" ? t("wallets.status.completed") : tx.status === "failed" ? t("wallets.status.failed") : tx.status === "reversed" ? t("wallets.status.reversed") : t("wallets.status.pending")}
-                            </Badge>
-                          </td>
-                          <td className="py-3.5 px-4 text-text-tertiary text-[11px] whitespace-nowrap">{formatDate(tx.created_at)}</td>
-                        </tr>
-                      );
-                    })}
-                    {transactions.length === 0 && (
-                      <tr><td colSpan={8} className="py-16 text-center text-text-disabled">
-                        <ArrowUpDown size={32} className="mx-auto mb-3 opacity-30" />
-                        <p>{t("wallets.noTransactions")}</p>
-                      </td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {txTotalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 py-4 px-6 border-t border-divider">
-                  {page > 1 && (
-                    <Link href={`/dashboard/wallets?tab=transactions&page=${page - 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                      <ChevronRight size={14} />
-                    </Link>
-                  )}
-                  <span className="text-[12px] text-text-tertiary font-medium">{t("common.page")} {page} {t("common.of")} {txTotalPages}</span>
-                  {page < txTotalPages && (
-                    <Link href={`/dashboard/wallets?tab=transactions&page=${page + 1}${walletTypeFilter ? `&wallet_type=${walletTypeFilter}` : ""}`}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-glass border border-divider text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all">
-                      <ChevronLeft size={14} />
-                    </Link>
-                  )}
-                </div>
-              )}
-            </div>
-          </>
+          <TransactionsTab
+            transactions={transactions}
+            count={txCount}
+            page={page}
+            totalPages={txTotalPages}
+            walletTypeFilter={walletTypeFilter}
+            txTypeFilter={txTypeFilter}
+            txTypeLabels={txTypeLabels}
+            currency={currency}
+            t={t}
+          />
         )}
       </div>
     </>

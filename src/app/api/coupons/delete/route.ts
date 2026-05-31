@@ -1,18 +1,23 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const CouponIdSchema = z.object({
+  coupon_id: uuidSchema,
+});
+
+export const POST = safeHandler(async (request: Request) => {
   // ── Auth Guard ──────────────────────────────────────────────────────────────
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
   const formData = await request.formData();
-  const couponId = formData.get("coupon_id") as string;
-
-  if (!couponId) {
+  const parsed = parseRequest(CouponIdSchema, formDataToObject(formData));
+  if (parsed.response) {
     return NextResponse.redirect(new URL("/dashboard/coupons?error=missing_id", request.url));
   }
+  const couponId = parsed.data.coupon_id;
 
   const supabase = createAdminClient();
 
@@ -27,4 +32,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.redirect(new URL("/dashboard/coupons", request.url));
-}
+});

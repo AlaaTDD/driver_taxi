@@ -1,17 +1,20 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { booleanFromRequest, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const ToggleVehicleTypeSchema = z.object({
+  id: uuidSchema,
+  is_active: booleanFromRequest,
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { id, is_active } = await request.json();
-
-    if (!id) {
-      return NextResponse.json({ error: "ID مطلوب" }, { status: 400 });
-    }
+    const parsed = parseRequest(ToggleVehicleTypeSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const { id, is_active } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -22,15 +25,8 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Toggle vehicle type error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Toggle vehicle type error:", error);
-    return NextResponse.json(
-      { error: "فشل تبديل حالة نوع المركبة" },
-      { status: 500 }
-    );
-  }
-}
+});

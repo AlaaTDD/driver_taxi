@@ -1,17 +1,22 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const CancelOfferSchema = z.object({
+  offer_id: uuidSchema,
+});
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
   const formData = await request.formData();
-  const offerId = formData.get("offer_id") as string;
-
-  if (!offerId) {
+  const parsed = parseRequest(CancelOfferSchema, formDataToObject(formData));
+  if (parsed.response) {
     return NextResponse.redirect(new URL("/dashboard/trip-offers?error=missing_id", request.url));
   }
+  const offerId = parsed.data.offer_id;
 
   const supabase = createAdminClient();
 
@@ -30,4 +35,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.redirect(new URL("/dashboard/trip-offers", request.url));
-}
+});

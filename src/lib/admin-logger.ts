@@ -18,7 +18,7 @@ export async function logAdminAction({
   ip_address = "system",
 }: {
   admin_id: string;
-  action: "create" | "update" | "delete" | "verify" | "revoke" | "block" | "unblock" | "send_notification";
+  action: "create" | "update" | "delete" | "verify" | "revoke" | "block" | "unblock" | "send_notification" | "export";
   table_name: string;
   record_id?: string;
   old_data?: any;

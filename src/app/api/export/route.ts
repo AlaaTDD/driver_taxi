@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { safeHandler } from "@/lib/api/validation";
 
 const MAX_EXPORT_ROWS = 5000;
 
@@ -9,7 +11,7 @@ type ExportTable = "users" | "drivers" | "trips" | "wallets" | "ratings";
 const TABLE_CONFIGS: Record<ExportTable, { table: string; select: string; order: string }> = {
   users: {
     table: "users",
-    select: "id, name, email, phone, role, is_active, is_blocked, created_at",
+    select: "id, name, role, is_active, is_blocked, created_at",
     order: "created_at",
   },
   drivers: {
@@ -52,11 +54,10 @@ function toCsv(data: Record<string, unknown>[]): string {
   return [headers.join(","), ...rows].join("\n");
 }
 
-export async function GET(request: Request) {
+export const GET = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
     const url = new URL(request.url);
     const table = url.searchParams.get("table") as ExportTable | null;
 
@@ -77,11 +78,20 @@ export async function GET(request: Request) {
       .limit(MAX_EXPORT_ROWS);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
-    const csv = toCsv((data as any[]) || []);
+    const rows = (data as any[]) || [];
+    const csv = toCsv(rows);
     const filename = `${table}_export_${new Date().toISOString().split("T")[0]}.csv`;
+
+    await logAdminAction({
+      admin_id: guard.user.id,
+      action: "export",
+      table_name: table,
+      new_data: { rows_exported: rows.length, format: "csv" },
+      ip_address: getIpFromRequest(request),
+    });
 
     return new Response(csv, {
       headers: {
@@ -89,7 +99,4 @@ export async function GET(request: Request) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch {
-    return NextResponse.json({ error: "Export failed" }, { status: 500 });
-  }
-}
+});

@@ -4,12 +4,23 @@ import { createServerClient } from "@supabase/ssr";
 
 // Simple in-memory rate limiter (per Edge isolate)
 const rateLimitMap = new Map<string, { count: number; expires: number }>();
+const MUTATION_METHODS = new Set(["POST", "PUT", "DELETE", "PATCH"]);
+const MAX_MUTATION_BODY_BYTES = 1_000_000;
+let rateLimitCleanupCounter = 0;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const windowMs = 60 * 1000;
-  const maxRequests = 600; // 600 requests per minute per IP (increased to prevent dev blocks)
+  const maxRequests = 200; // 200 requests per minute per IP
   
+  // Periodically purge expired entries to prevent memory leak
+  if (++rateLimitCleanupCounter >= 500) {
+    rateLimitCleanupCounter = 0;
+    for (const [key, val] of rateLimitMap) {
+      if (val.expires < now) rateLimitMap.delete(key);
+    }
+  }
+
   const record = rateLimitMap.get(ip);
   if (!record || record.expires < now) {
     rateLimitMap.set(ip, { count: 1, expires: now + windowMs });
@@ -22,6 +33,15 @@ function checkRateLimit(ip: string): boolean {
   
   record.count++;
   return true;
+}
+
+function headerHostMatches(value: string | null, host: string | null): boolean {
+  if (!value || !host) return false;
+  try {
+    return new URL(value).host === host;
+  } catch {
+    return false;
+  }
 }
 
 export async function proxy(request: NextRequest) {
@@ -41,17 +61,30 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. CSRF Protection for API Mutations
-  if (pathname.startsWith("/api/") && ["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
+  if (pathname.startsWith("/api/") && MUTATION_METHODS.has(method)) {
     const origin = request.headers.get("origin");
     const referer = request.headers.get("referer");
     const host = request.headers.get("host");
+    const contentLength = Number(request.headers.get("content-length") || 0);
+
+    if (Number.isFinite(contentLength) && contentLength > MAX_MUTATION_BODY_BYTES) {
+      return NextResponse.json({ error: "Request body too large" }, { status: 413 });
+    }
 
     if (host) {
-      const isValidOrigin = origin && new URL(origin).host === host;
-      const isValidReferer = referer && new URL(referer).host === host;
-      
-      if (!isValidOrigin && !isValidReferer) {
-        return NextResponse.json({ error: "CSRF token mismatch or invalid origin" }, { status: 403 });
+      // Prefer Origin (sent automatically by browsers for same-origin mutations).
+      // Fall back to Referer only when Origin is absent (e.g. some legacy clients).
+      // Reject if neither header is present on a mutation request.
+      if (origin) {
+        if (!headerHostMatches(origin, host)) {
+          return NextResponse.json({ error: "CSRF validation failed: origin mismatch" }, { status: 403 });
+        }
+      } else if (referer) {
+        if (!headerHostMatches(referer, host)) {
+          return NextResponse.json({ error: "CSRF validation failed: referer mismatch" }, { status: 403 });
+        }
+      } else {
+        return NextResponse.json({ error: "CSRF validation failed: missing origin" }, { status: 403 });
       }
     }
   }

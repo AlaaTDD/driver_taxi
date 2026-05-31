@@ -1,18 +1,21 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { booleanFromRequest, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(req: Request) {
+const ToggleBonusSchema = z.object({
+  id: uuidSchema,
+  is_active: booleanFromRequest,
+});
+
+export const POST = safeHandler(async (req: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
     const supabase = createAdminClient();
-    const { id, is_active } = await req.json();
-
-    if (!id) {
-      return NextResponse.json({ error: "id is required" }, { status: 400 });
-    }
+    const parsed = parseRequest(ToggleBonusSchema, await req.json());
+    if (parsed.response) return parsed.response;
+    const { id, is_active } = parsed.data;
 
     const { error } = await supabase
       .from("bonus_rules")
@@ -20,12 +23,9 @@ export async function POST(req: Request) {
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "حدث خطأ غير متوقع";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler catches & logs all uncaught errors
+});

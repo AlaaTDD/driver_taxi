@@ -1,14 +1,29 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { booleanFromRequest, moneyAmount, nonEmptyString, optionalString, safeHandler, parseRequest, triggerTypeSchema, z } from "@/lib/api/validation";
 
-export async function POST(req: Request) {
+const BonusRuleSchema = z.object({
+  name: nonEmptyString(100),
+  name_ar: optionalString(100),
+  trigger_type: triggerTypeSchema,
+  threshold: z.coerce.number().int().positive().max(100_000),
+  bonus_amount: moneyAmount(100_000),
+  vehicle_types: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
+  is_active: booleanFromRequest.default(true),
+  starts_at: optionalString(40),
+  valid_from: optionalString(40),
+  expires_at: optionalString(40),
+  valid_until: optionalString(40),
+});
+
+export const POST = safeHandler(async (req: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
     const supabase = createAdminClient();
-    const body = await req.json();
+    const parsed = parseRequest(BonusRuleSchema, await req.json());
+    if (parsed.response) return parsed.response;
     const {
       name,
       name_ar,
@@ -21,34 +36,15 @@ export async function POST(req: Request) {
       valid_from,
       expires_at,
       valid_until,
-    } = body;
-
-    const thresholdNumber = Number(threshold);
-    const bonusAmountNumber = Number(bonus_amount);
-    const validTriggerTypes = new Set(["daily_trips", "weekly_trips", "rating_threshold"]);
-
-    if (
-      typeof name !== "string" ||
-      typeof trigger_type !== "string" ||
-      !validTriggerTypes.has(trigger_type) ||
-      !Number.isFinite(thresholdNumber) ||
-      thresholdNumber <= 0 ||
-      !Number.isFinite(bonusAmountNumber) ||
-      bonusAmountNumber <= 0
-    ) {
-      return NextResponse.json(
-        { error: "بيانات قاعدة المكافأة غير صالحة" },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const insertData: Record<string, unknown> = {
       name: name.trim(),
       name_ar: name_ar || name,
       trigger_type,
-      threshold: thresholdNumber,
-      bonus_amount: bonusAmountNumber,
-      is_active: is_active ?? true,
+      threshold,
+      bonus_amount,
+      is_active,
     };
     if (vehicle_types?.length) insertData.vehicle_types = vehicle_types;
     const effective_start = starts_at || valid_from;
@@ -63,12 +59,9 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ data });
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "حدث خطأ غير متوقع";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler catches & logs all uncaught errors
+});

@@ -1,16 +1,19 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(req: Request) {
+const DeleteUserCouponSchema = z.object({
+  id: uuidSchema,
+});
+
+export const POST = safeHandler(async (req: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
-  try {
-    const { id } = await req.json();
-    if (!id) {
-      return NextResponse.json({ error: "id مطلوب" }, { status: 400 });
-    }
+    const parsed = parseRequest(DeleteUserCouponSchema, await req.json());
+    if (parsed.response) return parsed.response;
+    const { id } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -20,11 +23,9 @@ export async function POST(req: Request) {
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
-  }
-}
+  // [WEB-H-05 FIXED] catch removed — safeHandler handles uncaught errors
+});

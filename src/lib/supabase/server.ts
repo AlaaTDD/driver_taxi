@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 function requiredEnv(name: string): string {
@@ -46,5 +47,18 @@ export function createAdminClient() {
         setAll() {},
       },
     }
+  );
+}
+
+/**
+ * [WEB-C-01 FIX] Returns a raw Supabase client with service-role privileges
+ * that exposes `auth.admin.*` methods (e.g. updateUserById).
+ * Use only for auth-level operations like updating app_metadata.
+ */
+export function createAuthAdminClient() {
+  return createSupabaseClient(
+    requiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    requiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
+    { auth: { persistSession: false, autoRefreshToken: false } }
   );
 }

@@ -43,7 +43,7 @@ export default async function DashboardPage() {
     ] = await Promise.all([
       supabase.from("admin_dashboard").select("*").single(),
       supabase.from("admin_recent_trips").select("*").limit(10),
-      supabase.from("trips").select("id, status, price, vehicle_type").order("created_at", { ascending: false }).limit(500),
+      supabase.from("trips").select("id, status, price, final_price, vehicle_type").order("created_at", { ascending: false }).limit(500),
     ]);
   } catch (err: any) {
     if (err && (err.digest === 'DYNAMIC_SERVER_USAGE' || err.message?.includes('dynamic-server-error') || err.message?.includes('Dynamic server usage'))) {
@@ -99,7 +99,8 @@ export default async function DashboardPage() {
     .filter((trip) => trip.status === "completed")
     .forEach((trip) => {
       const vehicleType = trip.vehicle_type || t("common.vehicle");
-      revenueByType[vehicleType] = (revenueByType[vehicleType] || 0) + (Number(trip.price) || 0);
+      const revenue = Number(trip.final_price ?? trip.price ?? 0);
+      revenueByType[vehicleType] = (revenueByType[vehicleType] || 0) + revenue;
     });
 
   const vehicleTypeLabels: Record<string, string> = {
@@ -339,4 +340,3 @@ export default async function DashboardPage() {
     </>
   );
 }
-

@@ -1,24 +1,38 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { nonEmptyString, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
 
-export async function POST(request: Request) {
+const MAX_MESSAGE_LENGTH = 2000;
+const SendMessageSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("support"),
+    message: nonEmptyString(MAX_MESSAGE_LENGTH),
+    user_id: uuidSchema,
+    ticket_id: uuidSchema.optional(),
+  }),
+  z.object({
+    type: z.literal("trip"),
+    message: nonEmptyString(MAX_MESSAGE_LENGTH),
+    trip_id: uuidSchema,
+    receiver_id: uuidSchema,
+  }),
+]);
+
+export const POST = safeHandler(async (request: Request) => {
   const guard = await requireAdmin();
   if (guard instanceof Response) return guard;
 
   const adminUser = guard; // Contains admin user object
 
-  try {
     const supabase = createAdminClient();
-    const body = await request.json();
-    const { type, message, user_id, trip_id, receiver_id } = body;
-
-    if (!message || !type) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    const parsed = parseRequest(SendMessageSchema, await request.json());
+    if (parsed.response) return parsed.response;
+    const body = parsed.data;
+    const { type, message } = body;
 
     if (type === "support") {
-      if (!user_id) return NextResponse.json({ error: "Missing user_id for support message" }, { status: 400 });
+      const { user_id } = body;
 
       // If no ticket_id is provided, try to find an open ticket for this user
       let currentTicketId = body.ticket_id;
@@ -56,7 +70,7 @@ export async function POST(request: Request) {
 
       if (error) throw error;
     } else if (type === "trip") {
-      if (!trip_id || !receiver_id) return NextResponse.json({ error: "Missing trip_id or receiver_id for trip message" }, { status: 400 });
+      const { trip_id, receiver_id } = body;
 
       const { error } = await supabase.from("messages").insert({
         trip_id,
@@ -72,9 +86,4 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    console.error("Messages Send Error:", error);
-    const msg = error instanceof Error ? error.message : "Failed to send message";
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+});
