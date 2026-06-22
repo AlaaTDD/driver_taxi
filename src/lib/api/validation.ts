@@ -9,7 +9,7 @@ export const messageTypeSchema = z.enum(["support", "trip"]);
 export const complaintStatusSchema = z.enum(["pending", "in_progress", "resolved", "closed"]);
 export const triggerTypeSchema = z.enum(["daily_trips", "weekly_trips", "rating_threshold", "streak"]);
 export const walletTypeSchema = z.enum(["driver", "user"]);
-export const walletTxTypeSchema = z.enum(["bonus", "penalty", "adjustment"]);
+export const walletTxTypeSchema = z.enum(["bonus", "penalty", "adjustment", "top_up"]);
 
 export const nonEmptyString = (max: number) => z.string().trim().min(1).max(max);
 export const optionalString = (max: number) =>

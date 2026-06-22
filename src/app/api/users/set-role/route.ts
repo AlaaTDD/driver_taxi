@@ -19,6 +19,16 @@ export const POST = safeHandler(async (request: Request) => {
     if (parsed.response) return parsed.response;
     const { user_id: userId, role } = parsed.data;
 
+    // CODE-03 FIX: An admin must not be able to demote themselves.
+    // If they downgrade their own role to "user" or "driver" they lose access
+    // to the admin panel immediately (next requireAdmin() will reject them).
+    if (guard.user.id === userId) {
+      return NextResponse.json(
+        { error: "لا يمكن تغيير صلاحياتك بنفسك" },
+        { status: 403 },
+      );
+    }
+
     const supabase = createAdminClient();
 
     // 1. Update role in public.users table

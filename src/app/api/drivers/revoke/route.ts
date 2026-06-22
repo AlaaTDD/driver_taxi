@@ -23,18 +23,27 @@ export const POST = safeHandler(async (request: Request) => {
 
   const supabase = createAdminClient();
 
-  // [WEB-revoke FIXED] Use revoke_driver_atomic RPC — both tables (drivers_profile
-  // + users) update inside a single DB transaction. Previously Promise.all() ran
-  // two independent queries; if the second failed the driver would be unverified
-  // but their account would remain active.
-  // See migration: 20260530000003_revoke_driver_atomic.sql
-  const { error } = await supabase.rpc("revoke_driver_atomic", {
-    p_driver_id: driverId,
-  });
+  // Direct updates via service_role client — bypasses the is_admin_user() check
+  // inside unverify_driver / toggle_driver_active RPCs (auth.uid() is NULL with service_role).
+  const { error } = await supabase
+    .from("drivers_profile")
+    .update({ is_verified: false, is_available: false })
+    .eq("id", driverId);
 
   if (error) {
     console.error("Revoke driver error:", error);
     return NextResponse.redirect(new URL("/dashboard/drivers?error=revoke_failed", request.url));
+  }
+
+  // Deactivate the user account (is_active lives on users table).
+  const { error: deactivateError } = await supabase
+    .from("users")
+    .update({ is_active: false })
+    .eq("id", driverId);
+
+  if (deactivateError) {
+    console.error("Revoke driver — deactivate user error:", deactivateError);
+    // is_verified was already cleared; log the partial failure but do not block redirect.
   }
 
   await logAdminAction({

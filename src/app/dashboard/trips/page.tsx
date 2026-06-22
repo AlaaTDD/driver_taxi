@@ -55,18 +55,28 @@ export default async function TripsPage({
     .in("id", userIds);
   const userMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
-  let revenueQuery = supabase
-    .from("trips")
-    .select("price, final_price")
-    .eq("status", "completed");
-  if (vehicleFilter)
-    revenueQuery = revenueQuery.eq("vehicle_type", vehicleFilter);
-  const { data: allRevenueTrips } = await revenueQuery;
+  // PERF-03 FIX: Replaced full-table scan of completed trips with a DB-side SUM.
+  // Previously fetched every completed trip row to sum prices in JS (catastrophic at scale).
+  let totalRevenue = 0;
+  const revenueRpcArgs: Record<string, unknown> = {};
+  if (vehicleFilter) revenueRpcArgs.p_vehicle_type = vehicleFilter;
 
-  const totalRevenue = (allRevenueTrips || []).reduce(
-    (s, t) => s + (Number(t.final_price ?? t.price) || 0),
-    0,
+  const { data: revenueData } = await supabase.rpc(
+    "get_completed_trips_revenue",
+    vehicleFilter ? { p_vehicle_type: vehicleFilter } : {},
   );
+  if (typeof revenueData === "number") {
+    totalRevenue = revenueData;
+  } else {
+    // Fallback: if RPC doesn’t exist yet, use a bounded query (max 10 000 rows)
+    const { data: fallbackRows } = await (vehicleFilter
+      ? supabase.from("trips").select("final_price, price").eq("status", "completed").eq("vehicle_type", vehicleFilter).limit(10000)
+      : supabase.from("trips").select("final_price, price").eq("status", "completed").limit(10000));
+    totalRevenue = (fallbackRows || []).reduce(
+      (s, t) => s + (Number(t.final_price ?? t.price) || 0),
+      0,
+    );
+  }
 
   return (
     <>

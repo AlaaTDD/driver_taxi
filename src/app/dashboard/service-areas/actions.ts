@@ -3,6 +3,10 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
+import { safeErrorMessage } from "@/lib/api/validation";
+
+// CODE-14 FIX: Basic geohash character set validation (base32 chars only)
+const GEOHASH_RE = /^[0-9b-hjkmnp-z]+$/i;
 
 export async function createServiceArea(formData: FormData) {
   const guard = await requireAdmin();
@@ -20,6 +24,12 @@ export async function createServiceArea(formData: FormData) {
 
   const geohash_prefixes = prefixesStr.split(",").map(s => s.trim()).filter(Boolean);
 
+  // Reject any prefix that isn’t valid geohash base32 characters
+  const invalidPrefixes = geohash_prefixes.filter(p => !GEOHASH_RE.test(p));
+  if (invalidPrefixes.length > 0) {
+    return { error: `بادئات geohash غير صالحة: ${invalidPrefixes.join(", ")}` };
+  }
+
   const supabase = createAdminClient();
   const { error } = await supabase.from("service_areas").insert({
     name,
@@ -30,7 +40,7 @@ export async function createServiceArea(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: safeErrorMessage(error) };
   }
 
   revalidatePath("/dashboard/service-areas");
@@ -44,7 +54,7 @@ export async function toggleServiceArea(id: string, is_active: boolean) {
   const supabase = createAdminClient();
   const { error } = await supabase.from("service_areas").update({ is_active }).eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) return { error: safeErrorMessage(error) };
 
   revalidatePath("/dashboard/service-areas");
   return { success: true };
@@ -60,6 +70,6 @@ export async function testServiceAreaCoverage(lat: number, lng: number) {
     p_lng: lng
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: safeErrorMessage(error) };
   return { data };
 }

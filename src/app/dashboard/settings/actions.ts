@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
+import { safeErrorMessage } from "@/lib/api/validation";
 
 export async function updateAppConfig(formData: FormData) {
   const guard = await requireAdmin();
@@ -36,7 +37,7 @@ export async function updateAppConfig(formData: FormData) {
     .upsert({ key, value: parsedValue }, { onConflict: "key" });
 
   if (error) {
-    return { error: error.message };
+    return { error: safeErrorMessage(error) };
   }
 
   revalidatePath("/dashboard/settings");

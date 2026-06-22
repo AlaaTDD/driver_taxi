@@ -3,17 +3,35 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { safeErrorMessage } from "@/lib/api/validation";
+
+// SEC-03 FIX: Validate all required fields before touching formData.
+const couponBaseSchema = z.object({
+  code:           z.string().trim().min(1, "الكود مطلوب").max(50),
+  discount_type:  z.enum(["percentage", "fixed"]),
+  discount_value: z.coerce.number().finite().positive("قيمة الخصم يجب أن تكون أكبر من صفر"),
+});
 
 export async function createCoupon(formData: FormData) {
   const guard = await requireAdmin();
   if (guard instanceof Response) return { error: "غير مصرح لك بإجراء هذا العمل" };
 
+  const baseCheck = couponBaseSchema.safeParse({
+    code:           formData.get("code"),
+    discount_type:  formData.get("discount_type"),
+    discount_value: formData.get("discount_value"),
+  });
+  if (!baseCheck.success) {
+    return { error: baseCheck.error.issues[0]?.message ?? "بيانات غير صالحة" };
+  }
+
   const supabase = createAdminClient();
 
   const data: Record<string, unknown> = {
-    code: (formData.get("code") as string).toUpperCase(),
-    discount_type: formData.get("discount_type") as string,
-    discount_value: Number(formData.get("discount_value")),
+    code: baseCheck.data.code.toUpperCase(),
+    discount_type: baseCheck.data.discount_type,
+    discount_value: baseCheck.data.discount_value,
     is_active: true,
   };
 
@@ -53,7 +71,7 @@ export async function createCoupon(formData: FormData) {
   const { error } = await supabase.from("coupons").insert(data);
 
   if (error) {
-    return { error: error.message };
+    return { error: safeErrorMessage(error) };
   }
 
   revalidatePath("/dashboard/coupons");
@@ -64,12 +82,21 @@ export async function updateCoupon(couponId: string, formData: FormData) {
   const guard = await requireAdmin();
   if (guard instanceof Response) return { error: "غير مصرح لك بإجراء هذا العمل" };
 
+  const baseCheck = couponBaseSchema.safeParse({
+    code:           formData.get("code"),
+    discount_type:  formData.get("discount_type"),
+    discount_value: formData.get("discount_value"),
+  });
+  if (!baseCheck.success) {
+    return { error: baseCheck.error.issues[0]?.message ?? "بيانات غير صالحة" };
+  }
+
   const supabase = createAdminClient();
 
   const data: Record<string, unknown> = {
-    code: (formData.get("code") as string).toUpperCase(),
-    discount_type: formData.get("discount_type") as string,
-    discount_value: Number(formData.get("discount_value")),
+    code: baseCheck.data.code.toUpperCase(),
+    discount_type: baseCheck.data.discount_type,
+    discount_value: baseCheck.data.discount_value,
   };
 
   const optionalString = (key: string, field: string) => {
@@ -109,7 +136,7 @@ export async function updateCoupon(couponId: string, formData: FormData) {
     .eq("id", couponId);
 
   if (error) {
-    return { error: error.message };
+    return { error: safeErrorMessage(error) };
   }
 
   revalidatePath("/dashboard/coupons");

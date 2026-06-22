@@ -109,13 +109,13 @@ export default async function DriversPage({
 
       
       <div className="flex gap-2 flex-wrap">
-        {tabs.map((t) => (
+        {tabs.map((tabItem) => (
           <a
-            key={t.key}
-            href={`/dashboard/drivers?tab=${t.key}`}
-            id={`drivers-tab-${t.key}`}
+            key={tabItem.key}
+            href={`/dashboard/drivers?tab=${tabItem.key}`}
+            id={`drivers-tab-${tabItem.key}`}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
-            style={tab === t.key ? {
+            style={tab === tabItem.key ? {
               background: "var(--accent-surface)",
               border: "1px solid var(--accent-border)",
               color: "var(--primary)",
@@ -126,16 +126,16 @@ export default async function DriversPage({
               color: "var(--text-tertiary)",
             }}
           >
-            {t.icon}
-            {t.label}
-            {t.count > 0 && (
+            {tabItem.icon}
+            {tabItem.label}
+            {tabItem.count > 0 && (
               <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
                 style={{
-                  background: tab === t.key ? "var(--primary)" : "var(--surface-elevated)",
-                  color: tab === t.key ? "white" : "var(--text-tertiary)",
-                  border: tab === t.key ? "none" : "1px solid var(--divider)",
+                  background: tab === tabItem.key ? "var(--primary)" : "var(--surface-elevated)",
+                  color: tab === tabItem.key ? "white" : "var(--text-tertiary)",
+                  border: tab === tabItem.key ? "none" : "1px solid var(--divider)",
                 }}>
-                {t.count}
+                {tabItem.count}
               </span>
             )}
           </a>

@@ -22,16 +22,28 @@ export const POST = safeHandler(async (request: Request) => {
 
   const supabase = createAdminClient();
 
-  // [WEB-H-02 FIXED] Moved import to top-level (was dynamic import inside handler).
-  // [WEB-C-02 FIXED] Use verify_driver_atomic RPC — both tables update in a
-  // single DB transaction. See migration: 20260530000001_verify_driver_atomic.sql
-  const { error } = await supabase.rpc("verify_driver_atomic", {
-    p_driver_id: driverId,
-  });
+  // Direct update via service_role client — bypasses the is_admin_user() check
+  // inside the verify_driver RPC (which checks auth.uid(), always NULL with service_role).
+  // service_role key bypasses RLS so we write directly and safely.
+  const { error } = await supabase
+    .from("drivers_profile")
+    .update({ is_verified: true })
+    .eq("id", driverId);
 
   if (error) {
     console.error("Verify driver error:", error);
     return NextResponse.redirect(new URL("/dashboard/drivers?error=verify_failed", request.url));
+  }
+
+  // Activate the user account (is_active lives on users table).
+  const { error: activateError } = await supabase
+    .from("users")
+    .update({ is_active: true })
+    .eq("id", driverId);
+
+  if (activateError) {
+    console.error("Verify driver — activate user error:", activateError);
+    // is_verified was already set; log the partial failure but do not block redirect.
   }
 
   // [WEB-M-02 FIXED] Fetch old_data before the action so audit log is complete.

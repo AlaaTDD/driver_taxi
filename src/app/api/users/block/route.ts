@@ -21,6 +21,12 @@ export const POST = safeHandler(async (request: Request) => {
   if (parsed.response) return parsed.response;
   const { user_id: userId, action, reason } = parsed.data;
 
+  // M-05 FIX: An admin must not block themselves – that would immediately
+  // lock them out of all admin endpoints (requireAdmin checks is_blocked).
+  if (guard.user.id === userId) {
+    return NextResponse.json({ error: "لا يمكن حجب حسابك بنفسك" }, { status: 403 });
+  }
+
   const supabase = await createClient();
 
   if (action === "block") {

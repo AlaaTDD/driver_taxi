@@ -6,12 +6,13 @@ import { Navigation } from "lucide-react";
 export default async function RoutePlansPage({
   searchParams,
 }: {
-  searchParams: { page?: string; status?: string };
+  searchParams: Promise<{ page?: string; status?: string }>;
 }) {
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  const page = parseInt(searchParams.page || "1", 10);
+  const params = await searchParams;
+  const page = parseInt(params.page || "1", 10);
   const pageSize = 20;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -31,8 +32,8 @@ export default async function RoutePlansPage({
     )
     .order("created_at", { ascending: false });
 
-  if (searchParams.status) {
-    query = query.eq("status", searchParams.status);
+  if (params.status) {
+    query = query.eq("status", params.status);
   }
 
   const { data: routePlans, count, error } = await query.range(from, to);

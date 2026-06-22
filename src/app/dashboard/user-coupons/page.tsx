@@ -42,14 +42,27 @@ export default async function UserCouponsPage({
   const couponMap = new Map((coupons || []).map((c) => [c.id, c]));
 
 
-  const { data: usages } = await supabase.from("coupon_usages").select("id, trip_id, user_coupon_id, discount_amount, created_at");
+  // PERF-02 FIX: coupon_usages could have millions of rows — fetching them all would OOM
+  // the serverless function. The coupons table tracks spent_budget (pre-aggregated per coupon),
+  // so we compute totalDiscount from those aggregates instead.
+  const couponIdsForStats = couponIds.length
+    ? couponIds
+    : [...new Set((userCoupons || []).map((uc) => uc.coupon_id).filter(Boolean))];
+  const { data: couponStats } = couponIdsForStats.length
+    ? await supabase
+        .from("coupons")
+        .select("id, spent_budget")
+        .in("id", couponIdsForStats)
+    : { data: [] };
 
+  const totalDiscount = (couponStats || []).reduce(
+    (s, c) => s + (Number(c.spent_budget) || 0),
+    0,
+  );
 
   const totalAssigned = count || 0;
   const totalUsed = (userCoupons || []).filter((uc) => uc.is_used).length;
   const totalUnused = (userCoupons || []).filter((uc) => !uc.is_used).length;
-
-  const totalDiscount = (usages || []).reduce((s, u) => s + (Number(u.discount_amount) || 0), 0);
 
   return (
     <>

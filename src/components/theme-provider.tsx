@@ -4,13 +4,11 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { type ReactNode } from "react";
 
-if (typeof window !== 'undefined') {
-  const origError = console.error;
-  console.error = (...args: any[]) => {
-    if (typeof args[0] === 'string' && args[0].includes('Encountered a script tag')) return;
-    origError.apply(console, args);
-  };
-}
+// CODE-07 FIX: Removed the global console.error override that suppressed
+// "Encountered a script tag" warnings. While harmless in intent, globally
+// monkey-patching console.error masked other legitimate runtime errors and
+// is considered an anti-pattern. Next.js/React no longer emit this warning
+// in recent versions, making the override unnecessary.
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   return (

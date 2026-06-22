@@ -73,6 +73,9 @@ export const POST = safeHandler(async (request: Request) => {
       .from("users")
       .select("id")
       .eq("is_active", true)
+      // CODE-15 FIX: Also exclude blocked users – they should not receive
+      // broadcast notifications. Previously only is_active was checked.
+      .eq("is_blocked", false)
       .range(from, from + BATCH_SIZE - 1);
 
     if (usersError) {

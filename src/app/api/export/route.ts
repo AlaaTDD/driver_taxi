@@ -82,7 +82,9 @@ export const GET = safeHandler(async (request: Request) => {
     }
 
     const rows = (data as any[]) || [];
-    const csv = toCsv(rows);
+    // CODE-11 FIX: Prepend UTF-8 BOM (\uFEFF) so Excel on Windows renders
+    // Arabic characters correctly instead of showing mojibake.
+    const csv = "\uFEFF" + toCsv(rows);
     const filename = `${table}_export_${new Date().toISOString().split("T")[0]}.csv`;
 
     await logAdminAction({

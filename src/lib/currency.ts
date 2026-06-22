@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
+import { safeErrorMessage } from "@/lib/api/validation";
 
 export async function getAppCurrency(): Promise<string> {
   const supabase = createAdminClient();
@@ -37,7 +38,7 @@ export async function updateAppCurrency(newCurrency: string) {
       .update({ value: newCurrency })
       .eq("key", "currency");
 
-    if (error) return { error: error.message };
+    if (error) return { error: safeErrorMessage(error) };
   } else {
     const { error } = await supabase.from("app_config").insert({
       key: "currency",
@@ -46,7 +47,7 @@ export async function updateAppCurrency(newCurrency: string) {
       category: "general",
     });
 
-    if (error) return { error: error.message };
+    if (error) return { error: safeErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");

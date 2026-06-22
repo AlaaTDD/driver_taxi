@@ -8,6 +8,12 @@ export function getIpFromRequest(request: Request): string {
   return request.headers.get("x-real-ip") || "unknown";
 }
 
+// NEW-03 FIX: Extract User-Agent header for admin log attribution.
+// Previously the column was 100% NULL because nothing populated it.
+export function getUserAgentFromRequest(request: Request): string | undefined {
+  return request.headers.get("user-agent") ?? undefined;
+}
+
 export async function logAdminAction({
   admin_id,
   action,
@@ -16,6 +22,7 @@ export async function logAdminAction({
   old_data,
   new_data,
   ip_address = "system",
+  user_agent,
 }: {
   admin_id: string;
   action: "create" | "update" | "delete" | "verify" | "revoke" | "block" | "unblock" | "send_notification" | "export";
@@ -24,6 +31,7 @@ export async function logAdminAction({
   old_data?: any;
   new_data?: any;
   ip_address?: string;
+  user_agent?: string;
 }) {
   try {
     const supabase = createAdminClient();
@@ -35,6 +43,7 @@ export async function logAdminAction({
       old_data,
       new_data,
       ip_address,
+      ...(user_agent ? { user_agent } : {}),
     });
 
     if (error) {

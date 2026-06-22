@@ -83,7 +83,7 @@ export default function DriverLocationsMap({
 
     // Load Leaflet JS
     const loadLeaflet = () => {
-      return new Promise<void>((resolve) => {
+      return new Promise<void>((resolve, reject) => {
         if ((window as any).L) {
           resolve();
           return;
@@ -91,6 +91,9 @@ export default function DriverLocationsMap({
         const script = document.createElement("script");
         script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
         script.onload = () => resolve();
+        // CODE-06 FIX: Previously had no error handler — if the CDN was unreachable
+        // the map would silently fail with no user feedback.
+        script.onerror = () => reject(new Error("تعذر تحميل مكتبة الخريطة. تحقق من اتصال الإنترنت."));
         document.head.appendChild(script);
       });
     };

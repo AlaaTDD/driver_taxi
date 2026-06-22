@@ -37,6 +37,18 @@ export const POST = safeHandler(async (request: Request) => {
       return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 
+    // CODE-02 FIX: The DB trigger _fn_recalculate_driver_rating fires only on INSERT,
+    // not on DELETE. Call the recalculation RPC manually so the driver's aggregate
+    // rating stays accurate after admin-initiated deletions.
+    if (oldRating?.driver_id) {
+      const { error: rpcErr } = await supabase.rpc("recalculate_driver_rating", {
+        p_driver_id: oldRating.driver_id,
+      });
+      if (rpcErr) {
+        console.warn("recalculate_driver_rating RPC failed (non-fatal):", rpcErr.message);
+      }
+    }
+
     await logAdminAction({
       admin_id: guard.user.id,
       action: "delete",

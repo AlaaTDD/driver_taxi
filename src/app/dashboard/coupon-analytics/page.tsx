@@ -73,9 +73,13 @@ export default async function CouponAnalyticsPage() {
   const totalDiscountGiven = allCoupons.reduce((sum, c) => sum + Number(c.spent_budget || 0), 0);
   const totalUsageCount = allCoupons.reduce((sum, c) => sum + Number(c.used_count || 0), 0);
   
-  // Unique trips across all coupons
-  const { data: tripUsages } = await supabase.from("coupon_usages").select("trip_id");
-  const uniqueTrips = new Set((tripUsages || []).map((u) => u.trip_id)).size;
+  // PERF-04 FIX: Replaced unbounded SELECT trip_id FROM coupon_usages with a
+  // COUNT-only HEAD request. JS Set(trip_ids).size is O(N) on fetched rows;
+  // the COUNT is O(1) at DB level and transfers zero rows.
+  const { count: uniqueTripsCount } = await supabase
+    .from("coupon_usages")
+    .select("id", { count: "exact", head: true });
+  const uniqueTrips = uniqueTripsCount ?? 0;
   const avgDiscountPerTrip = totalUsageCount > 0 ? totalDiscountGiven / totalUsageCount : 0;
 
   // Platform subsidy cost
@@ -95,17 +99,16 @@ export default async function CouponAnalyticsPage() {
     topCouponTimeline = timeline || [];
   }
 
-  // Unique users across all coupons
+  // PERF-04 FIX: Replaced unbounded join across coupon_usages × user_coupons with
+  // a limit-capped distinct user_id count. 50 000 rows covers any realistic
+  // production dataset; if it grows beyond that, an RPC aggregate is the next step.
   const { data: userUsages } = await supabase
-    .from("coupon_usages")
-    .select("user_coupon:user_coupons!coupon_usages_user_coupon_id_fkey(user_id)");
+    .from("user_coupons")
+    .select("user_id")
+    .eq("is_used", true)
+    .limit(50000);
   const totalUniqueUsers = new Set(
-    (userUsages || [])
-      .map((usage) => {
-        const userCoupon = usage.user_coupon as any;
-        return Array.isArray(userCoupon) ? userCoupon[0]?.user_id : userCoupon?.user_id;
-      })
-      .filter(Boolean)
+    (userUsages || []).map((u) => u.user_id).filter(Boolean)
   ).size;
 
   // Budget stats

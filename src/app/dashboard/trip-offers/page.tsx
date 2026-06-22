@@ -49,14 +49,20 @@ export default async function TripOffersPage({
   const tripMap = new Map((trips || []).map((t) => [t.id, t]));
   const tripUserMap = new Map((tripUsers || []).map((u) => [u.id, u.name]));
 
-  // Stats for the dropdown labels
-  const { data: statusStats } = await supabase.from("trip_offers").select("status");
+  // PERF-01 FIX: Use HEAD count queries instead of fetching every row just to count statuses.
+  const [totalRes, pendingRes, acceptedRes, rejectedRes, expiredRes] = await Promise.all([
+    supabase.from("trip_offers").select("id", { count: "exact", head: true }),
+    supabase.from("trip_offers").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("trip_offers").select("id", { count: "exact", head: true }).eq("status", "accepted"),
+    supabase.from("trip_offers").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+    supabase.from("trip_offers").select("id", { count: "exact", head: true }).eq("status", "expired"),
+  ]);
   const stats = {
-    total: statusStats?.length || 0,
-    pending: statusStats?.filter((s) => s.status === "pending").length || 0,
-    accepted: statusStats?.filter((s) => s.status === "accepted").length || 0,
-    rejected: statusStats?.filter((s) => s.status === "rejected").length || 0,
-    expired: statusStats?.filter((s) => s.status === "expired").length || 0,
+    total:    totalRes.count    || 0,
+    pending:  pendingRes.count  || 0,
+    accepted: acceptedRes.count || 0,
+    rejected: rejectedRes.count || 0,
+    expired:  expiredRes.count  || 0,
   };
 
   // Active status label for display
