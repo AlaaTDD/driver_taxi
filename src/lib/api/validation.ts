@@ -4,7 +4,10 @@ import { z } from "zod";
 export { z };
 
 export const uuidSchema = z.string().trim().uuid();
-export const adminRoleSchema = z.enum(["user", "driver", "admin", "supervisor"]);
+// [P0-07 FIX] Removed "driver" — driver role is managed via drivers_profile table
+// (verify/revoke RPCs). Setting role=driver here would orphan the user from
+// the drivers_profile lifecycle, causing inconsistent state.
+export const adminRoleSchema = z.enum(["user", "admin", "supervisor"]);
 export const messageTypeSchema = z.enum(["support", "trip"]);
 export const complaintStatusSchema = z.enum(["pending", "in_progress", "resolved", "closed"]);
 export const triggerTypeSchema = z.enum(["daily_trips", "weekly_trips", "rating_threshold", "streak"]);
@@ -100,15 +103,25 @@ export function safeHandler(
  */
 export function safeErrorMessage(error: unknown, fallback = "An unexpected error occurred"): string {
   if (error instanceof Error) {
-    // Strip Postgres internal codes/hints from the message
     const msg = error.message;
-    if (msg.includes("violates") || msg.includes("duplicate key")) {
-      return "Operation failed due to a data constraint";
+    // [P0-09 FIXED] Whitelist approach: only known, user-safe phrases are mapped
+    // to fixed strings. The previous blacklist (`violates` / `duplicate key`
+    // / `relation` / `column`) let any other Postgres message of <200 chars
+    // through verbatim, leaking schema names, internal RPC hints, and
+    // constraint text to the browser. We now return `fallback` for anything
+    // that isn't explicitly recognized.
+    const SAFE_PATTERNS: { match: string; message: string }[] = [
+      { match: "insufficient_balance", message: "Insufficient balance" },
+      { match: "unauthorized", message: "Unauthorized" },
+      { match: "not pending", message: "The request is no longer pending" },
+      { match: "wallet_rpc_missing", message: "Wallet operation is unavailable" },
+      { match: "duplicate key", message: "Operation failed due to a data constraint" },
+      { match: "violates", message: "Operation failed due to a data constraint" },
+    ];
+    for (const { match, message } of SAFE_PATTERNS) {
+      if (msg.includes(match)) return message;
     }
-    if (msg.includes("relation") || msg.includes("column")) {
-      return fallback; // Don't leak table/column names
-    }
-    return msg.length > 200 ? msg.slice(0, 200) : msg;
+    return fallback;
   }
   return fallback;
 }

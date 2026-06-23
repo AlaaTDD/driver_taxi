@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { safeHandler } from "@/lib/api/validation";
 
 const MAX_EXPORT_ROWS = 5000;
@@ -21,7 +21,10 @@ const TABLE_CONFIGS: Record<ExportTable, { table: string; select: string; order:
   },
   trips: {
     table: "trips",
-    select: "id, user_id, driver_id, status, price, vehicle_type, pickup_address, destination_address, distance_km, duration_min, created_at",
+    // [P0-06 FIXED] Add final_price, coupon_discount, payment_method, completed_at.
+    // Exporting only `price` shipped the estimate, not the actually-charged
+    // amount, which broke revenue reconciliation downstream.
+    select: "id, user_id, driver_id, status, price, final_price, coupon_discount, payment_method, vehicle_type, pickup_address, destination_address, distance_km, duration_min, created_at, completed_at",
     order: "created_at",
   },
   wallets: {
@@ -93,6 +96,7 @@ export const GET = safeHandler(async (request: Request) => {
       table_name: table,
       new_data: { rows_exported: rows.length, format: "csv" },
       ip_address: getIpFromRequest(request),
+      user_agent: getUserAgentFromRequest(request),
     });
 
     return new Response(csv, {

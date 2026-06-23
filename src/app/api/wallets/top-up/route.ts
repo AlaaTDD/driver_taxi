@@ -1,7 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
-import { logAdminAction } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { formDataToObject, moneyAmount, optionalString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
 const MAX_TOP_UP_AMOUNT = 100_000;
@@ -64,7 +64,8 @@ export const POST = safeHandler(async (request: Request) => {
     record_id: walletId,
     old_data: walletBefore ? { balance: walletBefore.balance } : undefined,
     new_data: { amount, description, operation: "top_up" },
-    ip_address: request.headers.get("x-forwarded-for") || undefined,
+    ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   return redirect(request, "/dashboard/wallets?tab=user_wallets&success=wallet_topped_up");

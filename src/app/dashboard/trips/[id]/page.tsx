@@ -23,37 +23,57 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const supabase = createAdminClient();
   const currency = await getAppCurrency();
 
-  const { data: trip, error } = await supabase
-    .from("trips")
-    .select(`
-      *,
-      user:users!user_id(id, name, phone, email, rating, total_trips, is_blocked),
-      driver:users!driver_id(
-        id, name, phone, email, rating, total_trips, is_blocked,
-        drivers_profile(vehicle_type, vehicle_brand, vehicle_model, vehicle_plate)
-      )
-    `)
-    .eq("id", id)
-    .single();
+  // [PERF-02 FIXED] Run the 4 queries in parallel instead of serially.
+  // Previously: trip → complaints → routePlans → waypoints (4 round-trips = 4 × latency).
+  const [
+    tripResult,
+    complaintsResult,
+    routePlansResult,
+  ] = await Promise.all([
+    supabase
+      .from("trips")
+      .select(`
+        *,
+        user:users!user_id(id, name, phone, email, rating, total_trips, is_blocked),
+        driver:users!driver_id(
+          id, name, phone, email, rating, total_trips, is_blocked,
+          drivers_profile(vehicle_type, vehicle_brand, vehicle_model, vehicle_plate)
+        )
+      `)
+      .eq("id", id)
+      .single(),
+    supabase
+      .from("complaints")
+      .select("id, title, description, status, priority, created_at, admin_reply")
+      .eq("trip_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("trip_route_plans")
+      .select("id, status, total_distance_km, total_duration_min, created_at")
+      .eq("trip_id", id)
+      .order("created_at", { ascending: false })
+      .limit(1),
+  ]);
+
+  const { data: trip, error } = tripResult;
 
   if (error) console.error("Trip detail fetch error:", error);
   if (!trip) notFound();
 
-  const { data: complaints } = await supabase
-    .from("complaints")
-    .select("id, title, description, status, priority, created_at, admin_reply")
-    .eq("trip_id", id)
-    .order("created_at", { ascending: false });
+  const complaints = complaintsResult.data || [];
+  const routePlans = routePlansResult.data || [];
 
-  const { data: routePlans } = await supabase
-    .from("trip_route_plans")
-    .select("id, status, total_distance_km, total_duration_min, created_at")
-    .eq("trip_id", id)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  const activeRoutePlan = routePlans?.[0];
-  let waypoints: any[] = [];
+  const activeRoutePlan = routePlans[0];
+  let waypoints: Array<{
+    id: string;
+    seq_order: number;
+    role: string;
+    address: string;
+    lat: number | null;
+    lng: number | null;
+    actual_arrived_at: string | null;
+    actual_departed_at: string | null;
+  }> = [];
   if (activeRoutePlan) {
     const { data: wp } = await supabase
       .from("trip_route_waypoints")
@@ -490,7 +510,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               <div className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-success/15 via-success/8 to-transparent border border-success/20">
                 <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-success/10 -translate-x-8 -translate-y-8 pointer-events-none" />
                 <p className="text-text-tertiary text-[10px] font-bold uppercase tracking-wider mb-1 relative">التكلفة الإجمالية</p>
-                <p className="text-[32px] font-black num text-success leading-none relative">{formatCurrency(trip.price, currency)}</p>
+                <p className="text-[32px] font-black num text-success leading-none relative">{formatCurrency(trip.final_price ?? trip.price, currency)}</p>
                 {isCompleted && (
                   <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-full border border-success/20">
                     <CheckCircle size={9} /> تم الدفع

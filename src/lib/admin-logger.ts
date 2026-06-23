@@ -25,7 +25,17 @@ export async function logAdminAction({
   user_agent,
 }: {
   admin_id: string;
-  action: "create" | "update" | "delete" | "verify" | "revoke" | "block" | "unblock" | "send_notification" | "export";
+  action:
+    | "create"
+    | "update"
+    | "delete"
+    | "verify"
+    | "revoke"
+    | "block"
+    | "unblock"
+    | "send_notification"
+    | "export"
+    | "set_role";
   table_name: string;
   record_id?: string;
   old_data?: any;

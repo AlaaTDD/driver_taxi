@@ -6,12 +6,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// [UI-05 FIXED] Intl.NumberFormat can throw in environments that lack the
+// requested locale or in test runners. Wrap in try/catch so the UI always
+// renders a numeric value instead of crashing.
 export function formatCurrency(value: number, currency = "EGP", locale = "ar-EG"): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-  }).format(value);
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return `${value.toFixed(2)} ${currency}`;
+  }
 }
 
 export function formatDate(date: string, locale = "ar-EG"): string {

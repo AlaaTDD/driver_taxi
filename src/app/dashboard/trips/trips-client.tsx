@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -27,12 +27,15 @@ export default function TripsClient({
 }: TripsClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const t = useTranslations();
 
+  // [RENDER-01 FIXED] Previously `updateParams` started from an empty
+  // URLSearchParams(), so any query param not explicitly copied here (e.g. a
+  // future `q=` search) was silently dropped. We now build from the current
+  // searchParams to preserve everything.
   const updateParams = (key: string, value: string) => {
-    const params = new URLSearchParams();
-    if (currentStatus) params.set("status", currentStatus);
-    if (currentVehicle) params.set("vehicle", currentVehicle);
+    const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(key, value);
     } else {

@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
-import { logAdminAction } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { safeHandler } from "@/lib/api/validation";
 
 export const POST = safeHandler(async (request: Request) => {
@@ -49,7 +49,8 @@ export const POST = safeHandler(async (request: Request) => {
     // [INT-C-02 FIXED] old_data: vehicle_types snapshot before sync
     old_data: { vehicle_types_before_sync: vehicleTypes ?? [] },
     new_data: { sync_triggered: true },
-    ip_address: request.headers.get("x-forwarded-for") || undefined,
+    ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   return NextResponse.json({ success: true });

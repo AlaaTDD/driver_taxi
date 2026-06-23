@@ -1,10 +1,10 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
 import { formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 // [WEB-H-02 FIXED] Static import — dynamic `await import()` inside handlers
 // adds module-loading latency on every request.
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 
 const DriverIdSchema = z.object({
   driver_id: uuidSchema,
@@ -21,29 +21,31 @@ export const POST = safeHandler(async (request: Request) => {
   }
   const driverId = parsed.data.driver_id;
 
-  const supabase = createAdminClient();
+  // [P0-01 FIXED] Same fix as verify/route.ts: admin_revoke_driver checks
+  // is_admin_user() → auth.uid(), so it MUST be called via the session client.
+  const admin = createAdminClient();
 
-  // Direct updates via service_role client — bypasses the is_admin_user() check
-  // inside unverify_driver / toggle_driver_active RPCs (auth.uid() is NULL with service_role).
-  const { error } = await supabase
+  // Fetch true old_data BEFORE the mutation for an accurate audit log.
+  const { data: oldProfile } = await admin
     .from("drivers_profile")
-    .update({ is_verified: false, is_available: false })
-    .eq("id", driverId);
-
-  if (error) {
-    console.error("Revoke driver error:", error);
-    return NextResponse.redirect(new URL("/dashboard/drivers?error=revoke_failed", request.url));
-  }
-
-  // Deactivate the user account (is_active lives on users table).
-  const { error: deactivateError } = await supabase
+    .select("is_verified, is_available")
+    .eq("id", driverId)
+    .maybeSingle();
+  const { data: oldUser } = await admin
     .from("users")
-    .update({ is_active: false })
-    .eq("id", driverId);
+    .select("is_active")
+    .eq("id", driverId)
+    .maybeSingle();
 
-  if (deactivateError) {
-    console.error("Revoke driver — deactivate user error:", deactivateError);
-    // is_verified was already cleared; log the partial failure but do not block redirect.
+  const supabase = await createClient();
+
+  const { error: rpcError } = await supabase.rpc("admin_revoke_driver", {
+    p_driver_id: driverId,
+  });
+
+  if (rpcError) {
+    console.error("Revoke driver error:", rpcError);
+    return NextResponse.redirect(new URL("/dashboard/drivers?error=revoke_failed", request.url));
   }
 
   await logAdminAction({
@@ -51,11 +53,15 @@ export const POST = safeHandler(async (request: Request) => {
     action: "revoke",
     table_name: "drivers_profile",
     record_id: driverId,
-    // [INT-C-02 FIXED] old_data: state before revocation (was verified & active)
-    old_data: { is_verified: true, is_active: true },
+    old_data: {
+      is_verified: oldProfile?.is_verified ?? true,
+      is_available: oldProfile?.is_available ?? true,
+      is_active: oldUser?.is_active ?? true,
+    },
     new_data: { is_verified: false, is_available: false, is_active: false },
     ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
-  return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
+  return NextResponse.redirect(new URL("/dashboard/drivers?success=driver_revoked", request.url));
 });

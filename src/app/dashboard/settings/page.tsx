@@ -211,8 +211,3 @@ export default async function SettingsPage() {
     </div>
   );
 }
-const _SettingsPageDummy = () => {
-  return (
-    <div></div>
-  );
-}

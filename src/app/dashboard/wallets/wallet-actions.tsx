@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { X, Plus, ArrowUpDown } from "lucide-react";
 
 // ✅ BUG-6 FIX: WalletActions now shows TWO action types for user wallets:
@@ -25,11 +25,28 @@ export function WalletActions({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<ActionTab>("adjust");
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
     setIsLoading(false);
     setActiveTab("adjust");
+  }, []);
+
+  // [UI-01 FIXED] Close on Escape key and backdrop click.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) handleClose();
   };
 
   return (
@@ -43,9 +60,14 @@ export function WalletActions({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-surface border border-divider rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={handleBackdropClick}
+        >
+          <div
+            ref={panelRef}
+            className="bg-surface border border-divider rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-divider">
               <h3 className="font-bold text-lg text-text-primary">تعديل رصيد المحفظة</h3>

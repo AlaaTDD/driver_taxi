@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { booleanFromRequest, formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 // [WEB-H-02 FIXED] Static import — dynamic `await import()` inside handlers
 // adds module-loading latency on every request.
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 
 const ToggleDriverSchema = z.object({
   driver_id: uuidSchema,
@@ -43,6 +43,7 @@ export const POST = safeHandler(async (request: Request) => {
     old_data: { is_active: !isActive },
     new_data: { is_active: isActive },
     ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));

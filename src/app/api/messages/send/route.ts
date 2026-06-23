@@ -58,6 +58,25 @@ export const POST = safeHandler(async (request: Request) => {
           if (ticketError) throw ticketError;
           currentTicketId = newTicket.id;
         }
+      } else {
+        // [P0-10 FIX] When ticket_id is explicitly provided, verify ownership
+        // and that the ticket is not closed. Without this check, any admin
+        // could inject messages into arbitrary tickets of any user.
+        const { data: ticket } = await supabase
+          .from("support_tickets")
+          .select("id, user_id, status")
+          .eq("id", currentTicketId)
+          .maybeSingle();
+
+        if (!ticket) {
+          return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+        }
+        if (ticket.user_id !== user_id) {
+          return NextResponse.json({ error: "Ticket does not belong to this user" }, { status: 403 });
+        }
+        if (ticket.status === "closed") {
+          return NextResponse.json({ error: "Cannot send messages to a closed ticket" }, { status: 403 });
+        }
       }
 
       const { error } = await supabase.from("support_messages").insert({
@@ -71,6 +90,26 @@ export const POST = safeHandler(async (request: Request) => {
       if (error) throw error;
     } else if (type === "trip") {
       const { trip_id, receiver_id } = body;
+
+      // [SEC-06 FIXED] Verify that the receiver is actually a participant in
+      // the trip (either the user or the driver). Without this check any admin
+      // could send a message to any arbitrary user_id for any trip_id.
+      const { data: trip, error: tripErr } = await supabase
+        .from("trips")
+        .select("user_id, driver_id")
+        .eq("id", trip_id)
+        .maybeSingle();
+
+      if (tripErr || !trip) {
+        return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      }
+
+      if (receiver_id !== trip.user_id && receiver_id !== trip.driver_id) {
+        return NextResponse.json(
+          { error: "Receiver is not a participant in this trip" },
+          { status: 403 },
+        );
+      }
 
       const { error } = await supabase.from("messages").insert({
         trip_id,

@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
@@ -56,6 +56,7 @@ export const POST = safeHandler(async (request: Request) => {
       record_id: rating_id,
       old_data: oldRating ?? undefined,
       ip_address: getIpFromRequest(request),
+      user_agent: getUserAgentFromRequest(request),
     });
 
     revalidatePath("/dashboard/ratings");

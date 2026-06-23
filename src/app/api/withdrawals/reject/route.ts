@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
-import { logAdminAction } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { formDataToObject, nonEmptyString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
 const RejectSchema = z.object({
@@ -53,7 +53,8 @@ export const POST = safeHandler(async (request: Request) => {
     // [INT-C-02 FIXED] old_data: reject_withdrawal RPC only runs on pending requests
     old_data: { status: "pending" },
     new_data: { status: "rejected", rejected_by: guard.email, reason },
-    ip_address: request.headers.get("x-forwarded-for") || undefined,
+    ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   return redirect(request, "/dashboard/withdrawals?success=withdrawal_rejected");

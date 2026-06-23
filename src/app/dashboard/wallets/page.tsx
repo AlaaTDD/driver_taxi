@@ -165,11 +165,42 @@ export default async function WalletsPage({
     txCount = count || 0;
     txTotalPages = Math.ceil(txCount / pageSize);
 
+    // [P0-05 FIXED] `wallet_id` is the wallet PK, NOT the user id. The old
+    // code mapped wallet_id → users.id, which never matched (different UUIDs),
+    // so every transaction showed a blank user name. We now join through the
+    // wallet tables (driver_wallets / user_wallets) to resolve wallet_id →
+    // user_id → user name.
     const walletIds = [...new Set(transactions.map((tx) => tx.wallet_id).filter(Boolean))];
     if (walletIds.length) {
-      const { data: walletUsers } = await supabase.from("users").select("id, name").in("id", walletIds);
-      const uMap = new Map((walletUsers || []).map((u) => [u.id, u.name]));
-      transactions = transactions.map((tx) => ({ ...tx, user_name: uMap.get(tx.wallet_id) }));
+      // Resolve driver wallet ids
+      const { data: driverWallets } = await supabase
+        .from("driver_wallets")
+        .select("id, user_id")
+        .in("id", walletIds);
+      const dwMap = new Map((driverWallets || []).map((w) => [w.id, w.user_id]));
+
+      // Resolve user wallet ids
+      const { data: userWalletsResolved } = await supabase
+        .from("user_wallets")
+        .select("id, user_id")
+        .in("id", walletIds);
+      const uwMap = new Map((userWalletsResolved || []).map((w) => [w.id, w.user_id]));
+
+      // Merge: wallet_id → user_id
+      const walletToUser = new Map<string, string>();
+      dwMap.forEach((userId, walletId) => walletToUser.set(walletId, userId));
+      uwMap.forEach((userId, walletId) => walletToUser.set(walletId, userId));
+
+      const userIds = [...new Set([...walletToUser.values()].filter((v): v is string => Boolean(v)))];
+      let uNameMap = new Map<string, string>();
+      if (userIds.length) {
+        const { data: users } = await supabase.from("users").select("id, name").in("id", userIds);
+        uNameMap = new Map((users || []).map((u) => [u.id, u.name]));
+      }
+      transactions = transactions.map((tx) => ({
+        ...tx,
+        user_name: uNameMap.get(walletToUser.get(tx.wallet_id ?? "") ?? "") ?? "",
+      }));
     }
   }
 

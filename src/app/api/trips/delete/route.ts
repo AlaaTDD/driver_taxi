@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
@@ -59,6 +59,7 @@ export const POST = safeHandler(async (req: Request) => {
     // [INT-C-02 FIXED] old_data: the full trip snapshot before deletion
     old_data: trip,
     ip_address: getIpFromRequest(req),
+    user_agent: getUserAgentFromRequest(req),
   });
 
   return NextResponse.json({ success: true });

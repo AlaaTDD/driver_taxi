@@ -23,20 +23,11 @@ export const POST = safeHandler(async (request: Request) => {
 
     const supabase = createAdminClient();
 
-    
-    const { data: existing } = await supabase
-      .from("vehicle_types")
-      .select("id")
-      .eq("name", name)
-      .single();
-
-    if (existing) {
-      return NextResponse.json(
-        { error: "هذا الاسم التقني مستخدم بالفعل" },
-        { status: 400 }
-      );
-    }
-
+    // [P0-12 FIXED] Dropped the SELECT-then-INSERT race. Two concurrent
+    // requests could both pass the `existing` check and then both attempt
+    // INSERT. We now rely on the DB unique constraint on vehicle_types.name:
+    // 23505 → 409 conflict; everything else → 500. This is both faster
+    // (one query instead of two) and race-free.
     const { error } = await supabase.from("vehicle_types").insert({
       name,
       display_name,
@@ -49,6 +40,13 @@ export const POST = safeHandler(async (request: Request) => {
 
     if (error) {
       console.error("Create vehicle type error:", error);
+      // 23505 = unique_violation. PostgREST exposes the code on the error obj.
+      if (error.code === "23505") {
+        return NextResponse.json(
+          { error: "هذا الاسم التقني مستخدم بالفعل" },
+          { status: 409 }
+        );
+      }
       return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 

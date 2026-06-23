@@ -5,7 +5,7 @@ import {
   Trophy, Target, Calendar, Car, CheckCircle,
   XCircle, Clock, Zap, TrendingUp, Award,
 } from "lucide-react";
-import BonusesClient, { ToggleRuleStatus } from "./bonuses-client";
+import BonusesClient, { ToggleRuleStatus, RuleActions } from "./bonuses-client";
 import { getAppCurrency } from "@/lib/currency";
 
 export default async function BonusesPage({
@@ -168,6 +168,7 @@ export default async function BonusesPage({
                   <th className="px-5 py-3 text-start text-[11px] font-bold uppercase tracking-wider text-text-tertiary">{t("bonuses.vehicleTypes")}</th>
                   <th className="px-5 py-3 text-start text-[11px] font-bold uppercase tracking-wider text-text-tertiary">{t("common.status")}</th>
                   <th className="px-5 py-3 text-start text-[11px] font-bold uppercase tracking-wider text-text-tertiary">{t("bonuses.validity")}</th>
+                  <th className="px-5 py-3 text-start text-[11px] font-bold uppercase tracking-wider text-text-tertiary">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -218,11 +219,27 @@ export default async function BonusesPage({
                         )}
                       </div>
                     </td>
+                    <td className="px-5 py-3.5">
+                      <RuleActions
+                        rule={{
+                          id: rule.id,
+                          name: rule.name,
+                          name_ar: rule.name_ar,
+                          trigger_type: rule.trigger_type,
+                          threshold: Number(rule.threshold),
+                          bonus_amount: Number(rule.bonus_amount),
+                          vehicle_types: rule.vehicle_types,
+                          is_active: rule.is_active,
+                          starts_at: rule.starts_at,
+                          expires_at: rule.expires_at,
+                        }}
+                      />
+                    </td>
                   </tr>
                 ))}
                 {rules.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-16 text-center">
+                    <td colSpan={8} className="py-16 text-center">
                       <div className="flex flex-col items-center gap-3">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated border border-divider shadow-sm">
                           <Trophy size={24} className="text-text-disabled" />

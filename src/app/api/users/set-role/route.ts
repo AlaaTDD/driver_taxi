@@ -1,5 +1,6 @@
 import { createAdminClient, createAuthAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { adminRoleSchema, formDataToObject, safeHandler, parseRequest, uuidSchema, z } from "@/lib/api/validation";
@@ -59,6 +60,18 @@ export const POST = safeHandler(async (request: Request) => {
       // Non-fatal — DB role was updated; warn but don't fail the request.
       // The user will get the correct JWT on next login.
     }
+
+    // [SEC-08 FIXED] Role changes are a security-sensitive operation and must
+    // be audited. This was the only admin mutation with no admin_logs entry.
+    await logAdminAction({
+      admin_id: guard.user.id,
+      action: "set_role",
+      table_name: "users",
+      record_id: userId,
+      new_data: { role },
+      ip_address: getIpFromRequest(request),
+      user_agent: getUserAgentFromRequest(request),
+    });
 
     revalidatePath("/dashboard/users");
     return NextResponse.json({ success: true });

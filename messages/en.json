@@ -527,7 +527,12 @@
       "saveFailed": "Save failed",
       "toggleFailed": "Toggle failed",
       "confirmDelete": "Are you sure you want to delete this type?",
-      "deleteFailed": "Delete failed - Type might be used in trips"
+      "deleteFailed": "Delete failed - Type might be used in trips",
+      "activated": "Activated successfully",
+      "addSuccess": "Added successfully",
+      "deactivated": "Deactivated successfully",
+      "deleteSuccess": "Deleted successfully",
+      "updateSuccess": "Updated successfully"
     },
     "icons": {
       "car": "Car",

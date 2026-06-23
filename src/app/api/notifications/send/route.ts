@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { nonEmptyString, optionalString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
 const MAX_TITLE_LENGTH = 120;
@@ -52,6 +52,7 @@ export const POST = safeHandler(async (request: Request) => {
       record_id: user_id,
       new_data: { title, type },
       ip_address: getIpFromRequest(request),
+      user_agent: getUserAgentFromRequest(request),
     });
     return NextResponse.json({ success: true, sent: 1 });
   }
@@ -76,6 +77,7 @@ export const POST = safeHandler(async (request: Request) => {
       // CODE-15 FIX: Also exclude blocked users – they should not receive
       // broadcast notifications. Previously only is_active was checked.
       .eq("is_blocked", false)
+      .order("id", { ascending: true })  // Stable ordering prevents gaps/dups
       .range(from, from + BATCH_SIZE - 1);
 
     if (usersError) {
@@ -118,6 +120,7 @@ export const POST = safeHandler(async (request: Request) => {
     table_name: "notifications",
     new_data: { title, type, sent: totalSent, failed: totalFailed },
     ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   // 207 Multi-Status when some batches failed, 200 when all succeeded

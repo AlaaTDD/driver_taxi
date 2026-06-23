@@ -1,6 +1,6 @@
 import { createClient, createAuthAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { formDataToObject, optionalString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
@@ -53,6 +53,7 @@ export const POST = safeHandler(async (request: Request) => {
     old_data: { is_blocked: action !== "block" },
     new_data: { is_blocked: action === "block", reason },
     ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
   // [WEB-H-03 FIXED] Sync is_blocked to app_metadata so requireAdmin() can

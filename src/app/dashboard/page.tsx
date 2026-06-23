@@ -27,8 +27,15 @@ import { getAppCurrency } from "@/lib/currency";
 
 
 export default async function DashboardPage() {
-  let t, locale, supabase, currency;
-  let dashboardRes, recentTripsRes, tripsForChartRes;
+  type Translator = Awaited<ReturnType<typeof getTranslations>>;
+  let t: Translator | undefined;
+  let locale: string | undefined;
+  let supabase, currency;
+  // Typed containers so we avoid `any` casts and keep TS strict-happy.
+  let dashboard: Record<string, unknown> | null = null;
+  let recentTrips: any[] = [];
+  let statusChartData: { name: string; value: number; status: string }[] = [];
+  let revenueByType: Record<string, number> = {};
 
   try {
     t = await getTranslations();
@@ -36,30 +43,94 @@ export default async function DashboardPage() {
     supabase = createAdminClient();
     currency = await getAppCurrency();
 
-    [
-      dashboardRes,
-      recentTripsRes,
-      tripsForChartRes
-    ] = await Promise.all([
+    const [dashboardRes, recentTripsRes] = await Promise.all([
       supabase.from("admin_dashboard").select("*").single(),
       supabase.from("admin_recent_trips").select("*").limit(10),
-      supabase.from("trips").select("id, status, price, final_price, vehicle_type").order("created_at", { ascending: false }).limit(500),
     ]);
+
+    dashboard = dashboardRes.data;
+    recentTrips = recentTripsRes.data || [];
+
+    // [FALLBACK] Prefer the admin_trips_summary view for O(1) aggregation, but
+    // if the view is missing (migration not yet applied) fall back to a direct
+    // query against the trips table. Both code paths produce the same shape so
+    // the dashboard keeps working even before the DB migration is applied.
+    const tryView = await supabase
+      .from("admin_trips_summary")
+      .select("status, vehicle_type, trip_count, revenue");
+
+    let statusRows: { status: string; trip_count: number }[] = [];
+    let revenueRows: { vehicle_type: string | null; revenue: number }[] = [];
+
+    if (tryView.error) {
+      // View missing → aggregate directly from trips table.
+      const { data: allTrips } = await supabase
+        .from("trips")
+        .select("status, vehicle_type, final_price, price");
+
+      const agg = (allTrips || []).reduce((acc, tr) => {
+        const status = (tr as { status?: string }).status ?? "unknown";
+        if (!acc[status]) acc[status] = { status, trip_count: 0, revenue: 0, vehicle_type: (tr as { vehicle_type?: string }).vehicle_type ?? null };
+        acc[status].trip_count += 1;
+        acc[status].revenue += Number((tr as { final_price?: number; price?: number }).final_price ?? (tr as { price?: number }).price ?? 0);
+        return acc;
+      }, {} as Record<string, { status: string; trip_count: number; revenue: number; vehicle_type: string | null }>);
+
+      statusRows = Object.values(agg).map((r) => ({ status: r.status, trip_count: r.trip_count }));
+      revenueRows = Object.values(agg).filter((r) => r.status === "completed").map((r) => ({ vehicle_type: r.vehicle_type, revenue: r.revenue }));
+    } else {
+      // View present → collapse per-vehicle-type rows into per-status totals.
+      statusRows = (tryView.data || [])
+        .reduce((acc, row) => {
+          const existing = acc.find((r) => r.status === row.status);
+          if (existing) { existing.trip_count += Number(row.trip_count ?? 0); }
+          else { acc.push({ status: row.status, trip_count: Number(row.trip_count ?? 0) }); }
+          return acc;
+        }, [] as { status: string; trip_count: number }[])
+        .sort((a, b) => b.trip_count - a.trip_count);
+      revenueRows = (tryView.data || []).filter((r) => r.status === "completed");
+    }
+
+    // Build chart data from the rows.
+    statusChartData = statusRows.map((row) => ({
+      name: getStatusLabel(row.status),
+      value: Number(row.trip_count ?? 0),
+      status: row.status,
+    }));
+
+    const vehicleTypeLabels: Record<string, string> = {
+      car: t("dashboard.charts.car"),
+      motorcycle: t("dashboard.charts.motorcycle"),
+    };
+
+    revenueRows.forEach((row) => {
+      const vt = row.vehicle_type || t!("common.vehicle");
+      revenueByType[vt] = (revenueByType[vt] || 0) + Number(row.revenue ?? 0);
+    });
+    // Apply localized labels as the final keys.
+    revenueByType = Object.fromEntries(
+      Object.entries(revenueByType).map(([k, v]) => [vehicleTypeLabels[k] || k, v]),
+    );
   } catch (err: any) {
     if (err && (err.digest === 'DYNAMIC_SERVER_USAGE' || err.message?.includes('dynamic-server-error') || err.message?.includes('Dynamic server usage'))) {
       throw err;
     }
     console.error("Dashboard Page Error:", err);
+    // [P0-13 FIXED] Never expose err.message/err.stack to the browser. A
+    // misconfigured NODE_ENV (e.g. leaked "development" on a preview deploy)
+    // would otherwise leak file paths, line numbers, and DB internals. Use an
+    // explicit opt-in flag instead, and log details server-side only.
+    const showErrorDetails = process.env.SHOW_ERROR_DETAILS === "true";
     return (
       <div className="p-8 text-center rounded-2xl bg-error/10 border border-error/20 text-error max-w-2xl mx-auto my-12">
         <h2 className="text-xl font-bold mb-2">حدث خطأ في تحميل لوحة التحكم (Server Error)</h2>
         <p className="text-sm font-semibold mb-4">
-          {process.env.NODE_ENV === "development" ? (err?.message || String(err)) : "حدث خطأ غير متوقع أثناء تحميل البيانات. يرجى المحاولة لاحقاً."}
+          {showErrorDetails ? (err?.message || String(err)) : "حدث خطأ غير متوقع أثناء تحميل البيانات. يرجى المحاولة لاحقاً."}
         </p>
         <p className="text-[11px] text-text-secondary mb-4 text-right">
           يرجى التحقق من إعدادات مفاتيح البيئة (Environment Variables) في لوحة تحكم Vercel الخاصة بك (مثل SUPABASE_SERVICE_ROLE_KEY).
         </p>
-        {process.env.NODE_ENV === "development" && err?.stack && (
+        {showErrorDetails && err?.stack && (
           <pre className="p-4 rounded bg-black/80 text-white text-xs text-left overflow-auto max-h-60 font-mono dir-ltr">
             {err.stack}
           </pre>
@@ -67,10 +138,6 @@ export default async function DashboardPage() {
       </div>
     );
   }
-
-  const dashboard = dashboardRes.data;
-  const recentTrips = recentTripsRes.data || [];
-  const trips = tripsForChartRes.data || [];
 
   const totalUsers = Number(dashboard?.total_users ?? 0);
   const totalDrivers = Number(dashboard?.total_drivers ?? 0);
@@ -83,33 +150,9 @@ export default async function DashboardPage() {
   const pendingDrivers = Number(dashboard?.pending_drivers ?? 0);
   const totalRevenue = Number(dashboard?.total_revenue ?? 0);
 
-  // Generate chart data from the most recent 500 trips (optimized from 2000)
-  const statusCounts: Record<string, number> = {};
-  trips.forEach((tData) => {
-    statusCounts[tData.status] = (statusCounts[tData.status] || 0) + 1;
-  });
-  const statusChartData = Object.entries(statusCounts).map(([name, value]) => ({
-    name: getStatusLabel(name),
-    value,
-    status: name,
-  }));
-
-  const revenueByType: Record<string, number> = {};
-  trips
-    .filter((trip) => trip.status === "completed")
-    .forEach((trip) => {
-      const vehicleType = trip.vehicle_type || t("common.vehicle");
-      const revenue = Number(trip.final_price ?? trip.price ?? 0);
-      revenueByType[vehicleType] = (revenueByType[vehicleType] || 0) + revenue;
-    });
-
-  const vehicleTypeLabels: Record<string, string> = {
-    car: t("dashboard.charts.car"),
-    motorcycle: t("dashboard.charts.motorcycle"),
-  };
-
+  // statusChartData and revenueByType were built inside the try block above.
   const revenueChartData = Object.entries(revenueByType).map(([name, revenue]) => ({
-    name: vehicleTypeLabels[name] || name,
+    name,
     revenue,
   }));
 

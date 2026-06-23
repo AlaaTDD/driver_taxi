@@ -1,6 +1,6 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
@@ -20,44 +20,51 @@ export const POST = safeHandler(async (request: Request) => {
   }
   const driverId = parsed.data.driver_id;
 
-  const supabase = createAdminClient();
+  // [P0-01 FIXED] The RPC `admin_verify_driver` checks `is_admin_user()`, which
+  // relies on `auth.uid()`. `auth.uid()` returns NULL under the service-role
+  // client, so the RPC always raised `42501 unauthorized`. We now call it via
+  // the session-scoped client so the admin's identity is preserved.
+  // The admin client is still used for the read-only pre-fetch of old_data,
+  // since reads here are not identity-scoped.
+  const admin = createAdminClient();
 
-  // Direct update via service_role client — bypasses the is_admin_user() check
-  // inside the verify_driver RPC (which checks auth.uid(), always NULL with service_role).
-  // service_role key bypasses RLS so we write directly and safely.
-  const { error } = await supabase
+  // Fetch true old_data BEFORE the mutation so the audit log is accurate.
+  const { data: oldProfile } = await admin
     .from("drivers_profile")
-    .update({ is_verified: true })
-    .eq("id", driverId);
+    .select("is_verified, is_available")
+    .eq("id", driverId)
+    .maybeSingle();
+  const { data: oldUser } = await admin
+    .from("users")
+    .select("is_active")
+    .eq("id", driverId)
+    .maybeSingle();
 
-  if (error) {
-    console.error("Verify driver error:", error);
+  const supabase = await createClient();
+
+  const { error: rpcError } = await supabase.rpc("admin_verify_driver", {
+    p_driver_id: driverId,
+  });
+
+  if (rpcError) {
+    console.error("Verify driver error:", rpcError);
     return NextResponse.redirect(new URL("/dashboard/drivers?error=verify_failed", request.url));
   }
 
-  // Activate the user account (is_active lives on users table).
-  const { error: activateError } = await supabase
-    .from("users")
-    .update({ is_active: true })
-    .eq("id", driverId);
-
-  if (activateError) {
-    console.error("Verify driver — activate user error:", activateError);
-    // is_verified was already set; log the partial failure but do not block redirect.
-  }
-
-  // [WEB-M-02 FIXED] Fetch old_data before the action so audit log is complete.
-  // (Here we log post-verification state; old_data would need a pre-fetch to be accurate.
-  // Since RPC already ran, we log the known before/after values.)
   await logAdminAction({
     admin_id: guard.user.id,
     action: "verify",
     table_name: "drivers_profile",
     record_id: driverId,
-    old_data: { is_verified: false, is_active: false },
+    old_data: {
+      is_verified: oldProfile?.is_verified ?? false,
+      is_available: oldProfile?.is_available ?? false,
+      is_active: oldUser?.is_active ?? false,
+    },
     new_data: { is_verified: true, is_active: true },
     ip_address: getIpFromRequest(request),
+    user_agent: getUserAgentFromRequest(request),
   });
 
-  return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
+  return NextResponse.redirect(new URL("/dashboard/drivers?success=driver_verified", request.url));
 });

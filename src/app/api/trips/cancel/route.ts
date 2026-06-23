@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
-import { logAdminAction, getIpFromRequest } from "@/lib/admin-logger";
+import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
 import { formDataToObject, optionalString, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
@@ -54,6 +54,7 @@ export const POST = safeHandler(async (req: Request) => {
     old_data: oldTrip ?? undefined,
     new_data: { status: "cancelled", cancel_reason },
     ip_address: getIpFromRequest(req),
+    user_agent: getUserAgentFromRequest(req),
   });
 
   if (contentType.includes("application/json")) {

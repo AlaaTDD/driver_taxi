@@ -2,22 +2,30 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { safeErrorMessage } from "@/lib/api/validation";
 
 export async function getAppCurrency(): Promise<string> {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("app_config")
-    .select("value")
-    .eq("key", "currency")
-    .single();
+  // Guard: only authenticated admins can read app config
+  const guard = await requireAdmin();
+  if (guard instanceof Response) return "EGP";
 
-  if (data?.value && typeof data.value === "string") {
-    return data.value;
-  }
-  
-  return "EGP"; // Default currency
+  const getCurrency = unstable_cache(
+    async () => {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("app_config")
+        .select("value")
+        .eq("key", "currency")
+        .single();
+
+      return data?.value && typeof data.value === "string" ? data.value : "EGP";
+    },
+    ["app-currency"],
+    { revalidate: 300, tags: ["app-config"] }, // cache 5 min, invalidated by updateAppCurrency
+  );
+
+  return getCurrency();
 }
 
 export async function updateAppCurrency(newCurrency: string) {
@@ -50,6 +58,7 @@ export async function updateAppCurrency(newCurrency: string) {
     if (error) return { error: safeErrorMessage(error) };
   }
 
+  revalidateTag("app-config", "default");
   revalidatePath("/", "layout");
   return { success: true };
 }

@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { Star, MessageSquare, Trash2, Car, User, Users, SlidersHorizontal } from "lucide-react";
+import { Star, MessageSquare, Trash2, Car, User, Users, SlidersHorizontal, Phone } from "lucide-react";
 
 type TabType = "driver_ratings" | "user_ratings";
 
@@ -48,7 +48,7 @@ export default async function RatingsPage({
   if (tab === "driver_ratings") {
     let query = supabase
       .from("ratings")
-      .select("*, users!ratings_user_id_fkey(name, avatar_url), trips(id, pickup_address, destination_address)", { count: "exact" })
+      .select("*, users!ratings_user_id_fkey(id, name, phone, avatar_url), trips(id, pickup_address, destination_address)", { count: "exact" })
       .order("created_at", { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -60,13 +60,20 @@ export default async function RatingsPage({
     ratingsCount = count || 0;
     ratingsTotalPages = Math.ceil(ratingsCount / pageSize);
 
-    avgRating = ratings.length
-      ? (ratings.reduce((sum, r) => sum + Number(r.rating), 0) / ratings.length).toFixed(1)
+    // Aggregate avg + histogram from ALL matching rows (not just current page)
+    let aggQuery = supabase.from("ratings").select("rating");
+    if (driverFilter) aggQuery = aggQuery.eq("driver_id", driverFilter);
+    if (minRating > 0) aggQuery = aggQuery.gte("rating", minRating);
+    const { data: allRatingRows } = await aggQuery;
+    const allRatingValues = (allRatingRows || []).map((r: { rating: number }) => Number(r.rating));
+
+    avgRating = allRatingValues.length
+      ? (allRatingValues.reduce((sum, r) => sum + r, 0) / allRatingValues.length).toFixed(1)
       : "0.0";
 
-    ratings.forEach((r) => {
-      const rating = Math.round(Number(r.rating));
-      if (rating >= 1 && rating <= 5) ratingCounts[rating as keyof typeof ratingCounts]++;
+    allRatingValues.forEach((rating) => {
+      const rounded = Math.round(rating);
+      if (rounded >= 1 && rounded <= 5) ratingCounts[rounded as keyof typeof ratingCounts]++;
     });
   }
 
@@ -91,18 +98,24 @@ export default async function RatingsPage({
     userRatingsCount = count || 0;
     userRatingsTotalPages = Math.ceil(userRatingsCount / pageSize);
 
-    userAvgRating = userRatings.length
-      ? (userRatings.reduce((sum, r) => sum + Number(r.rating), 0) / userRatings.length).toFixed(1)
+    // Aggregate avg + histogram from ALL matching rows (not just current page)
+    let userAggQuery = supabase.from("user_ratings").select("rating");
+    if (minRating > 0) userAggQuery = userAggQuery.gte("rating", minRating);
+    const { data: allUserRatingRows } = await userAggQuery;
+    const allUserRatingValues = (allUserRatingRows || []).map((r: { rating: number }) => Number(r.rating));
+
+    userAvgRating = allUserRatingValues.length
+      ? (allUserRatingValues.reduce((sum, r) => sum + r, 0) / allUserRatingValues.length).toFixed(1)
       : "0.0";
 
-    userRatings.forEach((r) => {
-      const rating = Math.round(Number(r.rating));
-      if (rating >= 1 && rating <= 5) userRatingCounts[rating as keyof typeof userRatingCounts]++;
+    allUserRatingValues.forEach((rating) => {
+      const rounded = Math.round(rating);
+      if (rounded >= 1 && rounded <= 5) userRatingCounts[rounded as keyof typeof userRatingCounts]++;
     });
 
     const allUserIds = [...new Set(userRatings.map((r) => [r.user_id, r.driver_id]).flat().filter(Boolean))];
     if (allUserIds.length) {
-      const { data: users } = await supabase.from("users").select("id, name, role").in("id", allUserIds);
+      const { data: users } = await supabase.from("users").select("id, name, phone, role").in("id", allUserIds);
       const userMap = new Map((users || []).map((u) => [u.id, u]));
       userRatings = userRatings.map((r) => ({
         ...r,
@@ -319,7 +332,7 @@ export default async function RatingsPage({
         {tab === "driver_ratings" && (
           <div className="grid gap-3">
             {ratings.map((rating) => {
-              const user = rating.users as unknown as { name: string; avatar_url: string } | null;
+              const user = rating.users as unknown as { id: string; name: string; phone?: string; avatar_url: string } | null;
               const trip = rating.trips as unknown as { id: string; pickup_address: string; destination_address: string } | null;
               const stars = Math.round(Number(rating.rating));
               return (
@@ -332,6 +345,16 @@ export default async function RatingsPage({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
                           <span className="font-bold text-text-primary text-[14px]">{user?.name || t("common.user")}</span>
+                          {user?.phone && (
+                            <a
+                              href={`tel:${user.phone}`}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-text-tertiary hover:text-primary transition-colors num"
+                              dir="ltr"
+                            >
+                              <Phone size={10} />
+                              {user.phone}
+                            </a>
+                          )}
                           <div className="flex items-center gap-0.5">
                             {[...Array(5)].map((_, i) => (
                               <Star key={i} size={13} fill={i < stars ? "var(--warning)" : "transparent"} style={{ color: i < stars ? "var(--warning)" : "var(--text-disabled)" }} />
@@ -370,8 +393,8 @@ export default async function RatingsPage({
         {tab === "user_ratings" && (
           <div className="grid gap-3">
             {userRatings.map((rating) => {
-              const user = rating.user as { name: string; role: string } | undefined;
-              const driver = rating.driver as { name: string; role: string } | undefined;
+              const user = rating.user as { id: string; name: string; phone?: string; role: string } | undefined;
+              const driver = rating.driver as { id: string; name: string; phone?: string; role: string } | undefined;
               const stars = Math.round(Number(rating.rating));
               return (
                 <div key={rating.id} className="rounded-xl border border-divider bg-surface p-4 hover:border-primary/20 transition-all duration-200">
@@ -384,11 +407,31 @@ export default async function RatingsPage({
                         <div className="flex items-center gap-1.5">
                           <Car size={12} className="text-text-tertiary" />
                           <span className="font-bold text-text-primary text-[13px]">{driver?.name || t("common.driver")}</span>
+                          {driver?.phone && (
+                            <a
+                              href={`tel:${driver.phone}`}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-text-tertiary hover:text-primary transition-colors num"
+                              dir="ltr"
+                            >
+                              <Phone size={10} />
+                              {driver.phone}
+                            </a>
+                          )}
                         </div>
                         <span className="text-text-disabled text-[11px]">←</span>
                         <div className="flex items-center gap-1.5">
                           <User size={12} className="text-text-tertiary" />
                           <span className="text-text-secondary text-[13px]">{user?.name || t("common.user")}</span>
+                          {user?.phone && (
+                            <a
+                              href={`tel:${user.phone}`}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-text-tertiary hover:text-primary transition-colors num"
+                              dir="ltr"
+                            >
+                              <Phone size={10} />
+                              {user.phone}
+                            </a>
+                          )}
                         </div>
                         <div className="flex items-center gap-0.5">
                           {[...Array(5)].map((_, i) => (
