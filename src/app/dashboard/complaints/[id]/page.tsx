@@ -73,33 +73,47 @@ function buildThread(
   return thread;
 }
 
+function getCairoDateString(date: Date | string) {
+  return new Date(date).toLocaleDateString("en-US", { timeZone: "Africa/Cairo" });
+}
+
 function formatTime(iso: string | null) {
   if (!iso) return "";
   try {
     const d = new Date(iso);
-    return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", hour12: true });
+    return d.toLocaleTimeString("ar-EG", {
+      timeZone: "Africa/Cairo",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   } catch { return ""; }
 }
 
 function formatDayLabel(iso: string | null) {
   if (!iso) return "";
   try {
-    const date = new Date(iso);
-    const today = new Date();
-    const yesterday = new Date(today);
+    const dateStr = getCairoDateString(iso);
+    const todayStr = getCairoDateString(new Date());
+
+    const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const isSameDay = (a: Date, b: Date) =>
-      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-    if (isSameDay(date, today)) return "اليوم";
-    if (isSameDay(date, yesterday)) return "أمس";
-    return date.toLocaleDateString("ar-EG", { day: "numeric", month: "long" });
+    const yesterdayStr = getCairoDateString(yesterday);
+
+    if (dateStr === todayStr) return "اليوم";
+    if (dateStr === yesterdayStr) return "أمس";
+
+    return new Date(iso).toLocaleDateString("ar-EG", {
+      timeZone: "Africa/Cairo",
+      day: "numeric",
+      month: "long",
+    });
   } catch { return ""; }
 }
 
 function isSameDay(a: string | null, b: string | null) {
   if (!a || !b) return false;
-  const da = new Date(a), db = new Date(b);
-  return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
+  return getCairoDateString(a) === getCairoDateString(b);
 }
 
 // ── Conversation Panel ───────────────────────────────────────────────────────
@@ -267,11 +281,11 @@ function ConversationPanel({
                         border: isAdmin
                           ? "1px solid rgba(var(--success-rgb),0.2)"
                           : "1px solid var(--divider)",
-                        // admin on LEFT  → sharp top-left corner (tail points left toward avatar)
-                        // user  on RIGHT → sharp top-right corner (tail points right toward avatar)
+                        // Admin (Me) on right  → sharp bottom-right corner
+                        // User (Them) on left → sharp bottom-left corner
                         borderRadius: isAdmin
-                          ? "4px 18px 18px 18px"
-                          : "18px 4px 18px 18px",
+                          ? "18px 18px 4px 18px"
+                          : "18px 18px 18px 4px",
                         boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
                       }}
                     >
