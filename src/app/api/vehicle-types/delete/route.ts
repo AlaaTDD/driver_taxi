@@ -48,6 +48,23 @@ export const POST = safeHandler(async (request: Request) => {
       );
     }
 
+    const { count: pricingUsingType, error: pricingError } = await supabase
+      .from("pricing_config")
+      .select("id", { count: "exact", head: true })
+      .eq("vehicle_type", vehicleType.name);
+
+    if (pricingError) {
+      console.error("Check vehicle type pricing usage error:", pricingError);
+      return NextResponse.json({ error: "Operation failed" }, { status: 500 });
+    }
+
+    if ((pricingUsingType ?? 0) > 0) {
+      return NextResponse.json(
+        { error: "لا يمكن حذف هذا النوع لوجود إعدادات تسعير مرتبطة به" },
+        { status: 400 }
+      );
+    }
+
     const { error } = await supabase
       .from("vehicle_types")
       .delete()

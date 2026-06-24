@@ -25,7 +25,7 @@ const securityHeaders = [
   // Restrict the powerful browser features we don't use.
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+    value: "camera=(), microphone=(self), geolocation=(self), interest-cohort=()",
   },
   // Content Security Policy. `unsafe-inline` is required for Next's inline
   // styles (and our Leaflet popup styles) — the rest is locked down.
