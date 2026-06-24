@@ -6,11 +6,518 @@ import ComplaintDetailClient from "./complaint-detail-client";
 import {
   MessageSquareWarning, ArrowRight, Car, User, Phone, Mail,
   MapPin, DollarSign, Calendar, Clock, Link2, Route, CheckCircle2,
-  AlertTriangle, Loader,
+  AlertTriangle, Loader, ShieldCheck, Flag, Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { getAppCurrency } from "@/lib/currency";
 
+interface ThreadMessage {
+  id: string;
+  senderType: "user" | "admin";
+  message: string;
+  createdAt: string | null;
+  isOriginal?: boolean;
+}
+
+function buildThread(
+  description: string,
+  createdAt: string,
+  adminReply: string | null,
+  adminNotes: string | null,
+  repliedAt: string | null,
+): ThreadMessage[] {
+  const thread: ThreadMessage[] = [];
+
+  thread.push({
+    id: "original",
+    senderType: "user",
+    message: description,
+    createdAt,
+    isOriginal: true,
+  });
+
+  if (adminNotes) {
+    try {
+      const parsed = JSON.parse(adminNotes);
+      if (Array.isArray(parsed)) {
+        for (const msg of parsed) {
+          thread.push({
+            id: msg.id || crypto.randomUUID(),
+            senderType: msg.sender_type || "admin",
+            message: msg.message || "",
+            createdAt: msg.created_at || null,
+          });
+        }
+      }
+    } catch {
+      // Legacy plain-text — skip
+    }
+  }
+
+  const hasAdminInNotes = thread.some((m) => m.senderType === "admin");
+  if (adminReply && !hasAdminInNotes) {
+    thread.push({
+      id: "legacy-admin",
+      senderType: "admin",
+      message: adminReply,
+      createdAt: repliedAt || null,
+    });
+  }
+
+  thread.sort((a, b) => {
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return aTime - bTime;
+  });
+
+  return thread;
+}
+
+function formatTime(iso: string | null) {
+  if (!iso) return "";
+  try {
+    const d = new Date(iso);
+    return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", hour12: true });
+  } catch { return ""; }
+}
+
+function formatDayLabel(iso: string | null) {
+  if (!iso) return "";
+  try {
+    const date = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isSameDay = (a: Date, b: Date) =>
+      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    if (isSameDay(date, today)) return "اليوم";
+    if (isSameDay(date, yesterday)) return "أمس";
+    return date.toLocaleDateString("ar-EG", { day: "numeric", month: "long" });
+  } catch { return ""; }
+}
+
+function isSameDay(a: string | null, b: string | null) {
+  if (!a || !b) return false;
+  const da = new Date(a), db = new Date(b);
+  return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
+}
+
+// ── Conversation Panel ───────────────────────────────────────────────────────
+function ConversationPanel({
+  messages, adminName, complaintId, currentStatus,
+}: {
+  messages: ThreadMessage[];
+  adminName: string | null;
+  complaintId: string;
+  currentStatus: string;
+}) {
+  return (
+    <div
+      className="flex flex-col overflow-hidden rounded-2xl"
+      style={{
+        background: "var(--surface-glass)",
+        border: "1px solid var(--divider)",
+        height: "100%",
+        minHeight: "600px",
+      }}
+    >
+      {/* Chat header */}
+      <div
+        className="flex items-center gap-3 px-5 py-4 shrink-0"
+        style={{
+          background: "var(--surface-elevated)",
+          borderBottom: "1px solid var(--divider)",
+        }}
+      >
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-dark))" }}
+        >
+          <MessageSquareWarning size={18} className="text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[14px] font-black text-text-primary">سجل المحادثة</p>
+          <p className="text-[11px] text-text-disabled">{messages.length} رسائل</p>
+        </div>
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ background: "var(--success)", boxShadow: "0 0 6px var(--success)" }}
+        />
+      </div>
+
+      {/* Messages area */}
+      <div
+        className="flex-1 overflow-y-auto px-5 py-4 space-y-1"
+        style={{
+          backgroundImage: `radial-gradient(circle at 20% 50%, rgba(var(--primary-rgb),0.03) 0%, transparent 60%),
+                            radial-gradient(circle at 80% 20%, rgba(var(--info-rgb),0.03) 0%, transparent 50%)`,
+        }}
+      >
+        {messages.map((msg, i) => {
+          const isAdmin = msg.senderType === "admin";
+          const isOriginal = msg.isOriginal;
+          const showDateSep = i === 0 || !isSameDay(msg.createdAt, messages[i - 1].createdAt);
+          const showAvatar = i === 0 || messages[i - 1].senderType !== msg.senderType || showDateSep;
+          const timeStr = formatTime(msg.createdAt);
+
+          return (
+            <div key={msg.id}>
+              {/* Date separator */}
+              {showDateSep && (
+                <div className="flex items-center gap-3 py-4">
+                  <div className="flex-1 h-px" style={{ background: "var(--divider)" }} />
+                  <span
+                    className="text-[10px] font-bold px-3 py-1.5 rounded-full"
+                    style={{
+                      background: "var(--surface-elevated)",
+                      color: "var(--text-disabled)",
+                      border: "1px solid var(--divider)",
+                    }}
+                  >
+                    {formatDayLabel(msg.createdAt)}
+                  </span>
+                  <div className="flex-1 h-px" style={{ background: "var(--divider)" }} />
+                </div>
+              )}
+
+              {/* Original complaint special card */}
+              {isOriginal ? (
+                <div className="mb-5 mt-2">
+                  <div
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                      border: "1.5px solid rgba(var(--warning-rgb),0.35)",
+                      background: "rgba(var(--warning-rgb),0.05)",
+                    }}
+                  >
+                    <div
+                      className="flex items-center gap-2 px-4 py-3"
+                      style={{
+                        background: "rgba(var(--warning-rgb),0.1)",
+                        borderBottom: "1px solid rgba(var(--warning-rgb),0.2)",
+                      }}
+                    >
+                      <Flag size={13} style={{ color: "var(--warning)" }} />
+                      <span className="text-[11px] font-black" style={{ color: "var(--warning)" }}>
+                        الشكوى الأصلية
+                      </span>
+                      <div className="flex-1" />
+                      {timeStr && (
+                        <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>{timeStr}</span>
+                      )}
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-[13.5px] leading-relaxed whitespace-pre-wrap break-words"
+                        style={{ color: "var(--text-primary)" }}>
+                        {msg.message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Regular chat bubble */
+                <div
+                  className="flex items-end gap-2.5 mb-2"
+                  style={{ flexDirection: isAdmin ? "row" : "row-reverse" }}
+                >
+                  {/* Avatar */}
+                  {showAvatar ? (
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mb-1"
+                      style={{
+                        background: isAdmin
+                          ? "linear-gradient(135deg, var(--success), var(--success-dark, #16a34a))"
+                          : "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+                        boxShadow: isAdmin
+                          ? "0 2px 8px rgba(var(--success-rgb),0.3)"
+                          : "0 2px 8px rgba(var(--primary-rgb),0.3)",
+                      }}
+                    >
+                      {isAdmin
+                        ? <ShieldCheck size={14} className="text-white" />
+                        : <User size={14} className="text-white" />
+                      }
+                    </div>
+                  ) : (
+                    <div className="w-8 shrink-0" />
+                  )}
+
+                  {/* Bubble */}
+                  <div style={{ maxWidth: "72%" }}>
+                    {/* Sender name (shown only when avatar shows) */}
+                    {showAvatar && (
+                      <div
+                        className="text-[10px] font-black mb-1 px-1"
+                        style={{
+                          color: isAdmin ? "var(--success)" : "var(--primary)",
+                          textAlign: isAdmin ? "left" : "right",
+                        }}
+                      >
+                        {isAdmin ? `🛡️ الدعم${adminName ? ` — ${adminName}` : ""}` : "👤 المستخدم"}
+                      </div>
+                    )}
+                    <div
+                      className="px-4 py-2.5 relative"
+                      style={{
+                        background: isAdmin
+                          ? "linear-gradient(135deg, var(--success-surface, rgba(var(--success-rgb),0.12)), rgba(var(--success-rgb),0.08))"
+                          : "var(--surface-elevated)",
+                        border: isAdmin
+                          ? "1px solid rgba(var(--success-rgb),0.2)"
+                          : "1px solid var(--divider)",
+                        borderRadius: isAdmin
+                          ? "4px 18px 18px 18px"
+                          : "18px 4px 18px 18px",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                      }}
+                    >
+                      <p
+                        className="text-[13.5px] leading-relaxed whitespace-pre-wrap break-words"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {msg.message}
+                      </p>
+                      {timeStr && (
+                        <div
+                          className="flex items-center gap-1 mt-1.5"
+                          style={{
+                            justifyContent: isAdmin ? "flex-start" : "flex-end",
+                          }}
+                        >
+                          <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>
+                            {timeStr}
+                          </span>
+                          <CheckCircle2 size={9} style={{ color: "var(--text-disabled)" }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Reply box */}
+      {currentStatus !== "closed" && (
+        <div style={{ borderTop: "1px solid var(--divider)", background: "var(--surface-elevated)" }}>
+          <ComplaintDetailClient complaintId={complaintId} currentStatus={currentStatus} />
+        </div>
+      )}
+      {currentStatus === "closed" && (
+        <div
+          className="flex items-center justify-center gap-2 py-4"
+          style={{ borderTop: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+        >
+          <Lock size={13} style={{ color: "var(--text-disabled)" }} />
+          <span className="text-[12px] font-semibold" style={{ color: "var(--text-disabled)" }}>
+            هذه الشكوى مغلقة
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Info Panel ───────────────────────────────────────────────────────────────
+function InfoPanel({
+  complaint, user, trip, driver, adminName, currency,
+}: {
+  complaint: any;
+  user: any;
+  trip: any;
+  driver: any;
+  adminName: string | null;
+  currency: string;
+}) {
+  const categoryLabel: Record<string, string> = {
+    general: "عام", driver: "سائق", trip: "رحلة", payment: "دفع", app: "تطبيق", other: "أخرى",
+  };
+  const priorityColor: Record<string, string> = {
+    urgent: "var(--error)", high: "var(--warning)", normal: "var(--info)", low: "var(--text-disabled)",
+  };
+  const priorityLabel: Record<string, string> = {
+    urgent: "⚡ عاجل", high: "↑ مرتفع", normal: "— عادي", low: "↓ منخفض",
+  };
+  const followUpConfig: Record<string, { label: string; color: string; bg: string }> = {
+    open: { label: "مفتوحة", color: "var(--warning)", bg: "rgba(var(--warning-rgb),0.1)" },
+    in_progress: { label: "قيد المعالجة", color: "var(--info)", bg: "rgba(var(--info-rgb),0.1)" },
+    resolved: { label: "تم الحل", color: "var(--success)", bg: "rgba(var(--success-rgb),0.1)" },
+    closed: { label: "مغلقة", color: "var(--text-disabled)", bg: "var(--surface-elevated)" },
+  };
+  const followUp = followUpConfig[complaint.status] || { label: complaint.status, color: "var(--text-tertiary)", bg: "var(--surface-elevated)" };
+
+  const tripStatusConfig: Record<string, { label: string; color: string }> = {
+    completed: { label: "مكتملة", color: "var(--success)" },
+    in_progress: { label: "قيد التنفيذ", color: "var(--info)" },
+    cancelled: { label: "ملغاة", color: "var(--error)" },
+    accepted: { label: "مقبولة", color: "var(--info)" },
+  };
+  const tripStatus = trip ? (tripStatusConfig[trip.status] || { label: trip.status, color: "var(--text-tertiary)" }) : null;
+
+  return (
+    <div className="space-y-4">
+      {/* Status badge */}
+      <div
+        className="flex items-center gap-2 px-4 py-3 rounded-2xl"
+        style={{
+          background: followUp.bg,
+          border: `1px solid ${followUp.color}33`,
+        }}
+      >
+        <div
+          className="w-2 h-2 rounded-full shrink-0"
+          style={{ background: followUp.color, boxShadow: `0 0 6px ${followUp.color}` }}
+        />
+        <div className="flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-disabled)" }}>حالة الشكوى</p>
+          <p className="text-[13px] font-black" style={{ color: followUp.color }}>{followUp.label}</p>
+        </div>
+        <Clock size={14} style={{ color: followUp.color }} />
+      </div>
+
+      {/* Complaint info */}
+      <div className="dash-card p-4 space-y-3">
+        <p className="text-[10px] font-black text-text-disabled uppercase tracking-wider">تفاصيل الشكوى</p>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-text-tertiary">التصنيف</span>
+          <span
+            className="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+            style={{ background: "var(--info-surface)", color: "var(--info)" }}
+          >
+            {categoryLabel[complaint.category] || complaint.category}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-text-tertiary">الأولوية</span>
+          <span className="text-[11px] font-black" style={{ color: priorityColor[complaint.priority] }}>
+            {priorityLabel[complaint.priority] || complaint.priority}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-text-tertiary">التاريخ</span>
+          <span className="text-[11px] text-text-secondary num">{formatDate(complaint.created_at)}</span>
+        </div>
+      </div>
+
+      {/* User card */}
+      <div className="dash-card p-4">
+        <p className="text-[10px] font-black text-text-disabled uppercase tracking-wider mb-3">المستخدم</p>
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-[15px] shrink-0"
+            style={{ background: "var(--primary-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
+          >
+            {user?.name?.charAt(0)?.toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-text-primary text-[13px] break-words">{user?.name}</p>
+            {user?.phone && (
+              <p className="text-[11px] text-text-tertiary flex items-center gap-1 num mt-0.5">
+                <Phone size={10} /> {user.phone}
+              </p>
+            )}
+            {user?.email && (
+              <p className="text-[11px] text-text-disabled truncate flex items-center gap-1 mt-0.5">
+                <Mail size={10} /> <span className="truncate">{user.email}</span>
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Trip card */}
+      {trip && (
+        <div className="dash-card overflow-hidden">
+          <div className="dash-section-header">
+            <div className="flex items-center gap-2">
+              <Link2 size={13} className="text-text-tertiary" />
+              <p className="text-[12px] font-bold text-text-primary">الرحلة المرتبطة</p>
+            </div>
+            <Link
+              href={`/dashboard/trips/${trip.id}`}
+              className="text-[11px] font-bold hover:opacity-70 transition-opacity"
+              style={{ color: "var(--primary)" }}
+            >
+              عرض
+            </Link>
+          </div>
+
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-text-tertiary">الحالة</span>
+              {tripStatus && (
+                <span className="text-[11px] font-bold" style={{ color: tripStatus.color }}>{tripStatus.label}</span>
+              )}
+            </div>
+
+            {(trip.pickup_address || trip.destination_address) && (
+              <div className="space-y-1.5 pt-1">
+                {trip.pickup_address && (
+                  <div className="flex items-start gap-2">
+                    <MapPin size={11} className="text-success mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-text-secondary break-words leading-snug">{trip.pickup_address}</p>
+                  </div>
+                )}
+                {trip.destination_address && (
+                  <div className="flex items-start gap-2">
+                    <MapPin size={11} className="text-primary mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-text-secondary break-words leading-snug">{trip.destination_address}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-1 border-t" style={{ borderColor: "var(--divider)" }}>
+              <span className="text-[11px] text-text-tertiary">السعر النهائي</span>
+              <span className="text-[13px] font-black num" style={{ color: "var(--success)" }}>
+                {formatCurrency(Number(trip.final_price ?? trip.price ?? 0), currency)}
+              </span>
+            </div>
+
+            {trip.payment_method && (
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-text-tertiary">طريقة الدفع</span>
+                <span className="text-[11px] font-bold text-text-secondary">
+                  {trip.payment_method === "cash" ? "💵 نقدي" : trip.payment_method === "wallet" ? "👛 محفظة" : trip.payment_method}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Driver */}
+          {driver && (
+            <div className="px-4 py-3 border-t" style={{ borderColor: "var(--divider)" }}>
+              <p className="text-[10px] font-black text-text-disabled uppercase tracking-wider mb-2">السائق</p>
+              <Link
+                href={`/dashboard/drivers/${driver.id}`}
+                className="flex items-center gap-2.5 hover:bg-surface-elevated rounded-xl p-1.5 -m-1.5 transition-colors"
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-[12px] shrink-0"
+                  style={{ background: "var(--success-surface)", color: "var(--success)" }}
+                >
+                  {driver.name?.charAt(0)?.toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-text-primary text-[12px] break-words">{driver.name}</p>
+                  {driver.phone && (
+                    <p className="text-[10px] text-text-tertiary num flex items-center gap-1">
+                      <Phone size={9} /> {driver.phone}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Page ────────────────────────────────────────────────────────────────
 export default async function ComplaintDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const t = await getTranslations();
@@ -21,7 +528,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
     .from("complaints")
     .select(`
       id, title, description, category, status, priority,
-      admin_reply, replied_at, resolved_at, created_at, updated_at,
+      admin_reply, admin_notes, replied_at, resolved_at, created_at,
       trip_id,
       users!user_id(id, name, phone, email),
       admin:users!admin_id(name),
@@ -50,281 +557,51 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
   } | null;
 
   const driver = trip?.users ?? null;
-
-  const categoryLabel: Record<string, string> = { general: "عام", driver: "سائق", trip: "رحلة", payment: "دفع", app: "تطبيق", other: "أخرى" };
-  const priorityColor: Record<string, string> = { urgent: "var(--error)", high: "var(--warning)", normal: "var(--info)", low: "var(--text-disabled)" };
-
-  // Trip status display config
-  const tripStatusConfig: Record<string, { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
-    completed: { label: "مكتملة", color: "var(--success)", bg: "var(--success-surface)", icon: CheckCircle2 },
-    in_progress: { label: "قيد التنفيذ", color: "var(--info)", bg: "var(--info-surface)", icon: Loader },
-    cancelled: { label: "ملغاة", color: "var(--error)", bg: "var(--error-surface)", icon: AlertTriangle },
-    accepted: { label: "مقبولة", color: "var(--info)", bg: "var(--info-surface)", icon: Car },
-  };
-  const tripStatus = trip ? (tripStatusConfig[trip.status] || { label: trip.status, color: "var(--text-tertiary)", bg: "var(--surface-elevated)", icon: AlertTriangle }) : null;
-
-  // Complaint follow-up status
-  const followUpConfig: Record<string, { label: string; color: string; bg: string }> = {
-    open: { label: "مفتوحة — بانتظار الرد", color: "var(--warning)", bg: "var(--warning-surface)" },
-    in_progress: { label: "قيد المعالجة", color: "var(--info)", bg: "var(--info-surface)" },
-    resolved: { label: "تم الحل", color: "var(--success)", bg: "var(--success-surface)" },
-    closed: { label: "مغلقة", color: "var(--text-disabled)", bg: "var(--surface-elevated)" },
-  };
-  const followUp = followUpConfig[complaint.status] || { label: complaint.status, color: "var(--text-tertiary)", bg: "var(--surface-elevated)" };
+  const messages = buildThread(
+    complaint.description as string,
+    complaint.created_at as string,
+    complaint.admin_reply as string | null,
+    complaint.admin_notes as string | null,
+    complaint.replied_at as string | null,
+  );
 
   return (
-    <>
-    <div className="space-y-6 max-w-3xl mx-auto">
-
-      <Link href="/dashboard/complaints"
-        className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-sm transition-colors">
-        <ArrowRight size={14} />
-        {t("complaints.backToList")}
-      </Link>
-
-
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-xl font-black text-text-primary break-words">{complaint.title}</h1>
-          <div className="flex items-center gap-3 mt-2 flex-wrap">
-            <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold"
-              style={{ background: "var(--info-surface)", color: "var(--info)", border: "1px solid var(--info-surface)" }}>
-              {categoryLabel[complaint.category]}
-            </span>
-            <span className="text-[12px] font-bold" style={{ color: priorityColor[complaint.priority] }}>
-              {complaint.priority === "urgent" ? "⚡ عاجل" : complaint.priority === "high" ? "↑ مرتفع" : "— عادي"}
-            </span>
-            <span className="flex items-center gap-1 text-text-disabled text-[12px]">
-              <Calendar size={11} />
-              {formatDate(complaint.created_at)}
-            </span>
-          </div>
-        </div>
-        {/* Follow-up status badge */}
-        <span
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold whitespace-nowrap self-start"
-          style={{ background: followUp.bg, color: followUp.color, border: `1px solid ${followUp.color}33` }}
+    <div className="space-y-4 h-full">
+      {/* Back link + title */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <Link
+          href="/dashboard/complaints"
+          className="inline-flex items-center gap-1.5 text-text-tertiary hover:text-text-primary text-sm transition-colors"
         >
-          <Clock size={12} />
-          {followUp.label}
-        </span>
+          <ArrowRight size={14} />
+          {t("complaints.backToList")}
+        </Link>
+        <div className="w-px h-4" style={{ background: "var(--divider)" }} />
+        <h1 className="text-[16px] font-black text-text-primary truncate">{complaint.title}</h1>
       </div>
 
-
-      <div className="dash-card p-5">
-        <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider mb-3">المستخدم</h3>
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[15px] shrink-0"
-            style={{ background: "var(--primary-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
-            {user?.name?.charAt(0)?.toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold text-text-primary break-words">{user?.name}</p>
-            <div className="flex items-center gap-3 mt-1 flex-wrap text-[12px] text-text-tertiary">
-              {user?.phone && (
-                <span className="flex items-center gap-1 num">
-                  <Phone size={11} /> {user.phone}
-                </span>
-              )}
-              {user?.email && (
-                <span className="flex items-center gap-1 truncate">
-                  <Mail size={11} /> <span className="truncate">{user.email}</span>
-                </span>
-              )}
-            </div>
-          </div>
+      {/* Split layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 items-start">
+        {/* Left: Info panel */}
+        <div className="space-y-0">
+          <InfoPanel
+            complaint={complaint}
+            user={user}
+            trip={trip}
+            driver={driver}
+            adminName={admin?.name ?? null}
+            currency={currency}
+          />
         </div>
+
+        {/* Right: Chat panel */}
+        <ConversationPanel
+          messages={messages}
+          adminName={admin?.name ?? null}
+          complaintId={complaint.id}
+          currentStatus={complaint.status}
+        />
       </div>
-
-
-      <div className="dash-card p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <MessageSquareWarning size={14} className="text-text-tertiary" />
-          <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-wider">نص الشكوى</h3>
-        </div>
-        <p className="text-text-secondary leading-relaxed whitespace-pre-wrap break-words">{complaint.description}</p>
-      </div>
-
-
-      {/* ── TRIP + DRIVER + FINANCIAL DETAILS ────────────────────────── */}
-      {trip && (
-        <div className="dash-card overflow-hidden">
-          <div className="dash-section-header">
-            <div className="flex items-center gap-2.5">
-              <div className="w-[3px] h-5 rounded-full" style={{ background: "linear-gradient(to bottom, var(--primary), var(--primary-dark))" }} />
-              <Link2 size={14} className="text-text-tertiary" />
-              <h3 className="text-[13px] font-bold text-text-primary">الرحلة المرتبطة بالشكوى</h3>
-            </div>
-            <Link
-              href={`/dashboard/trips/${trip.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:opacity-80"
-              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
-            >
-              <MapPin size={11} />
-              عرض الرحلة
-            </Link>
-          </div>
-
-          {/* Trip ID + status row */}
-          <div className="px-5 py-4 border-b border-divider grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-text-tertiary font-bold">رقم الرحلة:</span>
-              <code className="text-[11px] font-mono font-bold text-text-primary bg-surface-elevated px-2 py-0.5 rounded">
-                {trip.id.substring(0, 8)}
-              </code>
-            </div>
-            {tripStatus && (
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] text-text-tertiary font-bold">حالة الرحلة:</span>
-                <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold"
-                  style={{ background: tripStatus.bg, color: tripStatus.color }}
-                >
-                  <tripStatus.icon size={10} />
-                  {tripStatus.label}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Route info */}
-          {(trip.pickup_address || trip.destination_address) && (
-            <div className="px-5 py-4 border-b border-divider">
-              <div className="flex items-center gap-2 mb-3">
-                <Route size={13} className="text-text-tertiary" />
-                <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">المسار</span>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-start gap-2">
-                  <MapPin size={12} className="text-success mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-[11px] text-text-tertiary font-bold">الانطلاق</p>
-                    <p className="text-[13px] text-text-primary break-words">{trip.pickup_address || "—"}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <MapPin size={12} className="text-primary mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-[11px] text-text-tertiary font-bold">الوجهة</p>
-                    <p className="text-[13px] text-text-primary break-words">{trip.destination_address || "—"}</p>
-                  </div>
-                </div>
-                {trip.distance_km != null && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Car size={11} className="text-text-tertiary" />
-                    <span className="text-[12px] text-text-secondary num">
-                      {Number(trip.distance_km).toFixed(1)} كم · {trip.vehicle_type === "car" ? "🚗 سيارة" : "🏍 دراجة"}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Driver info */}
-          {driver && (
-            <div className="px-5 py-4 border-b border-divider">
-              <div className="flex items-center gap-2 mb-3">
-                <User size={13} className="text-text-tertiary" />
-                <span className="text-[11px] font-bold text-text-tertiary uppercase tracking-wider">السائق</span>
-              </div>
-              <Link
-                href={`/dashboard/drivers/${driver.id}`}
-                className="flex items-center gap-3 hover:bg-surface-elevated rounded-xl p-2 -m-2 transition-colors"
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-[14px] shrink-0"
-                  style={{ background: "var(--success-surface)", color: "var(--success)" }}>
-                  {driver.name?.charAt(0)?.toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-text-primary text-[13px] break-words">{driver.name}</p>
-                  {driver.phone && (
-                    <p className="text-[11px] text-text-tertiary num flex items-center gap-1">
-                      <Phone size={10} /> {driver.phone}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            </div>
-          )}
-
-          {/* Financial details */}
-          <div className="px-5 py-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <DollarSign size={11} className="text-text-tertiary" />
-                <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">السعر الأصلي</span>
-              </div>
-              <p className="text-[15px] font-black num text-text-primary">
-                {formatCurrency(Number(trip.price ?? 0), currency)}
-              </p>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <DollarSign size={11} className="text-success" />
-                <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">السعر النهائي</span>
-              </div>
-              <p className="text-[15px] font-black num text-success">
-                {formatCurrency(Number(trip.final_price ?? trip.price ?? 0), currency)}
-              </p>
-            </div>
-            {trip.payment_method && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <DollarSign size={11} className="text-text-tertiary" />
-                  <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">طريقة الدفع</span>
-                </div>
-                <p className="text-[13px] font-bold text-text-secondary">
-                  {trip.payment_method === "cash" ? "نقدي" :
-                   trip.payment_method === "wallet" ? "محفظة" :
-                   trip.payment_method === "card" ? "بطاقة" : trip.payment_method}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Dates */}
-          <div className="px-5 py-4 border-t border-divider grid grid-cols-2 sm:grid-cols-3 gap-3 text-[11px]">
-            <div className="flex items-center gap-1.5 text-text-tertiary">
-              <Calendar size={10} />
-              <span>طلب: {trip.created_at ? formatDate(trip.created_at) : "—"}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-text-tertiary">
-              <CheckCircle2 size={10} />
-              <span>إتمام: {trip.completed_at ? formatDate(trip.completed_at) : "—"}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-text-tertiary">
-              <AlertTriangle size={10} />
-              <span>إلغاء: {trip.cancelled_at ? formatDate(trip.cancelled_at) : "—"}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-      {complaint.admin_reply && (
-        <div className="rounded-2xl p-5" style={{
-          background: "rgba(var(--success-rgb),0.06)",
-          border: "1px solid rgba(var(--success-rgb),0.15)",
-        }}>
-          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <h3 className="text-[12px] font-bold text-success uppercase tracking-wider">الرد السابق</h3>
-            {admin?.name && <span className="text-text-disabled text-[11px]">بواسطة: {admin.name}</span>}
-          </div>
-          <p className="text-text-secondary leading-relaxed whitespace-pre-wrap break-words">{complaint.admin_reply}</p>
-          {complaint.replied_at && (
-            <p className="text-text-disabled text-[11px] mt-3 flex items-center gap-1">
-              <Calendar size={10} /> {formatDate(complaint.replied_at)}
-            </p>
-          )}
-        </div>
-      )}
-
-
-      {complaint.status !== "closed" && (
-        <ComplaintDetailClient complaintId={complaint.id} currentStatus={complaint.status} />
-      )}
     </div>
-    </>
   );
 }

@@ -29,6 +29,7 @@ export const POST = safeHandler(async (request: Request) => {
     if (error) throw error;
 
     revalidatePath("/dashboard/complaints");
+    revalidatePath(`/dashboard/complaints/${complaint_id}`);
     return NextResponse.json({ success: true });
   // [WEB-H-05 FIXED] catch removed — safeHandler handles uncaught errors
 });
