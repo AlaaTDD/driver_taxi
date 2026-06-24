@@ -118,7 +118,7 @@ function ConversationPanel({
         background: "var(--surface-glass)",
         border: "1px solid var(--divider)",
         height: "100%",
-        minHeight: "600px",
+        minHeight: "500px",
       }}
     >
       {/* Chat header */}
@@ -164,19 +164,18 @@ function ConversationPanel({
             <div key={msg.id}>
               {/* Date separator */}
               {showDateSep && (
-                <div className="flex items-center gap-3 py-4">
-                  <div className="flex-1 h-px" style={{ background: "var(--divider)" }} />
+                <div className="flex justify-center py-3 w-full" dir="rtl">
                   <span
-                    className="text-[10px] font-bold px-3 py-1.5 rounded-full"
+                    className="text-[10.5px] font-bold px-3.5 py-1.5 rounded-full"
                     style={{
                       background: "var(--surface-elevated)",
-                      color: "var(--text-disabled)",
+                      color: "var(--text-tertiary)",
                       border: "1px solid var(--divider)",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     }}
                   >
                     {formatDayLabel(msg.createdAt)}
                   </span>
-                  <div className="flex-1 h-px" style={{ background: "var(--divider)" }} />
                 </div>
               )}
 
@@ -250,7 +249,9 @@ function ConversationPanel({
                         className="text-[10px] font-black mb-1 px-1"
                         style={{
                           color: isAdmin ? "var(--success)" : "var(--primary)",
+                          // text aligns physically: admin label to the left, user label to the right
                           textAlign: isAdmin ? "left" : "right",
+                          direction: "rtl",
                         }}
                       >
                         {isAdmin ? `🛡️ الدعم${adminName ? ` — ${adminName}` : ""}` : "👤 المستخدم"}
@@ -258,13 +259,16 @@ function ConversationPanel({
                     )}
                     <div
                       className="px-4 py-2.5 relative"
+                      dir="rtl"
                       style={{
                         background: isAdmin
-                          ? "linear-gradient(135deg, var(--success-surface, rgba(var(--success-rgb),0.12)), rgba(var(--success-rgb),0.08))"
+                          ? "linear-gradient(135deg, rgba(var(--success-rgb),0.12), rgba(var(--success-rgb),0.08))"
                           : "var(--surface-elevated)",
                         border: isAdmin
                           ? "1px solid rgba(var(--success-rgb),0.2)"
                           : "1px solid var(--divider)",
+                        // admin on LEFT  → sharp top-left corner (tail points left toward avatar)
+                        // user  on RIGHT → sharp top-right corner (tail points right toward avatar)
                         borderRadius: isAdmin
                           ? "4px 18px 18px 18px"
                           : "18px 4px 18px 18px",

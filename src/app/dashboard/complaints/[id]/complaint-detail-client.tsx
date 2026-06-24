@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Send, Check, ChevronDown } from "lucide-react";
 
@@ -10,21 +10,33 @@ interface ComplaintDetailClientProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: "in_progress", label: "قيد المعالجة", color: "var(--info)", rgb: "var(--info-rgb)" },
-  { value: "resolved", label: "محلول", color: "var(--success)", rgb: "var(--success-rgb)" },
-  { value: "closed", label: "مغلق", color: "var(--text-disabled)", rgb: "150,150,150" },
+  { value: "in_progress", label: "قيد المعالجة", color: "var(--info)", rgb: "59,130,246" },
+  { value: "resolved",    label: "محلول",        color: "var(--success)", rgb: "15,159,110" },
+  { value: "closed",      label: "مغلق",         color: "var(--text-disabled)", rgb: "142,160,190" },
 ];
 
 export default function ComplaintDetailClient({ complaintId, currentStatus }: ComplaintDetailClientProps) {
   const router = useRouter();
-  const [reply, setReply] = useState("");
-  const [status, setStatus] = useState(currentStatus === "open" ? "in_progress" : currentStatus);
-  const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [reply, setReply]         = useState("");
+  const [status, setStatus]       = useState(currentStatus === "open" ? "in_progress" : currentStatus);
+  const [loading, setLoading]     = useState(false);
+  const [saved, setSaved]         = useState(false);
   const [showStatus, setShowStatus] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedStatus = STATUS_OPTIONS.find((s) => s.value === status) ?? STATUS_OPTIONS[0];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowStatus(false);
+      }
+    };
+    if (showStatus) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showStatus]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +51,9 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
       if (res.ok) {
         setSaved(true);
         setReply("");
-        if (textareaRef.current) textareaRef.current.style.height = "auto";
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
         router.refresh();
         setTimeout(() => setSaved(false), 2500);
       }
@@ -58,40 +72,49 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
   const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReply(e.target.value);
     e.target.style.height = "auto";
-    e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
+    e.target.style.height = Math.min(e.target.scrollHeight, 130) + "px";
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="px-4 pt-3 pb-2 flex items-center gap-2 flex-wrap">
-        {/* Status selector */}
-        <div className="relative">
+    <form onSubmit={handleSubmit} dir="rtl">
+      {/* ── Toolbar: status selector + hint ── */}
+      <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+        {/* Status picker */}
+        <div className="relative" ref={dropdownRef}>
           <button
             type="button"
-            onClick={() => setShowStatus(!showStatus)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all"
+            onClick={() => setShowStatus((v) => !v)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all select-none"
             style={{
               background: `rgba(${selectedStatus.rgb}, 0.12)`,
               color: selectedStatus.color,
               border: `1px solid rgba(${selectedStatus.rgb}, 0.3)`,
             }}
           >
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: selectedStatus.color }}
-            />
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: selectedStatus.color }} />
             {selectedStatus.label}
-            <ChevronDown size={11} style={{ opacity: 0.7 }} />
+            <ChevronDown
+              size={11}
+              style={{
+                opacity: 0.7,
+                transform: showStatus ? "rotate(180deg)" : "none",
+                transition: "transform 0.2s",
+              }}
+            />
           </button>
 
+          {/* Dropdown — appears ABOVE button, anchored to right edge */}
           {showStatus && (
             <div
-              className="absolute bottom-full left-0 mb-1.5 rounded-xl overflow-hidden z-20"
+              className="absolute rounded-xl overflow-hidden"
               style={{
+                bottom: "calc(100% + 6px)",
+                right: 0,
+                minWidth: "148px",
                 background: "var(--surface-elevated)",
                 border: "1px solid var(--divider)",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                minWidth: "140px",
+                boxShadow: "0 -4px 24px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.1)",
+                zIndex: 9999,
               }}
             >
               {STATUS_OPTIONS.map((opt) => (
@@ -99,13 +122,17 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
                   key={opt.value}
                   type="button"
                   onClick={() => { setStatus(opt.value); setShowStatus(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold text-right transition-colors hover:bg-surface-glass"
-                  style={{ color: opt.color }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold transition-colors"
+                  style={{
+                    color: opt.color,
+                    background: status === opt.value ? `rgba(${opt.rgb}, 0.08)` : "transparent",
+                    textAlign: "right",
+                  }}
                 >
                   <div className="w-2 h-2 rounded-full shrink-0" style={{ background: opt.color }} />
-                  {opt.label}
+                  <span className="flex-1 text-right">{opt.label}</span>
                   {status === opt.value && (
-                    <Check size={11} className="mr-auto" style={{ color: opt.color }} />
+                    <Check size={11} style={{ color: opt.color }} />
                   )}
                 </button>
               ))}
@@ -113,41 +140,14 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           )}
         </div>
 
-        <span className="text-[10px] text-text-disabled mr-auto hidden sm:block">
+        <span className="text-[10px] mr-auto" style={{ color: "var(--text-disabled)" }}>
           Ctrl+Enter للإرسال
         </span>
       </div>
 
-      {/* Input row */}
-      <div className="px-3 pb-3 flex items-end gap-2">
-        <div
-          className="flex-1 rounded-2xl overflow-hidden transition-all"
-          style={{
-            background: "var(--bg-primary)",
-            border: reply.trim()
-              ? "1px solid rgba(var(--primary-rgb),0.4)"
-              : "1px solid var(--divider)",
-            boxShadow: reply.trim() ? "0 0 0 3px rgba(var(--primary-rgb),0.06)" : "none",
-          }}
-        >
-          <textarea
-            ref={textareaRef}
-            value={reply}
-            onChange={autoResize}
-            onKeyDown={handleKeyDown}
-            placeholder="اكتب ردك على المستخدم..."
-            id="complaint-reply-text"
-            rows={1}
-            className="w-full px-4 py-3 text-[13.5px] outline-none resize-none leading-relaxed bg-transparent"
-            style={{
-              color: "var(--text-primary)",
-              maxHeight: "140px",
-              overflow: "auto",
-            }}
-          />
-        </div>
-
-        {/* Send button */}
+      {/* ── Input row — LTR so send button is always on the right ── */}
+      <div className="px-3 pb-3 flex items-end gap-2" dir="ltr">
+        {/* Send button — physically LEFT in LTR = RIGHT side for reader */}
         <button
           type="submit"
           id="submit-complaint-reply"
@@ -172,9 +172,34 @@ export default function ComplaintDetailClient({ complaintId, currentStatus }: Co
           ) : saved ? (
             <Check size={17} />
           ) : (
-            <Send size={16} style={{ transform: "scaleX(-1)" }} />
+            <Send size={16} />
           )}
         </button>
+
+        {/* Textarea */}
+        <div
+          className="flex-1 rounded-2xl overflow-hidden transition-all"
+          style={{
+            background: "var(--bg-primary, var(--surface-glass))",
+            border: reply.trim()
+              ? "1px solid rgba(var(--primary-rgb),0.4)"
+              : "1px solid var(--divider)",
+            boxShadow: reply.trim() ? "0 0 0 3px rgba(var(--primary-rgb),0.06)" : "none",
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={reply}
+            onChange={autoResize}
+            onKeyDown={handleKeyDown}
+            placeholder="اكتب ردك على المستخدم..."
+            id="complaint-reply-text"
+            rows={1}
+            dir="rtl"
+            className="w-full px-4 py-3 text-[13.5px] outline-none resize-none leading-relaxed bg-transparent"
+            style={{ color: "var(--text-primary)", maxHeight: "130px", overflow: "auto" }}
+          />
+        </div>
       </div>
     </form>
   );
