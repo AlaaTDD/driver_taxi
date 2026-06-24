@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { booleanFromRequest, formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 // [WEB-H-02 FIXED] Static import — dynamic `await import()` inside handlers
 // adds module-loading latency on every request.
@@ -46,5 +47,7 @@ export const POST = safeHandler(async (request: Request) => {
     user_agent: getUserAgentFromRequest(request),
   });
 
+  revalidatePath("/dashboard/drivers");
+  revalidatePath(`/dashboard/drivers/${driverId}`);
   return NextResponse.redirect(new URL("/dashboard/drivers", request.url));
 });

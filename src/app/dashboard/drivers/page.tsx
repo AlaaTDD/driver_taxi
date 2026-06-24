@@ -1,10 +1,20 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/badge";
 import DriversClient from "./drivers-client";
 import { getTranslations } from "next-intl/server";
-import { Car, CheckCircle, Clock, ShieldBan, AlertCircle, Star } from "lucide-react";
+import {
+  Car, CheckCircle, Clock, ShieldBan, AlertCircle,
+  Star, FileWarning, Search,
+} from "lucide-react";
 import Link from "next/link";
+import { DriverActions, DriverCardActions } from "./_components/driver-actions";
+import { RevisionActions } from "./_components/revision-actions";
+import { DriversTabs } from "./_components/drivers-tabs";
+import { getDriverStatus, getAvatarStyle } from "./_lib/status-style";
+
+// Force fresh data on every navigation — driver state (verified/blocked)
+// changes often and must never be served from a stale render.
+export const dynamic = "force-dynamic";
 
 type TabType = "pending" | "approved" | "blocked" | "revision";
 
@@ -15,259 +25,359 @@ export default async function DriversPage({
 }) {
   const params = await searchParams;
   const tab = (params.tab as TabType) || "pending";
-  const page = Number(params.page) || 1;
-  const pageSize = 10;
-  const searchQuery = params.q || "";
+  const page = Math.max(1, Number(params.page) || 1);
+  const pageSize = 12;
+  const searchQuery = (params.q || "").trim();
 
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  
+  /* ═══════════════════════════════════════════════════════════════════════
+     DRIVERS WITH ACTIVE REVISION REQUESTS
+     These drivers are "under review" and must be EXCLUDED from the pending,
+     approved, and blocked counts AND list queries. Their status is distinct.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const { data: revisionRows } = await supabase
+    .from("driver_revision_requests")
+    .select("driver_id")
+    .eq("status", "pending");
+  const revisionDriverIds = [...new Set((revisionRows || []).map((r: any) => r.driver_id))];
+  const revisionExclusion = revisionDriverIds.length > 0 ? revisionDriverIds.join(",") : "00000000-0000-0000-0000-000000000000";
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ACCURATE TAB COUNTS
+     Mutually exclusive by design:
+       • pending   = not verified, not blocked, NOT in revision
+       • approved  = verified,     not blocked, NOT in revision
+       • blocked   = blocked (regardless of verified), NOT in revision
+       • revision  = has an active revision request (pending status)
+     A driver appears in exactly ONE tab — counts always add up.
+     ═══════════════════════════════════════════════════════════════════════ */
   const [pendingRes, approvedRes, blockedRes, revisionRes] = await Promise.all([
-    supabase.from("drivers_profile").select("id", { count: "exact", head: true }).eq("is_verified", false),
-    supabase.from("drivers_profile").select("id", { count: "exact", head: true }).eq("is_verified", true),
-    supabase.from("users").select("id", { count: "exact", head: true }).eq("role", "driver").eq("is_blocked", true),
-    supabase.from("driver_revision_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    // pending: is_verified=false AND not blocked AND not in revision
+    supabase
+      .from("drivers_profile")
+      .select("id, users!inner(is_blocked)", { count: "exact", head: true })
+      .eq("is_verified", false)
+      .eq("users.is_blocked", false)
+      .not("id", "in", `(${revisionExclusion})`),
+    // approved: is_verified=true AND not blocked AND not in revision
+    supabase
+      .from("drivers_profile")
+      .select("id, users!inner(is_blocked)", { count: "exact", head: true })
+      .eq("is_verified", true)
+      .eq("users.is_blocked", false)
+      .not("id", "in", `(${revisionExclusion})`),
+    // blocked: is_blocked=true AND not in revision
+    supabase
+      .from("drivers_profile")
+      .select("id, users!inner(is_blocked)", { count: "exact", head: true })
+      .eq("users.is_blocked", true)
+      .not("id", "in", `(${revisionExclusion})`),
+    // revision: count of pending revision requests
+    supabase
+      .from("driver_revision_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
   ]);
 
-  
-  let driversQuery = supabase
-    .from("drivers_profile")
-    .select(`
-      id, national_id, national_id_image_url,
+  const pendingCount = pendingRes.count ?? 0;
+  const approvedCount = approvedRes.count ?? 0;
+  const blockedCount = blockedRes.count ?? 0;
+  const revisionCount = revisionRes.count ?? 0;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     DRIVERS LIST (non-revision tabs) — applies the SAME filters as the counts
+     so the list length always matches the tab badge number.
+     ═══════════════════════════════════════════════════════════════════════ */
+  let driversQuery = supabase.from("drivers_profile").select(
+    `id, national_id, national_id_image_url,
       license_number, license_image_url,
       criminal_record_url, vehicle_type, vehicle_brand,
       vehicle_model, vehicle_year, vehicle_color, vehicle_plate,
       vehicle_image_url, is_verified, is_available,
-      users!inner(id, name, phone, email, rating, total_trips, is_active, is_blocked, created_at)
-    `, { count: "exact" });
+      users!inner(id, name, phone, email, rating, total_trips, is_active, is_blocked, role, created_at)`,
+    { count: "exact" },
+  );
 
   if (searchQuery) {
-    const safeSearch = searchQuery.replace(/[%_\\]/g, '\\$&');
-    driversQuery = driversQuery.or(`national_id.ilike.%${safeSearch}%,license_number.ilike.%${safeSearch}%,vehicle_plate.ilike.%${safeSearch}%,users.name.ilike.%${safeSearch}%,users.phone.ilike.%${safeSearch}%`);
+    const safeSearch = searchQuery.replace(/[%_\\]/g, "\\$&");
+    driversQuery = driversQuery.or(
+      `national_id.ilike.%${safeSearch}%,license_number.ilike.%${safeSearch}%,vehicle_plate.ilike.%${safeSearch}%,users.name.ilike.%${safeSearch}%,users.phone.ilike.%${safeSearch}%`,
+    );
   }
 
   if (tab === "approved") {
-    driversQuery = driversQuery.eq("is_verified", true);
+    driversQuery = driversQuery.eq("is_verified", true).eq("users.is_blocked", false);
   } else if (tab === "pending") {
-    driversQuery = driversQuery.eq("is_verified", false);
+    driversQuery = driversQuery.eq("is_verified", false).eq("users.is_blocked", false);
   } else if (tab === "blocked") {
     driversQuery = driversQuery.eq("users.is_blocked", true);
   }
 
+  // Exclude revision drivers from all non-revision tabs
+  driversQuery = driversQuery.not("id", "in", `(${revisionExclusion})`);
+
   const { data: driversRaw, count: driversCount } = await driversQuery
-    .order("id", { ascending: false })
+    .order("is_verified", { ascending: true })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  
-  let revisionDrivers: unknown[] = [];
+  /* ═══════════════════════════════════════════════════════════════════════
+     REVISION REQUESTS (revision tab)
+     ═══════════════════════════════════════════════════════════════════════ */
+  let revisionDrivers: Record<string, unknown>[] = [];
   if (tab === "revision") {
-    const { data: revData } = await supabase
+    let revQuery = supabase
       .from("driver_revision_requests")
-      .select(`
-        id, fields_requested, message, status, created_at, driver_id,
-        users!driver_id(id, name, phone, email)
-      `)
-      .eq("status", "pending")
+      .select(
+        `id, fields_requested, message, status, created_at, driver_id,
+        users!driver_id(id, name, phone, email)`,
+      )
+      .eq("status", "pending");
+
+    if (searchQuery) {
+      const safeSearch = searchQuery.replace(/[%_\\]/g, "\\$&");
+      revQuery = revQuery.or(
+        `users.name.ilike.%${safeSearch}%,users.phone.ilike.%${safeSearch}%`,
+      );
+    }
+
+    const { data: revData } = await revQuery
       .order("created_at", { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
-      
-    let mergedRevs: any[] = [];
+
     if (revData && revData.length > 0) {
-      const driverIds = [...new Set(revData.map(r => r.driver_id))];
+      const driverIds = [...new Set(revData.map((r: any) => r.driver_id))];
       const { data: profiles } = await supabase
         .from("drivers_profile")
-        .select("id, national_id, vehicle_type, vehicle_brand, vehicle_plate, national_id_image_url, license_image_url")
+        .select(
+          "id, national_id, vehicle_type, vehicle_brand, vehicle_plate, national_id_image_url, license_image_url, criminal_record_url, vehicle_image_url, is_verified",
+        )
         .in("id", driverIds);
-        
-      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
-      mergedRevs = revData.map(r => ({
+
+      const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+      revisionDrivers = revData.map((r: any) => ({
         ...r,
-        drivers_profile: profileMap.get(r.driver_id) || null
-      }));
+        drivers_profile: profileMap.get(r.driver_id) || null,
+      })) as Record<string, unknown>[];
     }
-    revisionDrivers = mergedRevs;
   }
 
-  const totalPages = Math.ceil(((tab === "revision" ? revisionRes.count : driversCount) || 0) / pageSize);
+  const listCount = tab === "revision" ? revisionCount : driversCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(listCount / pageSize));
 
   const tabs = [
-    { key: "pending", label: t("drivers.tabs.pending"), count: pendingRes.count || 0, icon: <Clock size={14} /> },
-    { key: "approved", label: t("drivers.tabs.approved"), count: approvedRes.count || 0, icon: <CheckCircle size={14} /> },
-    { key: "blocked", label: t("drivers.tabs.blocked"), count: blockedRes.count || 0, icon: <ShieldBan size={14} /> },
-    { key: "revision", label: t("drivers.tabs.revision"), count: revisionRes.count || 0, icon: <AlertCircle size={14} /> },
+    { key: "pending" as const, label: t("drivers.tabs.pending"), count: pendingRes.count || 0, icon: <Clock size={14} /> },
+    { key: "approved" as const, label: t("drivers.tabs.approved"), count: approvedRes.count || 0, icon: <CheckCircle size={14} /> },
+    { key: "blocked" as const, label: t("drivers.tabs.blocked"), count: blockedRes.count || 0, icon: <ShieldBan size={14} /> },
+    { key: "revision" as const, label: t("drivers.tabs.revision"), count: revisionRes.count || 0, icon: <AlertCircle size={14} /> },
+  ];
+
+  // Documents rendered as chips; missing URLs are rendered disabled.
+  const docList = (driver: any) => [
+    { label: t("drivers.docs.id"), url: driver.national_id_image_url },
+    { label: t("drivers.docs.license"), url: driver.license_image_url },
+    { label: t("drivers.docs.record"), url: driver.criminal_record_url },
+    { label: t("drivers.docs.vehicle"), url: driver.vehicle_image_url },
   ];
 
   return (
-    <>
-      <div className="space-y-6">
-        
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("drivers.title")}</h1>
-          <p className="text-sm text-text-secondary mt-1">{t("drivers.subtitle")}</p>
-        </div>
+    <div className="space-y-5">
 
-      
-      <div className="flex gap-2 flex-wrap">
-        {tabs.map((tabItem) => (
-          <a
-            key={tabItem.key}
-            href={`/dashboard/drivers?tab=${tabItem.key}`}
-            id={`drivers-tab-${tabItem.key}`}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200"
-            style={tab === tabItem.key ? {
-              background: "var(--accent-surface)",
+      {/* ═══════════════════════════════════════════════════════════════════════
+         PAGE HEADER — title + tab dropdown in one line
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <div className="dash-page-header items-center">
+        <div className="flex items-center gap-4">
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+            style={{
+              background: "linear-gradient(135deg, var(--accent-surface), var(--accent-surface-strong))",
               border: "1px solid var(--accent-border)",
-              color: "var(--primary)",
-              boxShadow: "0 4px 12px rgba(var(--primary-rgb),0.14)",
-            } : {
-              background: "var(--surface-elevated)",
-              border: "1px solid var(--divider)",
-              color: "var(--text-tertiary)",
+              boxShadow: "0 4px 14px rgba(var(--primary-rgb), 0.18)",
             }}
           >
-            {tabItem.icon}
-            {tabItem.label}
-            {tabItem.count > 0 && (
-              <span className="min-w-[20px] h-5 rounded-full text-[10px] font-black flex items-center justify-center px-1.5"
-                style={{
-                  background: tab === tabItem.key ? "var(--primary)" : "var(--surface-elevated)",
-                  color: tab === tabItem.key ? "white" : "var(--text-tertiary)",
-                  border: tab === tabItem.key ? "none" : "1px solid var(--divider)",
-                }}>
-                {tabItem.count}
-              </span>
-            )}
-          </a>
-        ))}
+            <Car size={20} style={{ color: "var(--primary)" }} />
+          </div>
+          <div>
+            <h1 className="text-[22px] font-black tracking-tight text-text-primary leading-tight">{t("drivers.title")}</h1>
+            <p className="text-[13px] text-text-tertiary mt-0.5">{t("drivers.subtitle")}</p>
+          </div>
+        </div>
+        {/* Tab dropdown — compact selector next to the title */}
+        <DriversTabs tabs={tabs} activeTab={tab} />
       </div>
 
-      
-      {tab !== "revision" ? (
-        <div className="dash-table-card">
+      {/* ═══════════════════════════════════════════════════════════════════════
+         SEARCH + PAGINATION BAR (client component)
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <DriversClient
+        key={searchQuery}
+        tab={tab}
+        currentPage={page}
+        totalPages={totalPages}
+        searchQuery={searchQuery}
+      />
 
-          
+      {tab !== "revision" ? (
+        /* ═══════════════════════════════════════════════════════════════════════
+           DRIVERS TABLE (desktop) + CARDS (mobile)
+           ═══════════════════════════════════════════════════════════════════════ */
+        <div className="dash-table-card animate-fade-in">
+          {/* Section header */}
           <div className="dash-section-header justify-between">
             <div className="flex items-center gap-2.5 flex-1">
-              <div className="w-[3px] h-5 rounded-full"
-                style={{ background: "linear-gradient(to bottom, var(--primary), transparent)", boxShadow: "0 0 8px rgba(var(--primary-rgb),0.35)" }} />
-              <h3 className="text-[13px] font-bold text-text-primary">{tabs.find(t => t.key === tab)?.label}</h3>
-              <span className="text-text-disabled text-[11px]">({driversCount || 0})</span>
+              <div
+                className="w-1 h-5 rounded-full"
+                style={{ background: `linear-gradient(to bottom, var(--primary), transparent)`, boxShadow: `0 0 8px rgba(var(--primary-rgb), 0.35)` }}
+              />
+              <h3 className="text-[13px] font-bold text-text-primary">
+                {tabs.find((tb) => tb.key === tab)?.label}
+              </h3>
+              <span
+                className="px-2 py-0.5 rounded-md text-[10px] font-bold num"
+                style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
+              >
+                {listCount}
+              </span>
             </div>
-            <DriversClient tab={tab} currentPage={page} totalPages={totalPages} searchQuery={searchQuery} />
           </div>
 
-          
-          <div className="hidden md:block overflow-x-auto">
+          {/* Desktop table */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="dash-table-head">
-                  {[t("common.driver"), t("common.vehicle"), t("drivers.documents"), t("common.trips"), t("drivers.rating"), t("common.status"), t("common.actions")].map(h => (
-                    <th key={h} className="text-right py-3 px-4 text-[11px] font-bold text-text-tertiary uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  {[
+                    t("common.driver"),
+                    t("common.vehicle"),
+                    t("drivers.documents"),
+                    t("common.trips"),
+                    t("drivers.rating"),
+                    t("common.status"),
+                    t("common.actions"),
+                  ].map((h) => (
+                    <th key={h} className="text-right py-3 px-4 text-[10px] font-black text-text-tertiary uppercase tracking-wider whitespace-nowrap">
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {(driversRaw || []).map((driver) => {
-                  
-                  const user = (driver as any).users;
+                {(driversRaw || []).map((driver: any, i: number) => {
+                  const user = driver.users as any;
+                  const hasRevision = revisionDriverIds.includes(driver.id);
                   return (
-                    <tr key={driver.id} className="group/row dash-table-row">
-                      
-                      <td className="py-3 px-4">
+                    <tr
+                      key={driver.id}
+                      className="group/row dash-table-row"
+                      style={{ animationDelay: `${i * 30}ms` }}
+                    >
+                      {/* Driver */}
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black shrink-0"
-                            style={{
-                              background: driver.is_verified ? "var(--success-surface)" : "var(--warning-surface)",
-                              color: driver.is_verified ? "var(--success)" : "var(--warning)",
-                              border: "1px solid var(--divider)",
-                            }}>
+                          <div
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-[14px] font-black shrink-0 transition-all"
+                            style={getAvatarStyle(getDriverStatus(user?.is_blocked ?? false, driver.is_verified, hasRevision))}
+                          >
                             {user?.name?.charAt(0)?.toUpperCase() || "D"}
                           </div>
-                          <div>
-                            <p className="font-bold text-text-primary text-[13px]">{user?.name}</p>
+                          <div className="min-w-0">
+                            <p className="font-bold text-text-primary text-[13px] truncate">{user?.name}</p>
                             <p className="text-text-disabled text-[11px] num">{user?.phone}</p>
                           </div>
                         </div>
                       </td>
 
-                      
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <Car size={11} className="text-text-disabled shrink-0" />
-                          <span className="text-text-secondary text-[12px]">
-                            {driver.vehicle_brand} {driver.vehicle_model} — {driver.vehicle_type === "car" ? "🚗" : "🏍"}
+                      {/* Vehicle */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2">
+                          <Car size={12} className="text-text-disabled shrink-0" />
+                          <div>
+                            <span className="text-text-secondary text-[12px] font-bold">
+                              {driver.vehicle_brand} {driver.vehicle_model}
+                            </span>
+                            <span className="text-text-disabled text-[12px] mx-1">—</span>
+                            <span className="text-[13px]">{driver.vehicle_type === "car" ? "🚗" : "🏍"}</span>
+                          </div>
+                        </div>
+                        <p
+                          className="mt-1 px-2 py-0.5 rounded-md text-[10px] font-black num inline-flex"
+                          style={{ background: "var(--warning-surface)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}
+                        >
+                          {driver.vehicle_plate}
+                        </p>
+                      </td>
+
+                      {/* Documents */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex gap-1.5 flex-wrap">
+                          {docList(driver).map((doc) =>
+                            doc.url ? (
+                              <a
+                                key={doc.label}
+                                href={doc.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all hover:shadow-sm"
+                                style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
+                              >
+                                {doc.label}
+                              </a>
+                            ) : (
+                              <span
+                                key={doc.label}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold opacity-60"
+                                style={{ background: "var(--neutral-surface)", color: "var(--text-disabled)", border: "1px solid var(--divider)" }}
+                              >
+                                {doc.label}
+                              </span>
+                            ),
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Trips */}
+                      <td className="py-3.5 px-4">
+                        <span className="text-text-secondary font-bold text-[13px] num">{user?.total_trips ?? 0}</span>
+                      </td>
+
+                      {/* Rating */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "var(--warning-surface)", border: "1px solid var(--warning-border)" }}>
+                          <Star size={11} style={{ color: "var(--warning)" }} fill="currentColor" />
+                          <span className="font-bold text-[13px] num" style={{ color: "var(--warning)" }}>
+                            {user?.rating ?? "—"}
                           </span>
                         </div>
-                        <p className="text-text-disabled text-[11px] mt-0.5 num">{driver.vehicle_plate}</p>
                       </td>
 
-                      
-                      <td className="py-3 px-4">
-                        <div className="flex gap-1.5 flex-wrap">
-                          {[
-                            { label: t("drivers.docs.id"), url: driver.national_id_image_url },
-                            { label: t("drivers.docs.license"), url: driver.license_image_url },
-                            { label: t("drivers.docs.record"), url: driver.criminal_record_url },
-                            { label: t("drivers.docs.vehicle"), url: driver.vehicle_image_url },
-                          ].map((doc) => (
-                            <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
-                              className="px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all hover:opacity-80"
-                              style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
-                              {doc.label}
-                            </a>
-                          ))}
-                        </div>
+                      {/* Status */}
+                      <td className="py-3.5 px-4">
+                        {user?.is_blocked ? (
+                          <Badge variant="error" dot>{t("drivers.status.blocked")}</Badge>
+                        ) : hasRevision ? (
+                          <Badge variant="warning" dot>
+                            <span className="flex items-center gap-1">
+                              <FileWarning size={11} />
+                              {t("drivers.tabs.revision")}
+                            </span>
+                          </Badge>
+                        ) : driver.is_verified ? (
+                          <Badge variant="success" dot>{t("drivers.verified")}</Badge>
+                        ) : (
+                          <Badge variant="warning" dot>{t("drivers.pending")}</Badge>
+                        )}
                       </td>
 
-                      
-                      <td className="py-3 px-4 text-text-secondary font-bold text-[13px] num">{user?.total_trips ?? 0}</td>
-
-                      
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-1">
-                          <Star size={11} style={{ color: "var(--warning)" }} />
-                          <span className="font-bold text-[13px] num" style={{ color: "var(--warning)" }}>{user?.rating ?? "—"}</span>
-                        </div>
-                      </td>
-
-                      
-                      <td className="py-3 px-4">
-                        <Badge variant={driver.is_verified ? "success" : "warning"} dot>
-                          {driver.is_verified ? t("drivers.verified") : t("drivers.pending")}
-                        </Badge>
-                      </td>
-
-                      
-                      <td className="py-3 px-4">
-                        <div className="flex gap-2 items-center transition-opacity">
-                          {!driver.is_verified && (
-                            <form action="/api/drivers/verify" method="POST">
-                              <input type="hidden" name="driver_id" value={driver.id} />
-                              <button type="submit" id={`verify-driver-${driver.id}`}
-                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-white"
-                                style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))", boxShadow: "0 3px 8px rgba(var(--primary-rgb),0.3)" }}>
-                                {t("drivers.verify")}
-                              </button>
-                            </form>
-                          )}
-                          {driver.is_verified && (
-                            <form action="/api/drivers/revoke" method="POST">
-                              <input type="hidden" name="driver_id" value={driver.id} />
-                              <button type="submit" id={`revoke-driver-${driver.id}`}
-                                className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
-                                style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>
-                                {t("common.cancel")}
-                              </button>
-                            </form>
-                          )}
-                          <Link href={`/dashboard/drivers/${driver.id}`}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-opacity hover:opacity-80"
-                            style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
-                            {t("common.details")}
-                          </Link>
-                          <DriversRevisionButton driverId={driver.id} driverName={user?.name} label={t("drivers.requestRevision")} />
-                        </div>
+                      {/* Actions */}
+                      <td className="py-3.5 px-4">
+                        <DriverActions
+                          driverId={driver.id}
+                          driverName={user?.name ?? ""}
+                          isVerified={driver.is_verified}
+                          isBlocked={user?.is_blocked ?? false}
+                        />
                       </td>
                     </tr>
                   );
@@ -275,9 +385,13 @@ export default async function DriversPage({
 
                 {(!driversRaw || driversRaw.length === 0) && (
                   <tr>
-                    <td colSpan={7} className="py-16 text-center text-text-disabled">
-                      <Car size={32} className="mx-auto mb-3 opacity-30" />
-                      <p>{t("drivers.noDrivers")}</p>
+                    <td colSpan={7}>
+                      <div className="flex flex-col items-center justify-center py-20 gap-3">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-surface-elevated border border-divider">
+                          <Search size={24} className="text-text-disabled" />
+                        </div>
+                        <p className="text-text-disabled text-sm font-bold">{t("drivers.noDrivers")}</p>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -285,158 +399,209 @@ export default async function DriversPage({
             </table>
           </div>
 
-          
-          <div className="md:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
-            {(driversRaw || []).map((driver) => {
-              
-              const user = (driver as any).users;
+          {/* ── Mobile cards ──────────────────────────────────────────────── */}
+          <div className="lg:hidden divide-y" style={{ borderColor: "var(--divider)" }}>
+            {(driversRaw || []).map((driver: any) => {
+              const user = driver.users as any;
+              const hasRevision = revisionDriverIds.includes(driver.id);
               return (
                 <div key={driver.id} className="p-4 space-y-3">
+                  {/* Top row: avatar + name + badge */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black"
-                        style={{ background: driver.is_verified ? "var(--success-surface)" : "var(--warning-surface)", color: driver.is_verified ? "var(--success)" : "var(--warning)" }}>
-                        {user?.name?.charAt(0)?.toUpperCase()}
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[15px]"
+                        style={getAvatarStyle(getDriverStatus(user?.is_blocked ?? false, driver.is_verified, hasRevision))}
+                      >
+                        {user?.name?.charAt(0)?.toUpperCase() || "D"}
                       </div>
-                      <div>
-                        <p className="font-bold text-text-primary">{user?.name}</p>
+                      <div className="min-w-0">
+                        <p className="font-bold text-text-primary text-[14px] truncate">{user?.name}</p>
                         <p className="text-text-disabled text-[11px] num">{user?.phone}</p>
                       </div>
                     </div>
-                    <Badge variant={driver.is_verified ? "success" : "warning"} dot>
-                      {driver.is_verified ? "معتمد" : "بانتظار"}
-                    </Badge>
+                    {user?.is_blocked ? (
+                      <Badge variant="error" dot>{t("drivers.status.blocked")}</Badge>
+                    ) : hasRevision ? (
+                      <Badge variant="warning" dot>{t("drivers.tabs.revision")}</Badge>
+                    ) : driver.is_verified ? (
+                      <Badge variant="success" dot>{t("drivers.verified")}</Badge>
+                    ) : (
+                      <Badge variant="warning" dot>{t("drivers.pending")}</Badge>
+                    )}
                   </div>
-                  <p className="text-text-tertiary text-[12px]">
-                    {driver.vehicle_brand} {driver.vehicle_model} — {driver.vehicle_plate}
-                  </p>
+
+                  {/* Vehicle info */}
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                    style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}
+                  >
+                    <Car size={14} className="text-text-tertiary shrink-0" />
+                    <span className="text-text-secondary text-[13px] font-bold">
+                      {driver.vehicle_brand} {driver.vehicle_model}
+                    </span>
+                    <span className="text-text-disabled">—</span>
+                    <span>{driver.vehicle_type === "car" ? "🚗" : "🏍"}</span>
+                    <span className="mr-auto" />
+                    <span
+                      className="px-2 py-0.5 rounded-md text-[10px] font-black num"
+                      style={{ background: "var(--warning-surface)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}
+                    >
+                      {driver.vehicle_plate}
+                    </span>
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "var(--warning-surface)", border: "1px solid var(--warning-border)" }}>
+                      <Star size={11} style={{ color: "var(--warning)" }} fill="currentColor" />
+                      <span className="font-bold text-[12px] num" style={{ color: "var(--warning)" }}>{user?.rating ?? "—"}</span>
+                    </div>
+                    <span className="text-text-tertiary text-[12px] font-bold">
+                      {user?.total_trips ?? 0} {t("common.trips")}
+                    </span>
+                  </div>
+
+                  {/* Documents */}
                   <div className="flex gap-1.5 flex-wrap">
-                    {[
-                      { label: t("drivers.docs.id"), url: driver.national_id_image_url },
-                      { label: t("drivers.docs.license"), url: driver.license_image_url },
-                      { label: t("drivers.docs.record"), url: driver.criminal_record_url },
-                      { label: t("drivers.docs.vehicle"), url: driver.vehicle_image_url },
-                    ].map((doc) => (
-                      <a key={doc.label} href={doc.url} target="_blank" rel="noopener noreferrer"
-                        className="px-2 py-1 rounded-lg text-[10px] font-bold"
-                        style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
-                        {doc.label}
-                      </a>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    {!driver.is_verified && (
-                      <form action="/api/drivers/verify" method="POST" className="flex-1">
-                        <input type="hidden" name="driver_id" value={driver.id} />
-                        <button className="w-full py-2 rounded-xl text-[12px] font-bold text-white"
-                          style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))" }}>اعتماد</button>
-                      </form>
+                    {docList(driver).map((doc) =>
+                      doc.url ? (
+                        <a
+                          key={doc.label}
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded-lg text-[10px] font-bold"
+                          style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
+                        >
+                          {doc.label}
+                        </a>
+                      ) : (
+                        <span
+                          key={doc.label}
+                          className="px-2.5 py-1 rounded-lg text-[10px] font-bold opacity-60"
+                          style={{ background: "var(--neutral-surface)", color: "var(--text-disabled)", border: "1px solid var(--divider)" }}
+                        >
+                          {doc.label}
+                        </span>
+                      ),
                     )}
-                    {driver.is_verified && (
-                      <form action="/api/drivers/revoke" method="POST" className="flex-1">
-                        <input type="hidden" name="driver_id" value={driver.id} />
-                        <button className="w-full py-2 rounded-xl text-[12px] font-bold"
-                          style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>إلغاء الاعتماد</button>
-                      </form>
-                    )}
-                    <div className="flex-1">
-                      <DriversRevisionButton driverId={driver.id} driverName={user?.name} label={t("drivers.requestRevision")} mobile />
-                    </div>
-                    <div className="flex-1">
-                      <Link href={`/dashboard/drivers/${driver.id}`}
-                        className="flex items-center justify-center w-full py-2 rounded-xl text-[12px] font-bold transition-opacity hover:opacity-80"
-                        style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
-                        التفاصيل
-                      </Link>
-                    </div>
                   </div>
+
+                  {/* Action buttons */}
+                  <DriverCardActions
+                    driverId={driver.id}
+                    driverName={user?.name ?? ""}
+                    isVerified={driver.is_verified}
+                    isBlocked={user?.is_blocked ?? false}
+                  />
                 </div>
               );
             })}
+            {(!driversRaw || driversRaw.length === 0) && (
+              <div className="flex flex-col items-center justify-center py-20 gap-3">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}
+                >
+                  <Search size={24} className="text-text-disabled" />
+                </div>
+                <p className="text-text-disabled text-sm font-bold">{t("drivers.noDrivers")}</p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
-        
-        <div className="dash-card">
-          <div className="dash-section-header">
-            <h3 className="text-[13px] font-bold text-text-primary">{t("drivers.revisionRequests")}</h3>
+        /* ═══════════════════════════════════════════════════════════════════════
+           REVISION REQUESTS
+           ═══════════════════════════════════════════════════════════════════════ */
+        <div className="dash-table-card animate-fade-in">
+          <div className="dash-section-header justify-between">
+            <div className="flex items-center gap-2.5 flex-1">
+              <div
+                className="w-1 h-5 rounded-full"
+                style={{ background: "linear-gradient(to bottom, var(--warning), transparent)", boxShadow: "0 0 8px rgba(var(--warning-rgb), 0.35)" }}
+              />
+              <h3 className="text-[13px] font-bold text-text-primary">{t("drivers.revisionRequests")}</h3>
+              <span
+                className="px-2 py-0.5 rounded-md text-[10px] font-bold num"
+                style={{ background: "var(--warning-surface)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}
+              >
+                {revisionCount}
+              </span>
+            </div>
           </div>
+
           <div className="divide-y" style={{ borderColor: "var(--divider)" }}>
-            {revisionDrivers.map((rev: unknown) => {
-              
-              const r = rev as any;
-              const user = r.users;
-              const dp = r.drivers_profile;
+            {revisionDrivers.map((rev: any) => {
+              const user = rev.users;
+              const dp = rev.drivers_profile;
               return (
-                <div key={r.id} className="p-5 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-text-primary">{user?.name}</span>
-                        <span className="text-[11px] text-text-disabled num">{user?.phone}</span>
-                      </div>
-                      <p className="text-text-tertiary text-[12px]">{dp?.vehicle_type === "car" ? "🚗" : "🏍"} {dp?.vehicle_brand} — {dp?.vehicle_plate}</p>
+                <div key={rev.id} className="p-5 space-y-4">
+                  {/* Driver info header */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-[14px] bg-warning/10 text-warning border border-warning/20">
+                      {user?.name?.charAt(0)?.toUpperCase() || "?"}
                     </div>
-                    <span className="text-[11px] text-text-disabled">{formatDate(r.created_at)}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-text-primary text-[14px]">{user?.name}</p>
+                      <p className="text-text-disabled text-[11px] num">{user?.phone}</p>
+                    </div>
+                    <Badge variant="warning" dot>
+                      <span className="flex items-center gap-1">
+                        <FileWarning size={11} />
+                        {t("drivers.tabs.revision")}
+                      </span>
+                    </Badge>
                   </div>
 
-                  <div className="p-3 rounded-xl" style={{ background: "var(--accent-surface)", border: "1px solid var(--accent-border)" }}>
-                    <p className="text-[12px] font-bold text-primary mb-1">{t("drivers.requestedFields")}:</p>
+                  {/* Vehicle mini-row */}
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-elevated border border-divider">
+                    <span>{dp?.vehicle_type === "car" ? "🚗" : "🏍"}</span>
+                    <span className="text-text-secondary text-[12px] font-bold">{dp?.vehicle_brand}</span>
+                    <span className="text-text-disabled">—</span>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-black num bg-warning/10 text-warning border border-warning/20">
+                      {dp?.vehicle_plate}
+                    </span>
+                  </div>
+
+                  {/* Requested fields */}
+                  <div className="p-3.5 rounded-xl space-y-2 bg-primary/10 border border-primary/20">
+                    <p className="text-[11px] font-black text-primary uppercase tracking-wider">{t("drivers.requestedFields")}:</p>
                     <div className="flex gap-1.5 flex-wrap">
-                      {(r.fields_requested || []).map((f: string) => (
-                        <span key={f} className="px-2 py-0.5 rounded-lg text-[10px] font-bold"
-                          style={{ background: "var(--accent-surface-strong)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
+                      {(rev.fields_requested || []).map((f: string) => (
+                        <span key={f} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-primary/15 text-primary border border-primary/20">
                           {f}
                         </span>
                       ))}
                     </div>
-                    <p className="text-text-secondary text-[12px] mt-2">{r.message}</p>
+                    {rev.message && (
+                      <p className="text-text-secondary text-[12px] mt-2 pt-2 border-t border-primary/20">{rev.message}</p>
+                    )}
                   </div>
 
-                  <div className="flex gap-2">
-                    <form action="/api/drivers/verify" method="POST">
-                      <input type="hidden" name="driver_id" value={user?.id} />
-                      <button type="submit" className="px-4 py-2 rounded-xl text-[12px] font-bold text-white"
-                        style={{ background: "linear-gradient(135deg,var(--primary),var(--primary-dark))" }}>
-                        قبول وتأكيد
-                      </button>
-                    </form>
-                    <form action="/api/drivers/revoke" method="POST">
-                      <input type="hidden" name="driver_id" value={user?.id} />
-                      <button type="submit" className="px-4 py-2 rounded-xl text-[12px] font-bold"
-                        style={{ background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}>
-                        رفض
-                      </button>
-                    </form>
-                  </div>
+                  {/* Actions */}
+                  <RevisionActions
+                    driverId={rev.driver_id}
+                    driverName={(rev.users as any)?.name ?? ""}
+                    revisionId={rev.id}
+                    isVerified={(rev.drivers_profile as any)?.is_verified ?? false}
+                  />
                 </div>
               );
             })}
             {revisionDrivers.length === 0 && (
-              <div className="py-16 text-center text-text-disabled">
-                <CheckCircle size={32} className="mx-auto mb-3 opacity-30" />
-                <p>{t("drivers.noRevisionRequests")}</p>
+              <div className="flex flex-col items-center justify-center py-20 gap-3">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-surface-elevated border border-divider">
+                  <CheckCircle size={24} className="text-text-disabled" />
+                </div>
+                <p className="text-text-disabled text-sm font-bold">{t("drivers.noRevisionRequests")}</p>
               </div>
             )}
           </div>
         </div>
       )}
     </div>
-    </>
   );
 }
 
-
-function DriversRevisionButton({ driverId, driverName, label, mobile }: { driverId: string; driverName: string; label: string; mobile?: boolean }) {
-  return (
-    <a
-      href={`/dashboard/drivers/revision?driver_id=${driverId}&name=${encodeURIComponent(driverName)}`}
-      id={`request-revision-${driverId}`}
-      className={`flex items-center justify-center gap-1 rounded-lg text-[11px] font-bold transition-all hover:opacity-80 ${mobile ? "w-full py-2" : "px-3 py-1.5"}`}
-      style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
-    >
-      <AlertCircle size={10} />
-      {label}
-    </a>
-  );
-}

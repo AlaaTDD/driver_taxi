@@ -31,6 +31,25 @@ export function formatDate(date: string, locale = "ar-EG"): string {
   });
 }
 
+// [UI-05 style] Intl.DateTimeFormat can throw on invalid dates or missing
+// locale data. Fall back gracefully instead of crashing the whole page.
+export function formatDateSafe(date: string | null | undefined, locale = "ar-EG"): string {
+  if (!date) return "—";
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return String(date);
+  }
+}
+
 export function getStatusColor(status: string): string {
   return STATUS_PILL_MAP[status] || "status-pill-muted border";
 }

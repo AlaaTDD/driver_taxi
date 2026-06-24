@@ -73,6 +73,7 @@ export function WalletActions({
               <h3 className="font-bold text-lg text-text-primary">تعديل رصيد المحفظة</h3>
               <button
                 onClick={handleClose}
+                aria-label="إغلاق"
                 className="p-1 text-text-tertiary hover:text-text-primary rounded-lg hover:bg-surface-elevated"
               >
                 <X size={18} />

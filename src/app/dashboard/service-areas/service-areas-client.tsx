@@ -38,7 +38,7 @@ export default function ServiceAreasClient() {
           <div className="w-full max-w-lg rounded-2xl bg-surface-elevated p-6 shadow-2xl border border-divider">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black text-text-primary">إضافة منطقة خدمة جديدة</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-text-tertiary hover:text-text-primary">
+              <button onClick={() => setIsModalOpen(false)} aria-label="إغلاق" className="text-text-tertiary hover:text-text-primary">
                 <X size={20} />
               </button>
             </div>

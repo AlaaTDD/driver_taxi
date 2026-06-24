@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import { UserBlockModal, UserRoleModal } from "./user-modals";
 import { toast } from "sonner";
+import { Badge } from "@/components/badge";
+import { ActionsMenu } from "../drivers/_components/actions-menu";
+import type { CSSProperties } from "react";
 
 interface User {
   id: string;
@@ -40,16 +43,29 @@ interface UsersClientProps {
 }
 
 /* ─── tiny helpers ───────────────────────────────────────── */
-const glassCard: React.CSSProperties = {
-  background: "var(--surface-glass)",
-  border: "1px solid var(--divider)",
-  color: "var(--text-primary)",
+// Status -> avatar color, mirroring the drivers page's getAvatarStyle/getDriverStatus
+// pattern (src/app/dashboard/drivers/_lib/status-style.ts) for visual parity.
+type UserAccountStatus = "blocked" | "admin" | "supervisor" | "active" | "inactive";
+
+const USER_STATUS_COLORS: Record<UserAccountStatus, { bg: string; fg: string; border: string }> = {
+  blocked: { bg: "var(--error-surface)", fg: "var(--error)", border: "var(--error-border)" },
+  admin: { bg: "var(--accent-surface)", fg: "var(--primary)", border: "var(--accent-border)" },
+  supervisor: { bg: "rgba(var(--color-purple-rgb), 0.12)", fg: "var(--color-purple)", border: "rgba(var(--color-purple-rgb), 0.22)" },
+  active: { bg: "var(--success-surface)", fg: "var(--success)", border: "var(--success-border)" },
+  inactive: { bg: "var(--neutral-surface)", fg: "var(--text-tertiary)", border: "var(--neutral-border)" },
 };
 
-const avatarGrad = (user: User) =>
-  user.is_blocked
-    ? { className: "variant-error-strong" }
-    : { className: "variant-primary-strong" };
+const getUserAccountStatus = (user: User): UserAccountStatus =>
+  user.is_blocked ? "blocked"
+  : user.is_admin ? "admin"
+  : user.role === "supervisor" ? "supervisor"
+  : user.is_active ? "active"
+  : "inactive";
+
+const avatarGrad = (user: User): CSSProperties => {
+  const c = USER_STATUS_COLORS[getUserAccountStatus(user)];
+  return { background: c.bg, color: c.fg, border: `1px solid ${c.border}` };
+};
 
 const roleLabel = (user: User, t: any) =>
   user.is_admin ? { label: t("users.roles.admin"), className: "variant-primary-strong" }
@@ -180,11 +196,14 @@ export default function UsersClient({
         .btn-action:hover { transform: scale(1.04); filter: brightness(1.12); }
         .btn-action:active { transform: scale(0.96); }
         .focus-ring:focus-within { outline: 2px solid var(--accent-border); outline-offset: 0; border-radius: 14px; }
+        .users-th { position: sticky; top: 0; z-index: 2; }
+        .trips-bar { height: 3px; border-radius: 2px; background: var(--accent-border); overflow: hidden; }
+        .trips-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); transition: width 0.4s ease; }
       `}</style>
 
       {/* ── Search + Filters bar ─────────────────────────── */}
       <div
-        className="flex flex-col sm:flex-row gap-3 flex-wrap items-center p-3 rounded-2xl"
+        className="flex flex-col sm:flex-row gap-3 flex-wrap items-center px-4 py-3.5 rounded-2xl"
         style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)", boxShadow: "var(--shadow-sm)" }}
       >
         {/* search */}
@@ -201,7 +220,7 @@ export default function UsersClient({
               style={{ background: "var(--surface)", border: "1px solid var(--divider)", color: "var(--text-primary)" }}
             />
             {search && (
-              <button type="button" onClick={() => { setSearch(""); updateParams({ q: "" }); }}
+              <button type="button" aria-label={t("common.close")} onClick={() => { setSearch(""); updateParams({ q: "" }); }}
                 className="absolute left-3 top-1/2 -translate-y-1/2 transition-all hover:scale-110 active:scale-90"
                 style={{ color: "var(--text-disabled)" }}>
                 <X size={12} />
@@ -289,7 +308,7 @@ export default function UsersClient({
               {t("common.loading")}...
             </span>
           ) : (
-            <span className="text-[11px] font-semibold px-2 py-1 rounded-lg"
+            <span className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg"
               style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}>
               {totalCount} {t("common.users")}
             </span>
@@ -303,16 +322,16 @@ export default function UsersClient({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="dash-table-head">
+              <tr className="dash-table-head users-th">
                 {[
-                  { label: t("common.name"), w: "w-[30%]" },
-                  { label: t("common.phone"), w: "w-[14%]" },
+                  { label: t("common.name"), w: "w-[32%]" },
+                  { label: t("common.phone"), w: "w-[15%]" },
                   { label: t("common.role"), w: "w-[11%]" },
                   { label: t("common.trips"), w: "w-[10%]" },
-                  { label: t("common.status"), w: "w-[13%]" },
+                  { label: t("common.status"), w: "w-[15%]" },
                   { label: t("common.actions"), w: "w-[10%]" },
                 ].map((h) => (
-                  <th key={h.label} className={`${h.w} text-right py-3 px-5 text-[10px] font-black uppercase tracking-widest whitespace-nowrap`}
+                  <th key={h.label} className={`${h.w} text-right py-3.5 px-5 text-[10px] font-black uppercase tracking-widest whitespace-nowrap`}
                     style={{ color: "var(--text-tertiary)" }}>
                     {h.label}
                   </th>
@@ -324,6 +343,8 @@ export default function UsersClient({
                 const av = avatarGrad(user);
                 const rl = roleLabel(user, t);
                 const canAct = user.id !== currentUserId && !user.is_admin;
+                const tripsMax = 100;
+                const tripsPercent = Math.min(100, ((user.total_trips ?? 0) / tripsMax) * 100);
                 return (
                   <tr
                     key={user.id}
@@ -333,108 +354,97 @@ export default function UsersClient({
                     }}
                   >
                     {/* Avatar + name */}
-                    <td className="py-3.5 px-5">
-                      <div className="flex items-center gap-3">
+                    <td className="py-4 px-5">
+                      <div className="flex items-center gap-3.5">
                         <div
-                          className={`relative w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0 transition-transform group-hover/row:scale-105 ${av.className}`}
+                          className="relative w-11 h-11 rounded-2xl flex items-center justify-center text-[14px] font-black flex-shrink-0 transition-transform group-hover/row:scale-105"
+                          style={av}
                         >
                           {user.name?.charAt(0)?.toUpperCase() || "U"}
                           {user.is_blocked && (
-                            <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
+                            <span className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full flex items-center justify-center"
                               style={{ background: "var(--surface-elevated)", border: "1.5px solid var(--divider)" }}>
-                              <Lock size={7} style={{ color: "var(--error)" }} />
+                              <Lock size={8} style={{ color: "var(--error)" }} />
                             </span>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-text-primary font-bold text-[13px] truncate">{user.name}</span>
-                            {user.is_admin && <Crown size={10} style={{ color: "var(--primary)", flexShrink: 0 }} />}
-                            {user.role === "supervisor" && !user.is_admin && <Shield size={10} style={{ color: "var(--color-purple)", flexShrink: 0 }} />}
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <span className="text-text-primary font-bold text-[13.5px] truncate">{user.name}</span>
+                            {user.is_admin && <Crown size={11} style={{ color: "var(--primary)", flexShrink: 0 }} />}
+                            {user.role === "supervisor" && !user.is_admin && <Shield size={11} style={{ color: "var(--color-purple)", flexShrink: 0 }} />}
                           </div>
-                          <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-disabled)" }}>{user.email}</p>
+                          <p className="text-[11.5px] truncate" style={{ color: "var(--text-disabled)" }}>{user.email}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Phone */}
-                    <td className="py-3.5 px-5">
+                    <td className="py-4 px-5">
                       <span className="text-[12px] font-mono tracking-wide" style={{ color: "var(--text-secondary)" }}>{user.phone}</span>
                     </td>
 
                     {/* Role badge */}
-                    <td className="py-3.5 px-5">
+                    <td className="py-4 px-5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap ${rl.className}`}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${rl.className}`}
                       >
                         {rl.label}
                       </span>
                     </td>
 
                     {/* Trips */}
-                    <td className="py-3.5 px-5">
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
-                        <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>{t("common.trips")}</span>
+                    <td className="py-4 px-5">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[15px] font-black num leading-none" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
+                        <div className="trips-bar w-10">
+                          <div className="trips-bar-fill" style={{ width: `${tripsPercent}%` }} />
+                        </div>
                       </div>
                     </td>
 
                     {/* Status */}
-                    <td className="py-3.5 px-5">
+                    <td className="py-4 px-5">
                       {user.is_blocked ? (
-                        <div className="flex flex-col gap-0.5">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-error">
-                            <Lock size={9} /> {t("common.blocked")}
-                          </span>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="error" dot>{t("common.blocked")}</Badge>
                           {user.blocked_reason && (
-                            <span className="text-[10px] px-1 truncate max-w-[110px]" style={{ color: "var(--text-disabled)" }} title={user.blocked_reason}>
+                            <span className="text-[10.5px] px-1 truncate max-w-[120px]" style={{ color: "var(--text-disabled)" }} title={user.blocked_reason}>
                               {user.blocked_reason}
                             </span>
                           )}
                         </div>
                       ) : user.is_active ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-primary">
-                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
-                          {t("common.active")}
-                        </span>
+                        <Badge variant="success" dot>{t("common.active")}</Badge>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold variant-neutral">
-                          {t("common.inactive")}
-                        </span>
+                        <Badge variant="default" dot>{t("common.inactive")}</Badge>
                       )}
                     </td>
 
                     {/* Actions */}
-                    <td className="py-3.5 px-5">
-                      {canAct && (
-                        <div className="flex items-center gap-1.5">
-                          {/* quick block toggle */}
-                          <button
-                            onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                            id={`${user.is_blocked ? "unblock" : "block"}-user-${user.id}`}
-                            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action ${user.is_blocked ? "variant-primary" : "variant-error"}`}
-                          >
-                            {user.is_blocked ? <><Unlock size={10} /> رفع</> : <><Lock size={10} /> حظر</>}
-                          </button>
-
-                          {/* quick supervisor toggle */}
-                          {user.role !== "driver" && (
-                            <button
-                              onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                              id={`set-role-${user.id}`}
-                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold btn-action"
-                              style={
-                                user.role === "supervisor"
-                                  ? { background: "var(--neutral-surface)", color: "var(--text-tertiary)", border: "1px solid var(--neutral-border)" }
-                                  : { background: "rgba(168, 85, 247, 0.12)", color: "rgb(168, 85, 247)", border: "1px solid rgba(168, 85, 247, 0.22)" }
-                              }
-                            >
-                              <Shield size={10} />
-                              {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
-                            </button>
-                          )}
-                        </div>
-                      )}
+                    <td className="py-4 px-5">
+                      <div className="flex justify-center">
+                        {canAct && (
+                          <ActionsMenu
+                            ariaLabel={t("common.actions")}
+                            items={[
+                              {
+                                key: "block",
+                                label: user.is_blocked ? t("drivers.unblock") : t("drivers.block"),
+                                icon: user.is_blocked ? <Unlock size={13} /> : <Lock size={13} />,
+                                variant: user.is_blocked ? "success" : "danger",
+                                onClick: () => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" }),
+                              },
+                              ...(user.role !== "driver" ? [{
+                                key: "role",
+                                label: user.role === "supervisor" ? t("users.removeSupervisor") : t("users.makeSupervisor"),
+                                icon: <Shield size={13} />,
+                                onClick: () => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" }),
+                              }] : []),
+                            ]}
+                          />
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -442,15 +452,15 @@ export default function UsersClient({
 
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  <td colSpan={6} className="py-24 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
                         style={{ background: "var(--neutral-surface)", border: "1px solid var(--neutral-border)" }}>
-                        <UserX size={26} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
+                        <UserX size={28} style={{ color: "var(--text-disabled)", opacity: 0.45 }} />
                       </div>
                       <div>
-                        <p className="font-bold text-[14px]" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
-                        <p className="text-[12px] mt-0.5" style={{ color: "var(--text-disabled)" }}>-</p>
+                        <p className="font-bold text-[15px]" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
+                        <p className="text-[12px] mt-1" style={{ color: "var(--text-disabled)" }}>جرّب تعديل الفلتر أو البحث</p>
                       </div>
                     </div>
                   </td>
@@ -475,12 +485,13 @@ export default function UsersClient({
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center text-[14px] font-black flex-shrink-0 ${av.className}`}
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-[15px] font-black flex-shrink-0"
+                      style={av}
                     >
                       {user.name?.charAt(0)?.toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="font-bold text-[14px] truncate" style={{ color: "var(--text-primary)" }}>{user.name}</span>
                         {user.is_admin && <Crown size={11} style={{ color: "var(--primary)", flexShrink: 0 }} />}
                         {user.role === "supervisor" && !user.is_admin && <Shield size={11} style={{ color: "var(--color-purple)", flexShrink: 0 }} />}
@@ -488,23 +499,21 @@ export default function UsersClient({
                       <p className="text-[11px] font-mono" style={{ color: "var(--text-disabled)" }}>{user.phone}</p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg ${rl.className}`}>
+                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${rl.className}`}>
                       {rl.label}
                     </span>
                     {user.is_blocked && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg variant-error">
-                        {t("common.blocked")}
-                      </span>
+                      <Badge variant="error" size="sm" dot>{t("common.blocked")}</Badge>
                     )}
                   </div>
                 </div>
 
                 {/* stats row */}
-                <div className="flex items-center gap-4 py-2 px-3 rounded-xl"
+                <div className="flex items-center gap-4 py-2.5 px-4 rounded-xl"
                   style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[14px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[16px] font-black num" style={{ color: "var(--text-primary)" }}>{user.total_trips ?? 0}</span>
                     <span className="text-[10px]" style={{ color: "var(--text-disabled)" }}>{t("common.trips")}</span>
                   </div>
                   <div className="w-px h-6" style={{ background: "var(--divider)" }} />
@@ -512,7 +521,7 @@ export default function UsersClient({
                     {user.is_blocked ? (
                       <span className="text-[11px] font-bold" style={{ color: "var(--error)" }}>{t("common.blocked")}</span>
                     ) : user.is_active ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold" style={{ color: "var(--primary)" }}>
+                      <span className="flex items-center gap-1.5 text-[11px] font-bold" style={{ color: "var(--primary)" }}>
                         <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
                         {t("common.active")}
                       </span>
@@ -526,17 +535,21 @@ export default function UsersClient({
                   <div className="flex gap-2 pt-0.5">
                     <button
                       onClick={() => setBlockModal({ user, action: user.is_blocked ? "unblock" : "block" })}
-                      className={`flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action ${user.is_blocked ? "variant-primary" : "variant-error"}`}
+                      className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
+                      style={user.is_blocked
+                        ? { background: "var(--success-surface)", color: "var(--success)", border: "1px solid var(--success-border)" }
+                        : { background: "var(--error-surface)", color: "var(--error)", border: "1px solid var(--error-border)" }}
                     >
-                      {user.is_blocked ? <><Unlock size={12} /> رفع الحظر</> : <><Lock size={12} /> حظر</>}
+                      {user.is_blocked ? <><Unlock size={12} /> {t("drivers.unblock")}</> : <><Lock size={12} /> {t("drivers.block")}</>}
                     </button>
                     {user.role !== "driver" && (
                       <button
                         onClick={() => setRoleModal({ user, role: user.role === "supervisor" ? "user" : "supervisor" })}
-                        className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action variant-primary"
+                        className="flex-1 py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 btn-action"
+                        style={{ background: "var(--accent-surface)", color: "var(--primary)", border: "1px solid var(--accent-border)" }}
                       >
                         <Shield size={12} />
-                        {user.role === "supervisor" ? "إلغاء مشرف" : "مشرف"}
+                        {user.role === "supervisor" ? t("users.removeSupervisor") : t("users.makeSupervisor")}
                       </button>
                     )}
                   </div>
@@ -546,12 +559,15 @@ export default function UsersClient({
           })}
 
           {users.length === 0 && (
-            <div className="py-20 text-center flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+            <div className="py-24 text-center flex flex-col items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
                 style={{ background: "var(--neutral-surface)", border: "1px solid var(--neutral-border)" }}>
-                <UserX size={22} style={{ color: "var(--text-disabled)", opacity: 0.5 }} />
+                <UserX size={24} style={{ color: "var(--text-disabled)", opacity: 0.45 }} />
               </div>
-              <p className="font-semibold" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
+              <div>
+                <p className="font-semibold text-[14px]" style={{ color: "var(--text-secondary)" }}>{t("common.noData")}</p>
+                <p className="text-[12px] mt-1" style={{ color: "var(--text-disabled)" }}>جرّب تعديل الفلتر أو البحث</p>
+              </div>
             </div>
           )}
         </div>
@@ -559,12 +575,12 @@ export default function UsersClient({
 
       {/* ── Pagination ─────────────────────────────────────── */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={() => goPage(currentPage - 1)}
             disabled={currentPage <= 1}
-            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30"
-            style={glassCard}
+            aria-label={t("common.previous")}
+            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30 bg-surface border border-divider text-text-secondary"
           >
             <ChevronRight size={14} />
           </button>
@@ -580,7 +596,7 @@ export default function UsersClient({
                 className="w-9 h-9 rounded-xl text-[13px] font-bold btn-action"
                 style={p === currentPage
                   ? { background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "var(--color-white)", boxShadow: "0 8px 20px rgba(var(--primary-rgb),0.26)", border: "1px solid var(--accent-border)" }
-                  : { ...glassCard, color: "var(--text-secondary)" }}
+                  : { background: "var(--surface)", border: "1px solid var(--divider)", color: "var(--text-secondary)" }}
               >
                 {p}
               </button>
@@ -590,8 +606,8 @@ export default function UsersClient({
           <button
             onClick={() => goPage(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30"
-            style={glassCard}
+            aria-label={t("common.next")}
+            className="w-9 h-9 rounded-xl flex items-center justify-center btn-action disabled:opacity-30 bg-surface border border-divider text-text-secondary"
           >
             <ChevronLeft size={14} />
           </button>

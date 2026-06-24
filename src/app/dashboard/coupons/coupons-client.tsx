@@ -166,6 +166,7 @@ export default function CouponsClient({ editData }: { editData?: CouponData & { 
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
+                  aria-label={t("common.close")}
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-text-tertiary hover:text-text-primary transition-colors"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >

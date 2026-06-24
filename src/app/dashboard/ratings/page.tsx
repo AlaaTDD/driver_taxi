@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { Star, MessageSquare, Trash2, Car, User, Users, SlidersHorizontal, Phone } from "lucide-react";
+import { Star, MessageSquare, Trash2, Car, User, Users, SlidersHorizontal, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 
 type TabType = "driver_ratings" | "user_ratings";
 
@@ -21,7 +21,6 @@ export default async function RatingsPage({
   const t = await getTranslations();
   const supabase = createAdminClient();
 
-  /* ── Stats ── */
   const [driverRatingsCountRes, userRatingsCountRes] = await Promise.all([
     supabase.from("ratings").select("id", { count: "exact", head: true }),
     supabase.from("user_ratings").select("id", { count: "exact", head: true }),
@@ -32,11 +31,7 @@ export default async function RatingsPage({
     { key: "user_ratings", label: t("ratings.tabs.userRatings"), count: userRatingsCountRes.count || 0, icon: Users, color: "var(--primary)", colorRaw: "var(--primary-rgb)" },
   ];
 
-  // Driver list for filter
-  const { data: drivers } = await supabase
-    .from("users")
-    .select("id, name")
-    .eq("role", "driver");
+  const { data: drivers } = await supabase.from("users").select("id, name").eq("role", "driver");
 
   /* ── DRIVER RATINGS ── */
   let ratings: any[] = [];
@@ -60,7 +55,6 @@ export default async function RatingsPage({
     ratingsCount = count || 0;
     ratingsTotalPages = Math.ceil(ratingsCount / pageSize);
 
-    // Aggregate avg + histogram from ALL matching rows (not just current page)
     let aggQuery = supabase.from("ratings").select("rating");
     if (driverFilter) aggQuery = aggQuery.eq("driver_id", driverFilter);
     if (minRating > 0) aggQuery = aggQuery.gte("rating", minRating);
@@ -98,7 +92,6 @@ export default async function RatingsPage({
     userRatingsCount = count || 0;
     userRatingsTotalPages = Math.ceil(userRatingsCount / pageSize);
 
-    // Aggregate avg + histogram from ALL matching rows (not just current page)
     let userAggQuery = supabase.from("user_ratings").select("rating");
     if (minRating > 0) userAggQuery = userAggQuery.gte("rating", minRating);
     const { data: allUserRatingRows } = await userAggQuery;
@@ -129,24 +122,47 @@ export default async function RatingsPage({
   const currentAvg = tab === "driver_ratings" ? avgRating : userAvgRating;
   const currentCounts = tab === "driver_ratings" ? ratingCounts : userRatingCounts;
   const currentTotal = tab === "driver_ratings" ? ratingsCount : userRatingsCount;
-  const starColors: Record<number, string> = { 5: "var(--success)", 4: "var(--primary)", 3: "var(--info)", 2: "var(--warning)", 1: "var(--error)" };
-  const starColorRaw: Record<number, string> = { 5: "16,185,129", 4: "245,158,11", 3: "59,130,246", 2: "245,158,11", 1: "239,68,68" };
 
-  const maxCount = Math.max(...Object.values(currentCounts), 1);
+  const barColors: Record<number, { from: string; to: string; glow: string; label: string }> = {
+    5: { from: "#10B981", to: "#34D399", glow: "rgba(16,185,129,0.30)", label: "#10B981" },
+    4: { from: "#22C55E", to: "#4ADE80", glow: "rgba(34,197,94,0.25)", label: "#22C55E" },
+    3: { from: "#F59E0B", to: "#FCD34D", glow: "rgba(245,158,11,0.28)", label: "#F59E0B" },
+    2: { from: "#F97316", to: "#FB923C", glow: "rgba(249,115,22,0.25)", label: "#F97316" },
+    1: { from: "#EF4444", to: "#F87171", glow: "rgba(239,68,68,0.28)", label: "#EF4444" },
+  };
+
+  const avgFloat = parseFloat(currentAvg);
+
+  // Smart pagination with ellipsis
+  const buildPages = (): (number | "...")[] => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const delta = 2;
+    const range: (number | "...")[] = [];
+    const left = Math.max(2, page - delta);
+    const right = Math.min(totalPages - 1, page + delta);
+    range.push(1);
+    if (left > 2) range.push("...");
+    for (let i = left; i <= right; i++) range.push(i);
+    if (right < totalPages - 1) range.push("...");
+    range.push(totalPages);
+    return range;
+  };
+
+  const pages = totalPages > 1 ? buildPages() : [];
+  const baseHref = `/dashboard/ratings?tab=${tab}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`;
 
   return (
     <>
       <div className="space-y-6">
 
-        {/* ── Page Header ── */}
+        {/* Page Header */}
         <div>
           <h1 className="text-2xl font-black tracking-tight text-text-primary">{t("ratings.title")}</h1>
           <p className="text-sm text-text-secondary mt-1">{t("ratings.subtitle")}</p>
         </div>
 
-        {/* ── Tabs + Stats row ── */}
+        {/* Tabs + Stats row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Tab switcher */}
           <div className="flex gap-2 p-1 rounded-xl" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
             {tabs.map((tabItem) => (
               <Link
@@ -178,7 +194,6 @@ export default async function RatingsPage({
             ))}
           </div>
 
-          {/* Quick stats inline */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--warning-surface)", border: "1px solid var(--warning-border)" }}>
@@ -202,21 +217,25 @@ export default async function RatingsPage({
           </div>
         </div>
 
-        {/* ── Main Card: Distribution + Filters side by side ── */}
-        <div className="rounded-2xl border border-divider bg-surface overflow-hidden">
-          {/* Card header with filters */}
-          <div className="px-5 py-4 border-b border-divider flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-warning/10 border border-warning/20">
-                <Star size={16} style={{ color: "var(--warning)" }} />
-              </div>
-              <div>
-                <h3 className="text-[15px] font-black text-text-primary leading-none">{t("ratings.distribution")}</h3>
-                <p className="mt-1 text-[12px] font-medium text-text-tertiary">{currentTotal} {t("ratings.stats.total").toLowerCase()}</p>
-              </div>
+        {/* Rating Distribution Hero Card */}
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--divider)",
+            boxShadow: "0 2px 32px 0 rgba(0,0,0,0.14)",
+          }}
+        >
+          {/* Filter bar */}
+          <div
+            className="px-5 py-3 flex items-center justify-between gap-4 flex-wrap"
+            style={{ borderBottom: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+          >
+            <div className="flex items-center gap-2">
+              <Star size={14} style={{ color: "var(--warning)" }} />
+              <span className="text-[13px] font-black text-text-primary">{t("ratings.distribution")}</span>
             </div>
 
-            {/* Filters as dropdowns */}
             <form className="flex items-center gap-2 flex-wrap">
               <input type="hidden" name="tab" value={tab} />
 
@@ -225,11 +244,11 @@ export default async function RatingsPage({
                   <select
                     name="driver_id"
                     defaultValue={driverFilter}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-xl text-[13px] font-semibold outline-none cursor-pointer transition-colors"
+                    className="appearance-none pl-3 pr-8 py-1.5 rounded-xl text-[12px] font-semibold outline-none cursor-pointer"
                     style={{
-                      background: driverFilter ? "var(--accent-surface)" : "var(--surface-elevated)",
-                      border: `1px solid ${driverFilter ? "var(--accent-border)" : "var(--divider-strong)"}`,
-                      color: driverFilter ? "var(--primary)" : "var(--text-primary)",
+                      background: driverFilter ? "rgba(245,158,11,0.10)" : "var(--surface)",
+                      border: `1px solid ${driverFilter ? "rgba(245,158,11,0.30)" : "var(--divider-strong)"}`,
+                      color: driverFilter ? "#F59E0B" : "var(--text-secondary)",
                     }}
                   >
                     <option value="">{t("ratings.filters.allDrivers")}</option>
@@ -237,7 +256,7 @@ export default async function RatingsPage({
                       <option key={driver.id} value={driver.id}>{driver.name || driver.id.slice(0, 8)}</option>
                     ))}
                   </select>
-                  <SlidersHorizontal size={11} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
+                  <SlidersHorizontal size={10} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
                 </div>
               )}
 
@@ -245,11 +264,11 @@ export default async function RatingsPage({
                 <select
                   name="min_rating"
                   defaultValue={minRating || ""}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-xl text-[13px] font-semibold outline-none cursor-pointer transition-colors"
+                  className="appearance-none pl-3 pr-8 py-1.5 rounded-xl text-[12px] font-semibold outline-none cursor-pointer"
                   style={{
-                    background: minRating > 0 ? "var(--warning-surface)" : "var(--surface-elevated)",
-                    border: `1px solid ${minRating > 0 ? "var(--warning-border)" : "var(--divider-strong)"}`,
-                    color: minRating > 0 ? "var(--warning)" : "var(--text-primary)",
+                    background: minRating > 0 ? "rgba(245,158,11,0.10)" : "var(--surface)",
+                    border: `1px solid ${minRating > 0 ? "rgba(245,158,11,0.30)" : "var(--divider-strong)"}`,
+                    color: minRating > 0 ? "#F59E0B" : "var(--text-secondary)",
                   }}
                 >
                   <option value="">{t("ratings.filters.allRatings")}</option>
@@ -257,13 +276,13 @@ export default async function RatingsPage({
                   <option value="3">{t("ratings.filters.threePlus")} ★★★</option>
                   <option value="1">{t("ratings.filters.oneTwo")} ★★</option>
                 </select>
-                <Star size={11} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
+                <Star size={10} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-disabled pointer-events-none" />
               </div>
 
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-bold transition-all"
-                style={{ background: "var(--primary)", color: "var(--color-black)", border: "1px solid var(--primary)" }}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-[12px] font-bold"
+                style={{ background: "var(--primary)", color: "var(--color-black)" }}
               >
                 {t("ratings.filters.apply")}
               </button>
@@ -271,8 +290,8 @@ export default async function RatingsPage({
               {(driverFilter || minRating > 0) && (
                 <Link
                   href={`/dashboard/ratings?tab=${tab}`}
-                  className="px-4 py-2 rounded-xl text-[13px] font-semibold text-text-tertiary hover:text-text-secondary transition-colors"
-                  style={{ border: "1px solid var(--divider)", background: "var(--surface-elevated)" }}
+                  className="px-3 py-1.5 rounded-xl text-[12px] font-semibold text-text-tertiary hover:text-text-secondary transition-colors"
+                  style={{ border: "1px solid var(--divider)", background: "var(--surface)" }}
                 >
                   {t("ratings.filters.reset")}
                 </Link>
@@ -280,46 +299,153 @@ export default async function RatingsPage({
             </form>
           </div>
 
-          {/* Compact Rating Distribution */}
-          <div className="px-5 py-4">
-            <div className="flex items-end gap-2 h-20">
+          {/* Distribution body */}
+          <div className="flex flex-col md:flex-row">
+
+            {/* Left: hero score */}
+            <div
+              className="flex flex-col items-center justify-center gap-4 px-10 py-8 shrink-0"
+              style={{ borderInlineEnd: "1px solid var(--divider)", minWidth: "210px" }}
+            >
+              <div className="relative flex flex-col items-center gap-1">
+                <div
+                  className="absolute rounded-full blur-3xl opacity-20 pointer-events-none"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "radial-gradient(circle, #F59E0B 0%, transparent 70%)",
+                  }}
+                />
+                <span
+                  className="relative leading-none font-black tabular-nums"
+                  style={{
+                    fontSize: "80px",
+                    letterSpacing: "-5px",
+                    background: "linear-gradient(155deg, #F59E0B 0%, #FBBF24 45%, #FDE68A 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  {currentAvg}
+                </span>
+                <span className="relative text-[11px] font-semibold text-text-tertiary">
+                  {t("ratings.stats.average")}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((s) => {
+                  const filled = s <= Math.floor(avgFloat);
+                  const partial = !filled && s === Math.ceil(avgFloat) && avgFloat % 1 >= 0.5;
+                  const gradId = `hg-${tab}-${s}`;
+                  return (
+                    <svg key={s} width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {partial && (
+                        <defs>
+                          <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
+                            <stop offset="55%" stopColor="#F59E0B" />
+                            <stop offset="55%" stopColor="transparent" />
+                          </linearGradient>
+                        </defs>
+                      )}
+                      <polygon
+                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+                        fill={filled ? "#F59E0B" : partial ? `url(#${gradId})` : "transparent"}
+                        stroke={filled || partial ? "#F59E0B" : "#374151"}
+                        strokeWidth="1.8"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  );
+                })}
+              </div>
+
+              <div
+                className="px-4 py-1.5 rounded-full text-[11px] font-bold"
+                style={{
+                  background: "rgba(245,158,11,0.10)",
+                  color: "#F59E0B",
+                  border: "1px solid rgba(245,158,11,0.20)",
+                }}
+              >
+                {currentTotal.toLocaleString()} {t("ratings.stats.total").toLowerCase()}
+              </div>
+            </div>
+
+            {/* Right: horizontal bars */}
+            <div className="flex-1 flex flex-col justify-center gap-3.5 px-8 py-8">
               {[5, 4, 3, 2, 1].map((stars) => {
                 const count = currentCounts[stars as keyof typeof currentCounts];
-                const heightPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
-                const color = starColors[stars];
-                const rgb = starColorRaw[stars];
+                const pct = currentTotal > 0 ? Math.round((count / currentTotal) * 100) : 0;
+                const bc = barColors[stars];
                 const isActive = !minRating || Number(minRating) === stars || (minRating === 1 && stars <= 2);
+
                 return (
                   <Link
                     key={stars}
                     href={`/dashboard/ratings?tab=${tab}&min_rating=${stars}`}
-                    className="flex-1 flex flex-col items-center gap-1.5 group transition-all"
-                    title={`${stars} ★ — ${count}`}
+                    className="flex items-center gap-3 group"
                   >
-                    {/* Count label */}
-                    <span
-                      className="text-[10px] font-black transition-all"
-                      style={{ color: isActive ? color : "var(--text-disabled)" }}
-                    >
-                      {count}
-                    </span>
-                    {/* Bar */}
-                    <div className="w-full rounded-t-lg overflow-hidden" style={{ height: "48px", background: "var(--surface-elevated)" }}>
-                      <div
-                        className="w-full rounded-t-lg transition-all duration-500 group-hover:opacity-80"
-                        style={{
-                          height: `${Math.max(heightPct, 4)}%`,
-                          marginTop: `${100 - Math.max(heightPct, 4)}%`,
-                          background: isActive
-                            ? `linear-gradient(to top, rgba(${rgb},0.85), rgba(${rgb},0.50))`
-                            : "var(--divider)",
-                        }}
-                      />
+                    <div className="flex items-center gap-1 w-11 shrink-0" style={{ justifyContent: "flex-end" }}>
+                      <span
+                        className="text-[13px] font-black tabular-nums"
+                        style={{ color: isActive ? bc.label : "var(--text-disabled)" }}
+                      >
+                        {stars}
+                      </span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <polygon
+                          points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+                          fill={isActive ? bc.label : "#374151"}
+                          strokeWidth="0"
+                        />
+                      </svg>
                     </div>
-                    {/* Star label */}
-                    <div className="flex items-center gap-0.5">
-                      <span className="text-[10px] font-bold" style={{ color: isActive ? color : "var(--text-disabled)" }}>{stars}</span>
-                      <Star size={9} style={{ color: isActive ? color : "var(--text-disabled)" }} />
+
+                    <div
+                      className="relative flex-1 rounded-full overflow-hidden"
+                      style={{
+                        height: "11px",
+                        background: "var(--surface-elevated)",
+                        border: "1px solid var(--divider)",
+                      }}
+                    >
+                      {pct > 0 && (
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full"
+                          style={{
+                            width: `${pct}%`,
+                            background: isActive
+                              ? `linear-gradient(90deg, ${bc.from} 0%, ${bc.to} 100%)`
+                              : "var(--divider-strong)",
+                            boxShadow: isActive ? `0 0 12px ${bc.glow}` : "none",
+                            transition: "width 0.65s cubic-bezier(0.4, 0, 0.2, 1)",
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 w-24 shrink-0">
+                      <span
+                        className="text-[13px] font-black tabular-nums"
+                        style={{
+                          color: isActive ? bc.label : "var(--text-disabled)",
+                          minWidth: "28px",
+                          textAlign: "right",
+                        }}
+                      >
+                        {count}
+                      </span>
+                      <span
+                        className="text-[11px] font-semibold tabular-nums"
+                        style={{ color: isActive ? "var(--text-tertiary)" : "var(--text-disabled)" }}
+                      >
+                        {pct}%
+                      </span>
                     </div>
                   </Link>
                 );
@@ -328,7 +454,7 @@ export default async function RatingsPage({
           </div>
         </div>
 
-        {/* ── DRIVER RATINGS LIST ── */}
+        {/* DRIVER RATINGS LIST */}
         {tab === "driver_ratings" && (
           <div className="grid gap-3">
             {ratings.map((rating) => {
@@ -389,7 +515,7 @@ export default async function RatingsPage({
           </div>
         )}
 
-        {/* ── USER RATINGS LIST ── */}
+        {/* USER RATINGS LIST */}
         {tab === "user_ratings" && (
           <div className="grid gap-3">
             {userRatings.map((rating) => {
@@ -452,7 +578,7 @@ export default async function RatingsPage({
           </div>
         )}
 
-        {/* ── Empty State ── */}
+        {/* Empty State */}
         {((tab === "driver_ratings" && ratings.length === 0) || (tab === "user_ratings" && userRatings.length === 0)) && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}>
@@ -467,30 +593,81 @@ export default async function RatingsPage({
 
         {/* ── Pagination ── */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between">
-            <div className="text-[11px] text-text-tertiary">{t("common.page")} {page} {t("common.of")} {totalPages}</div>
-            <div className="flex gap-2">
-              {page > 1 && (
-                <Link
-                  href={`?tab=${tab}&page=${page - 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`}
-                  className="px-4 py-2 rounded-xl text-[12px] font-semibold text-text-secondary hover:text-text-primary transition-colors"
-                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}
-                >
-                  {t("common.previous")}
-                </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+
+            {/* Info */}
+            <p className="text-[12px] font-medium order-2 sm:order-1" style={{ color: "var(--text-tertiary)" }}>
+              {t("common.page")}{" "}
+              <span className="font-black" style={{ color: "var(--text-secondary)" }}>{page}</span>{" "}
+              {t("common.of")}{" "}
+              <span className="font-black" style={{ color: "var(--text-secondary)" }}>{totalPages}</span>
+              {" · "}
+              <span className="font-black" style={{ color: "var(--text-secondary)" }}>{currentTotal.toLocaleString()}</span>{" "}
+              {t("ratings.stats.total").toLowerCase()}
+            </p>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1 order-1 sm:order-2">
+
+              {/* Prev */}
+              <Link
+                href={`${baseHref}&page=${page - 1}`}
+                aria-label={t("common.previous")}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all${page <= 1 ? " pointer-events-none opacity-25" : ""}`}
+                style={{ border: "1px solid var(--divider)", background: "var(--surface)" }}
+              >
+                <ChevronRight size={15} style={{ color: "var(--text-secondary)" }} />
+              </Link>
+
+              {/* Page numbers with ellipsis */}
+              {pages.map((p, i) =>
+                p === "..." ? (
+                  <span
+                    key={`e${i}`}
+                    className="w-9 h-9 flex items-center justify-center text-[13px] font-bold"
+                    style={{ color: "var(--text-disabled)" }}
+                  >
+                    ···
+                  </span>
+                ) : (
+                  <Link
+                    key={p}
+                    href={`${baseHref}&page=${p}`}
+                    className="w-9 h-9 rounded-xl text-[13px] font-black flex items-center justify-center transition-all"
+                    style={
+                      p === page
+                        ? {
+                            background: "linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%)",
+                            color: "var(--color-white, #fff)",
+                            border: "1px solid var(--primary)",
+                            boxShadow: "0 4px 14px rgba(var(--primary-rgb),0.30)",
+                          }
+                        : {
+                            border: "1px solid var(--divider)",
+                            color: "var(--text-secondary)",
+                            background: "var(--surface)",
+                          }
+                    }
+                  >
+                    {p}
+                  </Link>
+                )
               )}
-              {page < totalPages && (
-                <Link
-                  href={`?tab=${tab}&page=${page + 1}${driverFilter ? `&driver_id=${driverFilter}` : ""}${minRating ? `&min_rating=${minRating}` : ""}`}
-                  className="px-4 py-2 rounded-xl text-[12px] font-semibold text-text-secondary hover:text-text-primary transition-colors"
-                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--divider)" }}
-                >
-                  {t("common.next")}
-                </Link>
-              )}
+
+              {/* Next */}
+              <Link
+                href={`${baseHref}&page=${page + 1}`}
+                aria-label={t("common.next")}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all${page >= totalPages ? " pointer-events-none opacity-25" : ""}`}
+                style={{ border: "1px solid var(--divider)", background: "var(--surface)" }}
+              >
+                <ChevronLeft size={15} style={{ color: "var(--text-secondary)" }} />
+              </Link>
+
             </div>
           </div>
         )}
+
       </div>
     </>
   );

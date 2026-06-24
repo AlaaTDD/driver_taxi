@@ -2,6 +2,7 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth-guard";
 import { logAdminAction, getIpFromRequest, getUserAgentFromRequest } from "@/lib/admin-logger";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { formDataToObject, parseRequest, safeHandler, uuidSchema, z } from "@/lib/api/validation";
 
 const DriverIdSchema = z.object({
@@ -14,6 +15,13 @@ export const POST = safeHandler(async (request: Request) => {
   if (guard instanceof Response) return guard;
 
   const formData = await request.formData();
+
+  // Optional redirect_back — validated to be a same-origin /dashboard/* path
+  // to prevent open-redirect attacks. Lets the driver detail page send the admin
+  // back to the detail view instead of the drivers list after verifying.
+  const rawRedirectBack = formData.get("redirect_back")?.toString() ?? "";
+  const safeRedirectBack = rawRedirectBack.startsWith("/dashboard/") ? rawRedirectBack : null;
+
   const parsed = parseRequest(DriverIdSchema, formDataToObject(formData));
   if (parsed.response) {
     return NextResponse.redirect(new URL("/dashboard/drivers?error=missing_id", request.url));
@@ -66,5 +74,14 @@ export const POST = safeHandler(async (request: Request) => {
     user_agent: getUserAgentFromRequest(request),
   });
 
-  return NextResponse.redirect(new URL("/dashboard/drivers?success=driver_verified", request.url));
+  revalidatePath("/dashboard/drivers");
+  revalidatePath("/dashboard/drivers/" + driverId);
+
+  if (safeRedirectBack) {
+    revalidatePath(safeRedirectBack);
+    const sep = safeRedirectBack.includes("?") ? "&" : "?";
+    return NextResponse.redirect(new URL(safeRedirectBack + sep + "success=driver_verified", request.url));
+  }
+
+  return NextResponse.redirect(new URL("/dashboard/drivers?success=driver_verified&tab=approved", request.url));
 });

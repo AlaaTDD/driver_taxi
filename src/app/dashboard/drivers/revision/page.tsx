@@ -5,9 +5,11 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Send } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 
 function DriverRevisionForm() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
   const driverId = searchParams.get("driver_id");
@@ -18,14 +20,16 @@ function DriverRevisionForm() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Field keys map to the actual drivers_profile columns. Labels come from the
+  // i18n `revision.fields` map (matches the DB column names).
   const fieldOptions = [
-    { key: "national_id_image_url", label: "صورة الهوية الوطنية" },
-    { key: "license_image_url", label: "صورة رخصة القيادة" },
-    { key: "criminal_record_url", label: "صحيفة الحالة الجنائية" },
-    { key: "vehicle_image_url", label: "صورة المركبة" },
-    { key: "vehicle_plate", label: "رقم اللوحة" },
-    { key: "national_id", label: "الرقم القومي" },
-    { key: "license_number", label: "رقم الرخصة" },
+    { key: "national_id_image_url" },
+    { key: "license_image_url" },
+    { key: "criminal_record_url" },
+    { key: "vehicle_image_url" },
+    { key: "vehicle_plate" },
+    { key: "national_id" },
+    { key: "license_number" },
   ];
 
   const toggleField = (key: string) => {
@@ -46,10 +50,11 @@ function DriverRevisionForm() {
       });
       if (res.ok) {
         setSaved(true);
-        setTimeout(() => router.push("/dashboard/drivers"), 1200);
+        toast.success(t("drivers.toast.revisionSent"));
+        setTimeout(() => router.push("/dashboard/drivers?tab=revision"), 1200);
       } else {
         const data = await res.json().catch(() => ({}));
-        toast.error("حدث خطأ: " + (data.error || "فشل إرسال الطلب"));
+        toast.error(`${t("revision.errorPrefix")}: ${data.error || t("revision.errorFallback")}`);
       }
     } finally {
       setLoading(false);
@@ -58,29 +63,29 @@ function DriverRevisionForm() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      
+
       <Link
         href="/dashboard/drivers"
         className="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary text-[13px] transition-colors"
       >
         <ArrowRight size={14} />
-        العودة للسائقين
+        {t("drivers.backToList")}
       </Link>
 
-      
+
       <div>
-        <h1 className="page-title">طلب مراجعة</h1>
+        <h1 className="page-title">{t("revision.title")}</h1>
         <p className="page-subtitle">
-          طلب مراجعة الوثائق للسائق: <span className="text-text-primary font-bold">{driverName || "—"}</span>
+          {t("revision.reviewDocumentsFor")}: <span className="text-text-primary font-bold">{driverName || "—"}</span>
         </p>
       </div>
 
       {!driverId ? (
         <div className="rounded-2xl p-8 text-center" style={{ border: "1px solid var(--divider)" }}>
-          <p className="text-text-tertiary">لم يتم تحديد سائق. يرجى الاختيار من قائمة السائقين.</p>
+          <p className="text-text-tertiary">{t("revision.noDriverSelected")}</p>
         </div>
       ) : (
-        
+
         <form
           onSubmit={handleSubmit}
           className="dash-card overflow-hidden"
@@ -94,14 +99,14 @@ function DriverRevisionForm() {
                 boxShadow: "0 0 8px var(--primary-surface)",
               }}
             />
-            <h3 className="text-[13px] font-bold text-text-primary">بيانات الطلب</h3>
+            <h3 className="text-[13px] font-bold text-text-primary">{t("revision.requestData")}</h3>
           </div>
 
           <div className="p-6 space-y-5">
-            
+
             <div>
               <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-3">
-                الحقول المطلوبة
+                {t("revision.requiredFields")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {fieldOptions.map((opt) => {
@@ -120,24 +125,24 @@ function DriverRevisionForm() {
                       }}
                     >
                       {active && <Check size={10} className="inline ml-1" />}
-                      {opt.label}
+                      {t(`revision.fields.${opt.key}`)}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            
+
             <div>
               <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-2">
-                رسالة للسائق
+                {t("revision.messageToDriver")}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={5}
-                placeholder="اكتب تفاصيل طلب المراجعة..."
+                placeholder={t("revision.messagePlaceholder")}
                 className="w-full px-4 py-3 rounded-xl text-[13px] outline-none resize-none transition-all leading-relaxed"
                 style={{
                   background: "var(--surface-glass)",
@@ -146,11 +151,11 @@ function DriverRevisionForm() {
                 }}
               />
               <div className="text-[10px] text-text-disabled mt-1 text-left">
-                {message.length} حرف
+                {message.length} {t("revision.charCount")}
               </div>
             </div>
 
-            
+
             <button
               type="submit"
               disabled={loading || fields.length === 0 || !message.trim()}
@@ -168,16 +173,16 @@ function DriverRevisionForm() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  جاري الإرسال...
+                  {t("revision.sending")}
                 </>
               ) : saved ? (
                 <>
-                  <Check size={15} />تم الإرسال بنجاح!
+                  <Check size={15} />{t("revision.sentSuccess")}
                 </>
               ) : (
                 <>
                   <Send size={15} />
-                  إرسال طلب المراجعة
+                  {t("revision.submitRequest")}
                 </>
               )}
             </button>
@@ -190,10 +195,11 @@ function DriverRevisionForm() {
 
 
 function Loading() {
+  const t = useTranslations();
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="rounded-2xl p-8 text-center" style={{ border: "1px solid var(--divider)" }}>
-        <p className="text-text-tertiary">جاري التحميل...</p>
+        <p className="text-text-tertiary">{t("revision.loading")}</p>
       </div>
     </div>
   );

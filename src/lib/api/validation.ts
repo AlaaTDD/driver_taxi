@@ -3,7 +3,14 @@ import { z } from "zod";
 
 export { z };
 
-export const uuidSchema = z.string().trim().uuid();
+// z.string().uuid() enforces RFC 4122 version/variant bits and rejects valid
+// Postgres UUIDs whose version or variant nibble falls outside the RFC range
+// (e.g. seed/test UUIDs like bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb).
+// We validate shape only: 8-4-4-4-12 lowercase/uppercase hex groups.
+const UUID_RE = new RegExp(
+  "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+);
+export const uuidSchema = z.string().trim().refine((v) => UUID_RE.test(v), { message: "Invalid UUID" });
 // [P0-07 FIX] Removed "driver" — driver role is managed via drivers_profile table
 // (verify/revoke RPCs). Setting role=driver here would orphan the user from
 // the drivers_profile lifecycle, causing inconsistent state.

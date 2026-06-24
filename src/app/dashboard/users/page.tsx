@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 const STAT_COLORS = {
   users:      { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
   blocked:    { accent: "var(--error)", glow: "rgba(var(--error-rgb),0.14)", border: "rgba(var(--error-rgb),0.2)" },
-  supervisor: { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
-  admin:      { accent: "var(--primary)", glow: "rgba(var(--primary-rgb),0.14)", border: "rgba(var(--primary-rgb),0.2)" },
+  supervisor: { accent: "var(--color-purple)", glow: "rgba(var(--color-purple-rgb),0.14)", border: "rgba(var(--color-purple-rgb),0.2)" },
+  admin:      { accent: "var(--color-orange)", glow: "rgba(var(--color-orange-rgb),0.14)", border: "rgba(var(--color-orange-rgb),0.2)" },
 };
 
 export default async function UsersPage({
@@ -101,23 +101,24 @@ export default async function UsersPage({
       <div className="space-y-6">
 
         {/* ── Page header ──────────────────────────────────── */}
-        <div className="flex items-start justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
+        <div className="dash-page-header">
+          <div className="flex items-center gap-4">
             {/* icon badge */}
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
               style={{
-                background: "var(--accent-surface)",
+                background: "linear-gradient(135deg, var(--accent-surface), var(--accent-surface-strong))",
                 border: "1px solid var(--accent-border)",
+                boxShadow: "0 4px 14px rgba(var(--primary-rgb), 0.18)",
               }}
             >
-              <Users size={18} style={{ color: "var(--primary)" }} />
+              <Users size={20} style={{ color: "var(--primary)" }} />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+              <h1 className="text-[22px] font-black tracking-tight text-text-primary leading-tight">
                 {t("users.title")}
               </h1>
-              <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>
+              <p className="text-[13px] text-text-tertiary mt-0.5">
                 {t("users.subtitle")}
               </p>
             </div>
@@ -139,18 +140,19 @@ export default async function UsersPage({
         </div>
 
         {/* ── Stats grid ───────────────────────────────────── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map((stat) => {
             const c = STAT_COLORS[stat.key];
             return (
               <div
                 key={stat.key}
-                className="group relative overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 dash-stat"
+                className="group relative overflow-hidden dash-stat"
+                style={{ borderTop: `2px solid ${c.accent}` }}
               >
-                {/* icon + value */}
-                <div className="relative flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  {/* icon badge */}
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
                     style={{
                       background: c.glow,
                       border: `1px solid ${c.border}`,
@@ -159,24 +161,23 @@ export default async function UsersPage({
                   >
                     {stat.icon}
                   </div>
-                  <span
-                    className="text-[28px] leading-none font-black num tabular-nums"
-                    style={{ color: c.accent }}
-                  >
-                    {stat.value}
-                  </span>
-                </div>
 
-                {/* labels */}
-                <div>
-                  <p className="text-[12px] font-bold" style={{ color: "var(--text-primary)" }}>
-                    {stat.label}
-                  </p>
-                  <p className="text-[10px] mt-0.5" style={{ color: "var(--text-disabled)" }}>
-                    {stat.subLabel}
-                  </p>
+                  {/* value + labels */}
+                  <div className="min-w-0 flex-1">
+                    <span
+                      className="text-[22px] leading-none font-black num tabular-nums"
+                      style={{ color: c.accent }}
+                    >
+                      {stat.value}
+                    </span>
+                    <p className="text-[12px] font-bold mt-0.5 truncate" style={{ color: "var(--text-primary)" }}>
+                      {stat.label}
+                    </p>
+                    <p className="text-[10px] truncate" style={{ color: "var(--text-disabled)" }}>
+                      {stat.subLabel}
+                    </p>
+                  </div>
                 </div>
-
               </div>
             );
           })}

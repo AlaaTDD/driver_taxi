@@ -15,11 +15,12 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
-  AlertTriangle,
   Activity,
   BarChart2,
   ArrowUpRight,
   UserCheck,
+  Gauge,
+  ArrowLeftRight,
 } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 import { getAppCurrency } from "@/lib/currency";
@@ -158,228 +159,208 @@ export default async function DashboardPage() {
 
   const completionRate = totalTrips > 0 ? Math.round((completedTrips / totalTrips) * 100) : 0;
   const acceptanceRate = totalTrips > 0 ? Math.round(((totalTrips - cancelledTrips) / totalTrips) * 100) : 0;
-  const recentCompletedTrips = recentTrips.filter((trip) => trip.status === "completed").length;
-  const recentActiveTrips = recentTrips.filter((trip) => !["completed", "cancelled"].includes(trip.status)).length;
 
   return (
-    <>
-      <div className="space-y-6">
+    <div className="space-y-5">
 
-        {/* ─── PAGE HEADER ──────────────────────────────────────── */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-[28px] font-black tracking-tight text-text-primary leading-tight">
-              {t("dashboard.overview")}
-            </h1>
-            <p className="text-[14px] text-text-tertiary leading-relaxed">
-              {t("dashboard.welcome")}
-            </p>
-          </div>
-          <div className="flex flex-col sm:items-end gap-2 mt-2 sm:mt-0">
-            <LocalTimeDisplay />
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary">
-                <Activity size={13} />
-                {totalTrips} {t("dashboard.charts.tripsLabel")}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
-                <CheckCircle size={13} />
-                {completionRate}%
-              </span>
-            </div>
-          </div>
+      {/* ═══════════════════════════════════════════════════════════════════
+          ROW 1 — PAGE HEADER
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-[26px] font-black tracking-tight text-text-primary leading-tight">
+            {t("dashboard.overview")}
+          </h1>
+          <p className="text-[13px] text-text-tertiary leading-relaxed mt-1">
+            {t("dashboard.welcome")}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <LocalTimeDisplay />
+          <span className="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary">
+            <Activity size={13} />
+            {totalTrips} {t("dashboard.charts.tripsLabel")}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-xl border border-success/20 bg-success/10 px-3 py-1.5 text-[11px] font-black text-success">
+            <CheckCircle size={13} />
+            {completionRate}%
+          </span>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          ROW 2 — PRIMARY STAT CARDS (4 columns)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title={t("dashboard.stats.totalUsers")}
+          value={totalUsers}
+          icon={<Users size={18} strokeWidth={2.5} />}
+          colorVariant="primary"
+          subtitle={t("dashboard.stats.activeUsers")}
+        />
+        <StatCard
+          title={t("dashboard.stats.totalDrivers")}
+          value={totalDrivers}
+          icon={<Car size={18} strokeWidth={2.5} />}
+          colorVariant="info"
+          subtitle={`${availableDrivers} ${t("dashboard.stats.availableDriversSubtitle")}`}
+        />
+        <StatCard
+          title={t("dashboard.stats.activeTrips")}
+          value={activeTrips}
+          icon={<MapPin size={18} strokeWidth={2.5} />}
+          colorVariant="success"
+          subtitle={activeTrips === 0 ? t("dashboard.stats.noActiveTrips") : undefined}
+        />
+        <StatCard
+          title={t("dashboard.stats.totalRevenue")}
+          value={formatCurrency(totalRevenue, currency, locale)}
+          icon={<DollarSign size={18} strokeWidth={2.5} />}
+          colorVariant="warning"
+        />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          ROW 3 — CHARTS + KPI PANEL (7+5 split)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+        {/* ── LEFT: Trips Status Chart (takes 7 cols) ── */}
+        <div className="xl:col-span-7">
+          <ChartCard title={t("dashboard.charts.tripsByStatus")} icon={<BarChart2 size={16} />}>
+            <TripsStatusChart data={statusChartData} />
+          </ChartCard>
         </div>
 
-        {/* ─── PRIMARY STAT CARDS ── 4 cards matching design (RTL order) ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1 (rightmost in RTL): إجمالي المستخدمين */}
-          <StatCard
-            title={t("dashboard.stats.totalUsers")}
-            value={totalUsers}
-            icon={<Users size={24} strokeWidth={2.5} />}
-            colorVariant="primary"
-            showSparkline
-            subtitle={t("dashboard.stats.activeUsers")}
-          />
-          {/* Card 2: إجمالي السائقين */}
-          <StatCard
-            title={t("dashboard.stats.totalDrivers")}
-            value={totalDrivers}
-            icon={<Car size={24} strokeWidth={2.5} />}
-            colorVariant="info"
-            subtitle={`${availableDrivers} ${t("dashboard.stats.availableDriversSubtitle")}`}
-          />
-          {/* Card 3: رحلات نشطة */}
-          <StatCard
-            title={t("dashboard.stats.activeTrips")}
-            value={activeTrips}
-            icon={<MapPin size={24} strokeWidth={2.5} />}
-            colorVariant="success"
-            showSparkline
-            subtitle={activeTrips === 0 ? t("dashboard.stats.noActiveTrips") : undefined}
-          />
-          {/* Card 4 (leftmost in RTL): إجمالي الإيرادات */}
-          <StatCard
-            title={t("dashboard.stats.totalRevenue")}
-            value={formatCurrency(totalRevenue, currency, locale)}
-            icon={<DollarSign size={24} strokeWidth={2.5} />}
-            colorVariant="primary"
-            showSparkline
-          />
-        </div>
-
-        {/* ─── KPI STRIP ── Operational Performance Indicators ───── */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-2">
-              <Activity size={16} className="text-primary" />
-              <h2 className="text-[15px] font-bold text-text-primary">{t("dashboard.operationalKPIs")}</h2>
+        {/* ── RIGHT: Performance KPIs (takes 5 cols) ── */}
+        <div className="xl:col-span-5 dash-card">
+          <div className="dash-section-header">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+              <Gauge size={16} className="text-primary" />
             </div>
+            <h3 className="text-sm font-bold text-text-primary">{t("dashboard.operationalKPIs")}</h3>
           </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Available Drivers */}
+          <div className="p-3 flex flex-col divide-y divide-divider">
             <KpiCard
               label={t("dashboard.kpis.availableDrivers")}
               value={availableDrivers}
               suffix={`${t("dashboard.kpis.outOf")} ${totalDrivers}`}
-              icon={<UserCheck size={18} strokeWidth={2.5} />}
+              icon={<UserCheck size={16} strokeWidth={2.5} />}
               colorVariant="success"
               progress={totalDrivers > 0 ? (availableDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.onlineNow")}
             />
-
-            {/* Pending Drivers */}
             <KpiCard
               label={t("dashboard.kpis.pendingDrivers")}
               value={pendingDrivers}
-              icon={<Clock size={18} strokeWidth={2.5} />}
+              icon={<Clock size={16} strokeWidth={2.5} />}
               colorVariant="warning"
               progress={totalDrivers > 0 ? (pendingDrivers / totalDrivers) * 100 : 0}
               sublabel={t("dashboard.kpis.awaitingReview")}
             />
-
-            {/* Completion Rate */}
             <KpiCard
               label={t("dashboard.kpis.completionRate")}
               value={`${completionRate}%`}
-              icon={<AlertTriangle size={18} strokeWidth={2.5} />}
+              icon={<CheckCircle size={16} strokeWidth={2.5} />}
               colorVariant="success"
               progress={completionRate}
               sublabel={t("dashboard.kpis.ofTotalTrips")}
             />
-
-            {/* Acceptance Rate */}
             <KpiCard
               label={t("dashboard.kpis.acceptanceRate")}
               value={`${acceptanceRate}%`}
-              icon={<TrendingUp size={18} strokeWidth={2.5} />}
+              icon={<TrendingUp size={16} strokeWidth={2.5} />}
               colorVariant="primary"
               progress={acceptanceRate}
               sublabel={t("dashboard.kpis.ofTotalRequests")}
             />
           </div>
         </div>
+      </div>
 
-        {/* ─── CHARTS ──────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ChartCard title={t("dashboard.charts.tripsByStatus")} icon={<BarChart2 size={16} />}>
-            <TripsStatusChart data={statusChartData} />
-          </ChartCard>
-          <ChartCard title={t("dashboard.charts.revenueByVehicle")} icon={<BarChart2 size={16} />}>
+      {/* ═══════════════════════════════════════════════════════════════════
+          ROW 4 — REVENUE CHART + RECENT TRIPS (7+5 split)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+        {/* ── LEFT: Revenue Chart (takes 7 cols) ── */}
+        <div className="xl:col-span-7">
+          <ChartCard title={t("dashboard.charts.revenueByVehicle")} icon={<DollarSign size={16} />}>
             <RevenueChart data={revenueChartData} currency={currency} />
           </ChartCard>
         </div>
 
-        {/* ─── RECENT TRIPS TABLE ──────────────────────────────────── */}
-        <div className="rounded-2xl border border-divider bg-surface-elevated shadow-sm flex flex-col">
-          <div className="px-5 py-4 border-b border-divider flex items-center justify-between bg-surface/50">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-                <MapPin size={16} className="text-primary" />
-              </div>
-              <div>
-                <h3 className="text-[15px] font-black text-text-primary leading-none">{t("dashboard.recentTrips")}</h3>
-                <p className="mt-1 text-[12px] font-medium text-text-tertiary">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
-              </div>
+        {/* ── RIGHT: Recent Trips (takes 5 cols) ── */}
+        <div className="xl:col-span-5 dash-card flex flex-col">
+          <div className="dash-section-header">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+              <ArrowLeftRight size={16} className="text-primary" />
             </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/dashboard/trips"
-                className="group flex items-center gap-1.5 rounded-lg border border-divider bg-surface px-3 py-1.5 text-[12px] font-bold text-text-secondary transition-all hover:border-accent-border hover:bg-surface-elevated hover:text-text-primary"
-              >
-                {t("common.view")}
-                <ArrowUpRight size={13} className="text-text-tertiary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-              </Link>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-text-primary leading-none">{t("dashboard.recentTrips")}</h3>
+              <p className="text-[11px] text-text-tertiary mt-0.5">{t("dashboard.recentTripsSubtitle", { count: recentTrips.length })}</p>
             </div>
+            <Link
+              href="/dashboard/trips"
+              className="group flex items-center gap-1 rounded-lg border border-divider bg-surface px-2.5 py-1 text-[11px] font-bold text-text-secondary transition-all hover:border-accent-border hover:bg-surface-elevated hover:text-text-primary"
+            >
+              {t("common.viewAll")}
+              <ArrowUpRight size={12} className="text-text-tertiary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+            </Link>
           </div>
 
-          <div className="p-4 flex flex-col gap-3">
+          {/* ── Trip list ── */}
+          <div className="flex-1 overflow-y-auto">
             {recentTrips.length > 0 ? (
-              recentTrips.map((trip) => (
-                <div
-                  key={trip.id}
-                  className="group relative flex flex-col sm:flex-row justify-between p-3.5 rounded-xl border border-divider bg-surface transition-all duration-300 hover:border-primary/30 hover:bg-surface-elevated hover:shadow-md"
-                >
-                  {/* Left: Route (Primary Focus) */}
-                  <div className="flex items-stretch gap-3.5 flex-1 min-w-0">
-                    <div className="flex flex-col items-center pt-1.5 pb-1 w-4 shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full bg-success ring-4 ring-success/10" />
-                      <div className="w-[1.5px] grow my-1.5 bg-gradient-to-b from-success/10 to-primary/10" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-primary/10" />
-                    </div>
-                    
-                    <div className="flex flex-col justify-between py-0.5 min-w-0">
-                      <div className="mb-4">
-                        <p className="text-[13px] font-black text-text-primary truncate">{trip.pickup_address || "-"}</p>
-                        <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.from")}</p>
+              <div className="divide-y divide-table-row-border">
+                {recentTrips.slice(0, 6).map((trip) => (
+                  <Link
+                    key={trip.id}
+                    href={`/dashboard/trips/${trip.id}`}
+                    className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-table-row-hover"
+                  >
+                    {/* ── Route dots + addresses ── */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className="w-[7px] h-[7px] rounded-full bg-success" />
+                        <div className="w-px h-5 bg-divider" />
+                        <div className="w-[7px] h-[7px] rounded-full bg-primary" />
                       </div>
-                      <div>
-                        <p className="text-[13px] font-black text-text-primary truncate">{trip.destination_address || "-"}</p>
-                        <p className="text-[11px] font-bold text-text-tertiary mt-0.5">{t("trips.to")}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right: Data & Actions (Stacked) */}
-                  <div className="flex flex-col items-end justify-between shrink-0 pl-4 mt-3 sm:mt-0 sm:border-l border-divider gap-3">
-                    <div className="flex flex-col items-end gap-1.5 w-full">
-                      <div className="flex items-center gap-2 justify-end w-full">
-                        <span className="text-[15px] font-black num tracking-tight text-text-primary">
-                          {formatCurrency(Number(trip.price), currency, locale)}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
-                          {getStatusLabel(trip.status, t)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-text-tertiary group-hover:text-text-secondary transition-colors">
-                        <Clock size={12} />
-                        <span className="text-[11px] font-bold">{formatDate(trip.created_at, locale)}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-bold text-text-primary truncate leading-tight">
+                          {trip.pickup_address || "-"}
+                        </p>
+                        <p className="text-[11px] text-text-tertiary truncate leading-tight mt-1">
+                          {trip.destination_address || "-"}
+                        </p>
                       </div>
                     </div>
 
-                    <Link
-                      href={`/dashboard/trips/${trip.id}`}
-                      className="mt-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg border transition-all hover:shadow-sm table-action"
-                    >
-                      {t("common.view")}
-                      <ArrowUpRight size={13} />
-                    </Link>
-                  </div>
-                </div>
-              ))
+                    {/* ── Price + Status ── */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[13px] font-black num tracking-tight text-text-primary">
+                        {formatCurrency(Number(trip.price), currency, locale)}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${getStatusColor(trip.status)}`}>
+                        {getStatusLabel(trip.status, t)}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             ) : (
-              <div className="py-16 text-center flex flex-col items-center gap-3">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated border border-divider shadow-sm">
-                  <MapPin size={24} className="text-text-disabled" />
+              <div className="py-12 text-center flex flex-col items-center gap-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-elevated border border-divider">
+                  <MapPin size={20} className="text-text-disabled" />
                 </div>
-                <p className="text-sm font-bold text-text-disabled">{t("common.noData")}</p>
+                <p className="text-[12px] font-bold text-text-disabled">{t("common.noData")}</p>
               </div>
             )}
           </div>
         </div>
-
       </div>
-    </>
+
+    </div>
   );
 }

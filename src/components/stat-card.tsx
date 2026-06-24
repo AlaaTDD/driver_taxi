@@ -21,94 +21,33 @@ export function StatCard({
   value,
   icon,
   colorVariant = "primary",
-  trend,
   className,
   subtitle,
-  showSparkline,
-  trendPercent,
-  trendUp = true,
 }: StatCardProps) {
   const colors = COLOR_MAP[colorVariant];
-  const sparkColor = colors.var;
-  const gradientId = `spark-grad-${title.replace(/[^\w-]+/g, "-")}`;
 
   return (
     <div
       className={cn(
-        "dash-stat group relative overflow-hidden transition-all duration-300 cursor-default",
-        "hover:-translate-y-0.5",
+        "dash-metric-card group relative overflow-hidden transition-all duration-200 cursor-default",
         className
       )}
     >
+      {/* ── Top accent bar ── */}
+      <div
+        className="absolute top-0 inset-x-0 h-[3px] rounded-t-[14px]"
+        style={{
+          background: `linear-gradient(90deg, ${colors.var}, transparent 80%)`,
+        }}
+      />
+
       <div className="relative p-5 z-10">
         {/* Top row: title + icon */}
-        <div className="flex items-start justify-between gap-3">
-          {/* Left: title + value */}
-          <div className="flex-1 min-w-0">
-            <p className="text-text-tertiary text-[12px] font-semibold mb-2">{title}</p>
-            <div className="text-[28px] font-black tracking-tight text-text-primary leading-none num">
-              {value}
-            </div>
-            {subtitle && (
-              <p className="mt-2 truncate text-[11px] font-semibold text-text-tertiary">
-                {subtitle}
-              </p>
-            )}
-
-            {/* Trend percentage */}
-            {trendPercent && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <span
-                  className="text-[12px] font-bold flex items-center gap-0.5"
-                  style={{ color: trendUp ? "var(--success)" : "var(--error)" }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ transform: trendUp ? "none" : "rotate(180deg)" }}>
-                    <path d="M6 2L10 7H2L6 2Z" fill="currentColor" />
-                  </svg>
-                  {trendPercent}
-                </span>
-              </div>
-            )}
-
-            {/* Sparkline mini chart */}
-            {showSparkline && (
-              <svg className="mt-3 w-full h-[32px]" viewBox="0 0 120 32" fill="none" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={sparkColor} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={sparkColor} stopOpacity="0.01" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4"
-                  stroke={sparkColor}
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  opacity="0.9"
-                  className="sparkline-path"
-                  style={{ "--spark-rgb": colors.rgb } as React.CSSProperties}
-                />
-                <path
-                  d="M0 28 Q10 20 20 22 Q30 24 40 18 Q50 12 60 16 Q70 20 80 10 Q90 5 100 8 Q110 11 120 4 L120 32 L0 32 Z"
-                  fill={`url(#${gradientId})`}
-                />
-              </svg>
-            )}
-
-            {/* Trend info */}
-            {trend && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <span className={cn("text-[12px] font-bold num", colors.text)}>{trend.value}</span>
-                <span className="text-[11px] text-text-tertiary">{trend.label}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Right: big colored icon box */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <p className="text-[12px] font-semibold text-text-tertiary leading-none">{title}</p>
           <div
             className={cn(
-              "relative flex-shrink-0 w-[52px] h-[52px] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105",
+              "flex-shrink-0 w-[34px] h-[34px] rounded-xl flex items-center justify-center transition-all duration-200",
               colors.bg,
               colors.border,
               colors.text,
@@ -119,17 +58,26 @@ export function StatCard({
           </div>
         </div>
 
-        {/* Bottom bar indicator */}
-        {!showSparkline && !trendPercent && !trend && (
-          <div
-            className="mt-4 h-[3px] rounded-full opacity-30"
-            style={{ 
-              background: `linear-gradient(to left, transparent, ${sparkColor})`,
-              width: "60%",
-            }}
-          />
+        {/* Value */}
+        <div className="text-[30px] font-black tracking-tight text-text-primary leading-none num mb-2">
+          {value}
+        </div>
+
+        {/* Subtitle */}
+        {subtitle && (
+          <p className="text-[11px] font-semibold text-text-tertiary leading-relaxed">
+            {subtitle}
+          </p>
         )}
       </div>
+
+      {/* ── Hover glow ── */}
+      <div
+        className="absolute bottom-0 right-0 w-32 h-32 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 100% 100%, ${colors.var}15, transparent 70%)`,
+        }}
+      />
     </div>
   );
 }

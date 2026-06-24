@@ -422,8 +422,6 @@
     "confirmRevokeTitle": "Revoke Verification",
     "confirmRevokeMessage": "Do you want to revoke this driver's verification? They won't receive trip requests until re-verified.",
     "confirmBlockTitle": "Block Driver",
-    "confirmBlockMessage": "Do you want to block this driver? They will lose account access and won't receive trip requests immediately.",
-    "confirmUnblockTitle": "Unblock Driver",
     "confirmUnblockMessage": "Do you want to unblock this driver? They will regain account access immediately.",
     "confirmResolveTitle": "Resolve Revision Request",
     "confirmResolveMessage": "Do you want to resolve this revision request? Its status will be updated.",

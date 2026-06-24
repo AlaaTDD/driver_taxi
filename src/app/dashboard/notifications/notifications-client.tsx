@@ -114,6 +114,7 @@ export default function NotificationsClient({
             <button
               onClick={() => currentPage > 1 && updateParams("page", String(currentPage - 1))}
               disabled={currentPage <= 1}
+              aria-label="السابق"
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ ...selectStyle, cursor: currentPage <= 1 ? "not-allowed" : "pointer", color: currentPage <= 1 ? "var(--text-disabled)" : "var(--text-secondary)" }}
             >
@@ -136,6 +137,7 @@ export default function NotificationsClient({
             <button
               onClick={() => currentPage < totalPages && updateParams("page", String(currentPage + 1))}
               disabled={currentPage >= totalPages}
+              aria-label="التالي"
               className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ ...selectStyle, cursor: currentPage >= totalPages ? "not-allowed" : "pointer", color: currentPage >= totalPages ? "var(--text-disabled)" : "var(--text-secondary)" }}
             >
@@ -169,6 +171,7 @@ export default function NotificationsClient({
                 </div>
                 <button
                   onClick={() => setShowSendModal(false)}
+                  aria-label="إغلاق"
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-text-tertiary hover:text-text-primary transition-colors"
                   style={{ background: "var(--surface-glass)", border: "1px solid var(--divider)" }}
                 >

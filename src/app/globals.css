@@ -1889,7 +1889,8 @@ body {
 
 .dark .dash-card,
 .dark .dash-stat,
-.dark .dash-table-card {
+.dark .dash-table-card,
+.dark .dash-metric-card {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), var(--shadow-sm);
 }
 
@@ -1955,6 +1956,21 @@ body {
 
 .dash-stat:hover {
   border-color: var(--divider-strong);
+}
+
+/* Metric card — new stat card design */
+.dash-metric-card {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  box-shadow: none;
+  overflow: hidden;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.dash-metric-card:hover {
+  border-color: var(--divider-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Section header bar */

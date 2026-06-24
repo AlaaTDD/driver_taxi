@@ -70,6 +70,12 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
       },
     ],
+    // placehold.co returns SVG placeholder images — allow them.
+    // contentDispositionType + contentSecurityPolicy sandbox the SVG so it
+    // cannot execute scripts even if the CDN were compromised.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 

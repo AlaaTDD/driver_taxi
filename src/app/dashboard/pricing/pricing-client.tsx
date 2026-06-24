@@ -338,6 +338,7 @@ export default function PricingClient({ configs, currency }: PricingClientProps)
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
+                aria-label={t("common.close")}
                 className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-elevated text-text-tertiary hover:text-error transition-colors"
               >
                 <X size={18} />

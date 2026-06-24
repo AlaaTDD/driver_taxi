@@ -370,6 +370,7 @@ export function ChatButton({ props }: { props: ChatModalProps }) {
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
+                  aria-label="إغلاق"
                   className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:bg-surface-glass"
                   style={{ color: "var(--text-tertiary)" }}
                 >
@@ -504,6 +505,7 @@ export function ChatButton({ props }: { props: ChatModalProps }) {
                   <button
                     onClick={handleSend}
                     disabled={sending || !newMessage.trim()}
+                    aria-label="إرسال"
                     className="w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all hover:scale-105 disabled:opacity-40 disabled:scale-100 shrink-0 mb-0.5"
                     style={{
                       background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",

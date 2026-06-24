@@ -118,6 +118,7 @@ export default function BonusesClient() {
               </h2>
               <button
                 onClick={() => { setIsModalOpen(false); setEditTarget(null); }}
+                aria-label="إغلاق"
                 className="text-text-tertiary hover:text-primary"
               >
                 <X size={20} />

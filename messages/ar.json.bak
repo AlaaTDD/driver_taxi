@@ -422,8 +422,6 @@
     "confirmRevokeTitle": "سحب الاعتماد",
     "confirmRevokeMessage": "هل تريد سحب اعتماد هذا السائق؟ لن يتمكن من استقبال الطلبات حتى يُعاد اعتماده.",
     "confirmBlockTitle": "حظر السائق",
-    "confirmBlockMessage": "هل تريد حظر هذا السائق؟ سيفقد القدرة على استقبال الطلبات والوصول لحسابه فوراً.",
-    "confirmUnblockTitle": "فك الحظر",
     "confirmUnblockMessage": "هل تريد فك الحظر عن هذا السائق؟ سيستعيد وصوله للحساب فوراً.",
     "confirmResolveTitle": "إنهاء طلب المراجعة",
     "confirmResolveMessage": "هل تريد إنهاء طلب المراجعة؟ سيتم تحديث حالته.",
